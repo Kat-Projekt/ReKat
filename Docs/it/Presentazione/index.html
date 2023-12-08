@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<link rel="icon" sizes="16x16 24x24 32x32 48x48 64x64" href="favicon.ico">
+	<link rel="stylesheet" href="index.css">
+    <script defer src="index.js"></script>
+
+    <title>ReKat</title>
+</head>
+<body class="panel PCB" >
+    <div class="panel hide round"> <div id="content" class="animated panel">
+        <div class="panel flex ver_center PC1"> <h4>ReKat:</h4> <h2>Guida di installazione</h2> </div>
+        <div class="panel center PC2"> <h1>GitHub</h1> 
+            <p>Per prima dobbiamo ottenere il codice sorgente.
+            <br><br>Il metodo più veloce è tramite <a href="https://desktop.github.com/">GitHub</a>
+            <br><br>Installato il programma possiamo scaricare il codice.
+            <br><br>Aggiungiamo una Repository con il seguente percorso <a href="https://github.com/ELDRON64/ReKat">https://github.com/ELDRON64/ReKat</a>
+        </p> </div>
+        <div class="panel center PC3"> <h1>CMake</h1>
+            <p>Ottenuto il codice dobbiamo trovare un modo per eseguirlo.
+            <br><br>A questo scopo ci arriva in aiuto <a href="https://cmake.org/download/">CMake</a>.
+            <br><br>CMake genera un particolare tipo di file chiamato <a href="https://it.wikipedia.org/wiki/Make">Makefile</a> 
+            <br><br>Questo file ha lo scopo di dare ad un compilatore tutte le istruzioni che gli servono per creare l'eseguibile.
+        </p> </div>
+        <div class="panel center PC4"> <h1>MinGw</h1>
+            <p>Però CMake non lavora a da solo. Ha bisogno di un compilatore, nel nostro caso utilizzeremo un compilatore per il linguaggio c/c++
+            <br><br>Per i sistemi Windows utilizzeremo <a href="https://winlibs.com/">MinGw</a>
+            <br><br>Per i sistemi Unix utilizzeremo <a href="https://gcc.gnu.org/">gcc</a>
+        </p> </div>
+        <div class="panel center PC5"> <h1>Preparazione</h1>
+            <p>Prima di poter compilare il programma dobbiamo preparare il nostro Computer:
+            <br><br>Pre iniziare dobbiamo aggiungere CMake e il compilatore a PATH ( per i sistemi Windows ).
+            <br>Cerchiamo sul menù di ricerca: <a href="https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/path">PATH</a>, e apriamo il programma "Modifica le Variabili di ambiente per l'account"
+            <br><br>selezioniamo PATH e Aggiungiamo 2 nuovi valori:
+            <br>&emsp; Il percorso per MinGW
+            <br>&emsp; Il percorso per CMake
+        </p></div>
+        <div class="panel center PC6"> <h1>Configurazione</h1>
+            <p>Per Configurare il programma usiamo i seguenti passi:
+            <br><br>Apriamo il programma CMake-gui
+            <br><br>Scegliamo la cartella dove abbiamo scaricato il codice sorgente e la cartella dove vogliamo installare il programma
+            <br><br>Premiamo su "Configurate" e selezioniamo MinGW Makefiles con default compilers
+            <br><br>Finita la configurazione possiamo generare il progetto con "Gemerate".
+        </p></div>
+        <div class="panel center PC3"> <h1>Compilazione</h1>
+            <p>Ora possiamo finalmente compilare il programma
+            <br><br>Ora apriamo un terminale di <a href="https://learn.microsoft.com/it-it/powershell/scripting/overview?view=powershell-7.3">Powershell</a>: Win + powershell e eseguiamo i seguenti comandi:
+            <br>&emsp; $ <a href="https://learn.microsoft.com/it-it/windows-server/administration/windows-commands/cd">cd</a> "cartella di instalazione"
+            <br>&emsp; $ mingw64-make
+            <br><br>Con questi comandi abbiamo creato il programma e ora possiamo eseguirlo.
+        </p> </div>
+        <div class="panel center PC1"> <h1>Utilizzo</h1>
+            <p>Per avviare il programma nella stessa powershell che abbiamo usato prima digitiamo: 
+            <br>&emsp; $ cd Build/ReKat
+            <br>&emsp; $ .\ReKat
+            <br><br>con questo abbiamo avviato il programma.
+            
+        </p> </div>
+    </div> </div>
+
+    <div id="button_container">
+        <div onclick="previous();" class="button round"><img src="Arrow.png" alt="+--" style="transform: scaleX(-1)"></div>
+        <div onclick="next();" class="button round"><img src="Arrow.png" alt="--+"></div>
+    </div>
+</body>
+</html>

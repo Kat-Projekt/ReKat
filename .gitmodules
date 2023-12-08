@@ -1,15 +1,16 @@
-[submodule "Code/Libs/glfw"]
-	path = Code/Libs/glfw
+[submodule "Code/Lib/glfw"]
+	path = Code/Lib/glfw
 	url = https://github.com/glfw/glfw
-[submodule "Code/Libs/stb"]
-	path = Code/Libs/stb
+[submodule "Code/Lib/stb"]
+	path = Code/Lib/stb
 	url = https://github.com/nothings/stb
-[submodule "Code/Libs/glad"]
-	path = Code/Libs/glad
-	url = https://github.com/Dav1dde/glad
-[submodule "Code/Libs/freetype"]
-	path = Code/Libs/freetype
+[submodule "Code/Lib/freetype"]
+	path = Code/Lib/freetype
 	url = https://github.com/freetype/freetype.git
-[submodule "Code/Libs/glm"]
-	path = Code/Libs/glm
+[submodule "Code/Lib/glm"]
+	path = Code/Lib/glm
 	url = https://github.com/g-truc/glm
+[submodule "Code/Lib/glad"]
+	path = Code/Lib/glad
+	url = https://github.com/Dav1dde/glad
+	branch = c
