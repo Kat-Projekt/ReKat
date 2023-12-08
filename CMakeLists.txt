@@ -30,7 +30,11 @@ include_directories(Code/Include/
 file(GLOB LIBS_SOURCES    Code/Lib/glad/src/glad.c)
 file(GLOB PROJECT_HEADERS Code/Include/*.hpp
                           Code/Inlcude/*.h)
+# production
 file(GLOB PROJECT_SOURCES Code/Src/main.cpp )
+# testing
+file(GLOB PROJECT_SOURCES Code/Test/audio_text.cpp )
+
 file(GLOB PROJECT_SHADERS Code/Resources/Shaders/*.cs
                           Code/Resources/Shaders/*.fs
                           Code/Resources/Shaders/*.gs

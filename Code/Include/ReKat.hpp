@@ -36,8 +36,7 @@
 #endif
 
 #ifdef OPENAL
-	#include <AL/al.h>
-	#include <AL/alc.h>
+	#include "Synth/synth.hpp"
 #endif
 
 

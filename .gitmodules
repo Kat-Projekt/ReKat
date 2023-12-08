@@ -14,3 +14,6 @@
 	path = Code/Lib/glad
 	url = https://github.com/Dav1dde/glad
 	branch = c
+[submodule "Code/Lib/openal-soft"]
+	path = Code/Lib/openal-soft
+	url = https://github.com/kcat/openal-soft
