@@ -1,0 +1,15 @@
+[submodule "Code/Libs/glfw"]
+	path = Code/Libs/glfw
+	url = https://github.com/glfw/glfw
+[submodule "Code/Libs/stb"]
+	path = Code/Libs/stb
+	url = https://github.com/nothings/stb
+[submodule "Code/Libs/glad"]
+	path = Code/Libs/glad
+	url = https://github.com/Dav1dde/glad
+[submodule "Code/Libs/freetype"]
+	path = Code/Libs/freetype
+	url = https://github.com/freetype/freetype.git
+[submodule "Code/Libs/glm"]
+	path = Code/Libs/glm
+	url = https://github.com/g-truc/glm
