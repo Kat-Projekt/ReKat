@@ -3,9 +3,11 @@
 
 #include "sprite.h"
 #include "unordered_map"
+#include "behaviour.h"
 
 class Object {
 protected:
+    bool Active = true;
     std::string name;
 
     // transform
@@ -19,8 +21,7 @@ protected:
     float rot = 0;
     glm::vec2 pivot = {0.5,0.5};
 
-    void (* update_call ) (std::string) = nullptr;
-    void (* start_call ) (std::string) = nullptr;
+    std::vector < std::shared_ptr<Behaviour> > components;
 
 public:
     Object ( ) { }
@@ -49,7 +50,7 @@ public:
     char* packpos ( ) 
     { return (char*) & pos; }
 
-    glm::vec2 Get_pos ( ) { return pos; }
+    glm::vec2 Get_pos ( ) { return pos - glm::vec2{-size.x*0.5,size.y*0.5}; }
     glm::vec2 Get_size ( ) { return size; }
 
     void Rotate ( float rotation ) { rot = rotation; }
@@ -58,18 +59,38 @@ public:
     void Change_frame ( int _frame ) { frame = _frame; }
     void DChange_frame ( int _frame ) { frame += _frame; }
     void Draw  ( ) { 
+        if ( !Active ) { return; }
         if ( sprite != nullptr ) { sprite->Draw_frame ( frame, pos+parent_pos - glm::vec2(size.x/2, size.y/2), size, rot, {1,1,1,1}, pivot ); }
         for ( auto o : Sub_Objects ) 
         { o.second->Draw( ); }
     }
-
-    void Set_Update_call ( void (* _call ) ( std::string ) ) { update_call = _call; }
-    void Update ( )
-    { if ( update_call != nullptr ) { update_call (name); } }
     
-    void Set_Start_call ( void (* _call ) ( std::string ) ) { start_call = _call; }
-    void Start ( ) 
-    { if ( start_call != nullptr ) { start_call (name); } }
+    template < class C > 
+    C* Add_component ( ) {
+        C* c = new C ( );
+        if ( std::is_base_of<Behaviour, C>::value ) 
+        { components.push_back( std::shared_ptr < Behaviour > ( c ) ); }
+        return c;
+    }
+
+    template < class C > 
+    C* Add_component ( C* c ) {
+        if ( std::is_base_of<Behaviour, C>::value ) 
+        { components.push_back( std::shared_ptr < Behaviour > ( c ) ); }
+        return c;
+    }
+
+    void Update ( ) { 
+        for ( auto c : components ) 
+        { c->Update(); } 
+    }
+    
+    void Start ( ) {
+        for ( auto c : components ) 
+        { c->Start(); } 
+    }
+
+    void Set_Active ( bool active ) { Active = active; }
 };
 
 

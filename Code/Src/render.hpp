@@ -13,16 +13,20 @@ void Grapik_Init ( ) {
     Load_resources ( );
     
     // configure objects
-    Manager::Buttton_Load ( "start", "START", "UI", {0,0}, {100,100}, button_callback, 6 );
+    Manager::Button_Load ( "start", "START", "UI", {0,0}, {100,100}, button_callback, 6 );
 
     // configure player
     Manager::Object_Load ( "Player", "Player", {100,100}, {100,100} );
     Manager::Object_Load ( "Spada", "Spada",{100,100}, {100,100} );
 
+    Enemy_start ( );
+
     Manager::Object_Get("Spada")->Set_Rotation_Pivot({0.5,1});
     Manager::Object_Get("Player")->Add_Sub_Object ( "Spada", Manager::Object_Get("Spada") );
+    Manager::Object_Get("Player")->Add_component <Player> ( );
 
     Manager::Start ( );
+    ReKat::grapik::Input::Configure();
 }
 
 uint64_t spash_start = Get_Time();
@@ -55,7 +59,7 @@ int Render_splash_fade ( ) {
 
     Manager::Text_Get ( "death_record" )->RenderText ( "Real Engine 5", {SCR_WIDTH/2 - 250, SCR_HEIGHT/2 },
                                                             {SCR_WIDTH-50.0f,200.0f}, 2.0f, glm::vec4(violet_fl,alpha));
-    if ( alpha < 0 ) { std::cout << "end"; return 1; }
+    if ( alpha < 0 ) { return 1; }
     else { return 0;} 
 }
 
@@ -93,22 +97,24 @@ void Render_text ( ) {
 }
 
 void Render ( ) {
+
     glClearColor(0, 0, 0, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     if ( !text_mode ) { Render_text(); }
 
     fps++;
-    if ( _time < time (0) ) { _time = time (0); std::cout << "\nfps: " << fps << " time: " << _time; fps = 0; dis = !dis; }
+    //if ( _time < time (0) ) { _time = time (0); std::cout << "\nfps: " << fps << " time: " << _time; fps = 0; dis = !dis; }
     if ( fps%20 == 0 ) { frame ++; }
 
     // updating camera projections
+    cam.Move( Manager::Object_Get("Player")->Get_pos() );
+
     Manager::Shader_Get( "sprite_1x1"  )->setMat4("projection", cam.GetWiew());
     Manager::Shader_Get( "sprite_2x2"  )->setMat4("projection", cam.GetWiew());
     Manager::Shader_Get( "tilemap" )->setMat4("projection", cam.GetWiew());
     Manager::Shader_Get("text")->setMat4("projection", glm::ortho ( 0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT) ));
     
-    cam.Move( Manager::Object_Get("Player")->Get_pos() - glm::vec2{SCR_WIDTH/2,SCR_HEIGHT/2});
-
+    
     // Manager::Sprite_Get( "sprite" )->Draw_frame( frame, {300,100},{100,100},0 );
     // Manager::Text_Get ( "death_record" )->RenderText ( "ciao", {25.0f,SCR_HEIGHT-75.0f}, { SCR_WIDTH-50.0f, 200.0f}, 1.0f, glm::vec3(0.21875f, 0, 0.21875f));
     Manager::Tilemap_Get ( "tilemap" )->Draw({100,300},{50,50});

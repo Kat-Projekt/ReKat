@@ -12,7 +12,8 @@ class Texture {
 public:
     enum Status {
         SUCCESS,
-        FAILED_LOAD_IMAGE
+        FAILED_LOAD_IMAGE,
+        EMPTY_BUFFER
     };
 
     // holds the ID of the texture object, used for all texture operations to reference to this particular texture
@@ -32,6 +33,8 @@ public:
     ~Texture ( ) { glDeleteTextures(1,&ID); }
     // generates texture from image data
     int Make ( const char * file );
+    // generates texture from provided buffer
+    static int Make ( unsigned char* data, unsigned int width, unsigned int height, int nrChannels );
     // binds the texture as the current active GL_TEXTURE_2D texture object
     void Bind ( ) const { glBindTexture(GL_TEXTURE_2D, this->ID); }
 };
@@ -69,4 +72,31 @@ int Texture::Make ( const char * file ) {
     stbi_image_free(data);
     return SUCCESS; 
 }
+
+int Texture::Make ( unsigned char* data, unsigned int width, unsigned int height, int nrChannels ) {
+    unsigned int ID;
+    int Format;
+    glGenTextures(1, &ID);
+    if (data) {
+        switch ( nrChannels ) {
+        case 1: Format = GL_RED; break;
+        case 3: Format = GL_RGB; break;
+        case 4: Format = GL_RGBA; break;
+        }
+
+        glBindTexture(GL_TEXTURE_2D, ID);
+        glTexImage2D(GL_TEXTURE_2D, 0, Format, width, height, 0, Format, GL_UNSIGNED_BYTE, data);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+        glGenerateMipmap(GL_TEXTURE_2D);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    } else { return EMPTY_BUFFER; }
+
+    return ID; 
+}
+
 #endif

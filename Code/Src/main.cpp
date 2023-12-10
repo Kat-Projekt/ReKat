@@ -105,12 +105,13 @@ int main(int argc, char const *argv[]) {
     { Render(); ReKat::grapik::Pool(); }
     Main_shutdown = true;
     grapik::Terminate ( );
+    std::cout << "\n\n----------------------- ENDED GRAPIK ---------------------\n";
 
     dump_history (path);
 
     // terminate threads
     if ( recv_thread.joinable() ) { recv_thread.join ( ); }
-    std::cout << "ended recive\n";
+    std::cout << "----------------------- ENDED RECIVE ---------------------\n";
 
     if ( conn_thread.joinable() ) {
         TerminateThread ((HANDLE)conn_thread.native_handle(),1);

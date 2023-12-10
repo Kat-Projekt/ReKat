@@ -25,11 +25,13 @@ const float ZOOM        =  45.0f;
 
 class Camera {
 private:
+    // pos is the center of the camera
     glm::vec2 pos;
     glm::vec2 size;
     float scale = 1.0f;
 
 public:
+    Camera ( ) { };
     Camera ( glm::vec2 new_pos, glm::vec2 size ) : pos(new_pos), size(size) { };
     ~Camera ( ) { };
 
@@ -43,9 +45,11 @@ public:
 
     float GetScale ( ) { return scale; }
 
-    glm::mat4 GetWiew ( ) {
-        return glm::ortho ( pos.x + (size.x - size.x * scale) * 0.5f, pos.x + (size.x + size.x * scale) * 0.5f, 
-                            pos.y + (size.y + size.y * scale) * 0.5f, pos.y + (size.y - size.y * scale) * 0.5f,
+    glm::mat4 GetWiew ( ) { // 0, width, heigth, 0
+        //glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(this->Width), static_cast<float>(this->Height), 0.0f, -1.0f, 1.0f);
+    
+        return glm::ortho ( pos.x - (size.x * scale) * 0.5f, pos.x + (size.x * scale) * 0.5f, 
+                            pos.y + (size.y * scale) * 0.5f, pos.y - (size.y * scale) * 0.5f,
                             -1.0f, 1.0f );
     }
 };

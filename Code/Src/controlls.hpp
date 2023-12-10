@@ -8,43 +8,16 @@ double m_x,m_y;
 int old_start_line = 0;
 int start_line;
 
-float angle ( glm::vec2 vector ) {
-    // normalize
-   // float magnetude = sqrt(vector.x*vector.x + vector.y*vector.y);
-   // vector = { vector.x / magnetude , vector.y / magnetude };
-    // find angle
+float angle ( glm::vec2 v ) {
     float angle = 0;
-    if ( vector.x > 0 ) {
-        if ( vector.y > 0) { angle = M_PI_4; }
-        else { angle = - M_PI_4; }
-    } else {
-        if ( vector.y > 0) { angle = M_PI - M_PI_4; }
-        else { angle = M_PI + M_PI_4; }
-    }
-    std::cout << "vector.x " << vector.x << " vector.y " << vector.y << '\n';
-    return angle - M_PI_2;
+    float X = v.x / sqrt( v.x * v.x + v.y *v.y );
+    if ( v.y > 0 ) { angle = M_PI-std::asin ( X ); } 
+    else { angle = std::asin ( X ); }
+    return angle;
 }
 
-static void ReKat::grapik::Input::Keyboard ( GLFWwindow* window, int key, int scancode, int action, int mode ) {
-    // shift
-    if ( key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT ) {
-        if ( action == GLFW_PRESS ) { shift = true; } 
-        else { shift = false; }
-    }
-    // ctrl
-    if ( key == GLFW_KEY_LEFT_CONTROL || key == GLFW_KEY_RIGHT_CONTROL ) {
-        if ( action == GLFW_PRESS ) { ctrl = true; } 
-        else { ctrl = false; }
-    }
-
+static void __Keyboard ( GLFWwindow* window, int key, int scancode, int action, int mode ) {
     if ( ( action == GLFW_PRESS || action == GLFW_REPEAT ) ) {
-        // player movement
-        if ( key == GLFW_KEY_A ) { Manager::Object_Get("Player")->DMove ( glm::vec2(-10,0) ); Send_positon (); }
-        if ( key == GLFW_KEY_W ) { Manager::Object_Get("Player")->DMove ( glm::vec2(0,-10) ); Send_positon (); }
-        if ( key == GLFW_KEY_D ) { Manager::Object_Get("Player")->DMove ( glm::vec2(10,0) );  Send_positon (); }
-        if ( key == GLFW_KEY_S ) { Manager::Object_Get("Player")->DMove ( glm::vec2(0,10) );  Send_positon (); }
-
-
         if ( key == GLFW_KEY_ESCAPE ) { grapik::End(); }
         if ( key == GLFW_KEY_ENTER ) { execute_command (); return; }
         if ( key == GLFW_KEY_DELETE || key == GLFW_KEY_BACKSPACE ) 
@@ -56,7 +29,7 @@ static void ReKat::grapik::Input::Keyboard ( GLFWwindow* window, int key, int sc
         if ( key == GLFW_KEY_T && !text_mode ) { text_mode = true; std::cout << "enter text mode\n"; }
     }
 }
-static void ReKat::grapik::Input::Mouse_pos ( GLFWwindow* window, double xposIn, double yposIn ) { 
+static void __Mouse_pos ( GLFWwindow* window, double xposIn, double yposIn ) { 
     if ( press && !text_mode ) {
         // cam.DMove ( {(m_x - xposIn) * cam.GetScale(),  (m_y - yposIn) * cam.GetScale()}  );
     }
@@ -67,15 +40,15 @@ static void ReKat::grapik::Input::Mouse_pos ( GLFWwindow* window, double xposIn,
     Manager::Update_Mouse_Position ( {xposIn, yposIn} );
 
     // spada rotation
-    Manager::Object_Get("Player")->Get_Sub_Object("Spada")->Rotate( angle( { SCR_WIDTH/2- xposIn, SCR_HEIGHT/2 - yposIn } ) );
+    Manager::Object_Get("Player")->Get_Sub_Object("Spada")->Rotate( angle( { xposIn - SCR_WIDTH/2, yposIn - SCR_HEIGHT/2 } ) );
 }
-static void ReKat::grapik::Input::Mouse_key ( GLFWwindow *window, int button, int action, int mods ) {
+static void __Mouse_key ( GLFWwindow *window, int button, int action, int mods ) {
     if ( button == GLFW_MOUSE_BUTTON_LEFT ) {
         if ( action == GLFW_PRESS )   { press = true;  Manager::Update_Mouse_Status(Manager::Pressed); }
         if ( action == GLFW_RELEASE ) { press = false; Manager::Update_Mouse_Status(Manager::Release); }
     }
 }
-static void ReKat::grapik::Input::ScrollWell ( GLFWwindow* window, double xoffset, double yoffset ) {
+static void __ScrollWell ( GLFWwindow* window, double xoffset, double yoffset ) {
     if ( text_mode ) {
         if ( yoffset <= 0 ) { old_start_line = start_line; start_line ++; }
         if ( yoffset >= 0 ) { old_start_line = start_line; start_line --; }
@@ -84,11 +57,20 @@ static void ReKat::grapik::Input::ScrollWell ( GLFWwindow* window, double xoffse
     }
     // if (start_line < 0 ) { start_line = 0; }
 }
-static void ReKat::grapik::Input::FreamBufferResize ( GLFWwindow* window, int width, int height ) {
+static void __FreamBufferResize ( GLFWwindow* window, int width, int height ) {
     glViewport ( 0, 0, SCR_WIDTH = width, SCR_HEIGHT = height );
     cam.Resize({width,height});
 }
-static void ReKat::grapik::Input::Caracters ( GLFWwindow* window, unsigned int codepoint ) {
+static void __Caracters ( GLFWwindow* window, unsigned int codepoint ) {
     if ( text_mode ) 
     { history[current_command] += (char)(codepoint); }
+}
+
+void Setup_Input () {
+    ReKat::grapik::Input::_Keyboard = &__Keyboard;
+    ReKat::grapik::Input::_Mouse_pos = &__Mouse_pos;
+    ReKat::grapik::Input::_Mouse_key = &__Mouse_key;
+    ReKat::grapik::Input::_ScrollWell = &__ScrollWell;
+    ReKat::grapik::Input::_FreamBufferResize = &__FreamBufferResize;
+    ReKat::grapik::Input::_Caracters = &__Caracters;
 }

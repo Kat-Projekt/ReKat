@@ -32,6 +32,9 @@
 		#include <Graphik/manager.h>
 		#include <Graphik/object.h>
 		#include <Graphik/colors.h>
+		#include <Graphik/animator.h>
+		#include <Graphik/behaviour.h>
+		#include <Graphik/scene.h>
 	#endif
 #endif
 

@@ -2,6 +2,8 @@
 #define GRAPIK
 
 #include <string>
+#include <map>
+#include <glm/glm.hpp>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
@@ -31,12 +33,115 @@ namespace Internal {
 
 // this namespace is ment to be used for defining Input function external to the main namespace
 namespace Input {
-	static void Keyboard ( GLFWwindow* window, int key, int scancode, int action, int mode );
-	static void Mouse_pos ( GLFWwindow* window, double xpos, double ypos );
-	static void Mouse_key ( GLFWwindow* window, int button, int action, int mods );
-	static void ScrollWell ( GLFWwindow* window, double xoffset, double yoffset );
-	static void FreamBufferResize ( GLFWwindow* window, int width, int height );
-	static void Caracters ( GLFWwindow* window, unsigned int codepoint );
+	enum Mode {
+		NONE,
+		PRESSED,
+		HELD,
+		RELEASED
+	};
+	static std::map < std::string, Mode > keys;
+	static glm::vec2 mouse_pos;
+
+	static void(*_Keyboard)  (GLFWwindow*, int, int, int, int) = nullptr;
+	static void(*_Mouse_pos) (GLFWwindow*, double, double ) = nullptr;
+	static void(*_Mouse_key) (GLFWwindow*, int, int, int ) = nullptr;
+	static void(*_Caracters) (GLFWwindow*, unsigned int ) = nullptr;
+	static void(*_ScrollWell)(GLFWwindow*, double, double ) = nullptr;
+	static void(*_FreamBufferResize)(GLFWwindow*, int, int ) = nullptr;
+
+	static void Keyboard ( GLFWwindow* window, int key, int scancode, int action, int mode ) {
+		if ( _Keyboard != nullptr ) 
+		{ _Keyboard ( window, key, scancode, action, mode ); }
+		// adding meta charaters
+		if ( action == GLFW_PRESS ) {
+			if ( key == GLFW_KEY_LEFT_CONTROL || key == GLFW_KEY_RIGHT_CONTROL ) { keys["Ctrl"] = PRESSED; return; }
+			if ( key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT ) { keys["Shift"] = PRESSED; return; }
+			if ( key == GLFW_KEY_LEFT_ALT || key == GLFW_KEY_RIGHT_ALT ) { keys["Alt"] = PRESSED; return; }
+			if ( key == GLFW_KEY_DELETE || key == GLFW_KEY_BACKSPACE ) { keys["Del"] = PRESSED; return; }
+			if ( key == GLFW_KEY_ENTER ) { keys["Enter"] = PRESSED; return; }
+			if ( key == GLFW_KEY_ESCAPE ) { keys["Esc"] = PRESSED; return; }
+		}
+		if ( action == GLFW_RELEASE ) {
+			if ( key == GLFW_KEY_LEFT_CONTROL || key == GLFW_KEY_RIGHT_CONTROL ) { keys["Ctrl"] = RELEASED; return; }
+			if ( key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT ) { keys["Shift"] = RELEASED; return; }
+			if ( key == GLFW_KEY_LEFT_ALT || key == GLFW_KEY_RIGHT_ALT ) { keys["Alt"] = RELEASED; return; }
+			if ( key == GLFW_KEY_DELETE || key == GLFW_KEY_BACKSPACE ) { keys["Del"] = RELEASED; return; }
+			if ( key == GLFW_KEY_ENTER ) { keys["Enter"] = RELEASED; return; }
+			if ( key == GLFW_KEY_ESCAPE ) { keys["Esc"] = RELEASED; return; }
+		}
+		// adding caracter keys;
+		if ( GLFW_KEY_A <= key && key <= GLFW_KEY_Z ) { 
+			if ( action == GLFW_PRESS ) { keys[std::string(1,(char)key)] = PRESSED; }
+			if ( action == GLFW_RELEASE ) { keys[std::string(1,(char)key)] = RELEASED; }
+		}
+	}
+	static void Mouse_pos ( GLFWwindow* window, double xpos, double ypos ) {
+		if ( _Mouse_pos != nullptr ) 
+		{ _Mouse_pos ( window, xpos, ypos ); }
+		mouse_pos = {xpos, ypos};
+	}
+	static void Mouse_key ( GLFWwindow* window, int button, int action, int mode ) {
+		if ( _Mouse_key != nullptr ) 
+		{ _Mouse_key ( window, button, action, mode ); }
+		if ( action == GLFW_PRESS ) {
+			if ( button == GLFW_MOUSE_BUTTON_LEFT ) { keys["Mouse1"] = PRESSED; return; }
+			if ( button == GLFW_MOUSE_BUTTON_MIDDLE ) { keys["Mouse2"] = PRESSED; return; }
+			if ( button == GLFW_MOUSE_BUTTON_RIGHT ) { keys["Mouse3"] = PRESSED; return; }
+		}
+		if ( action == GLFW_RELEASE ) {
+			if ( button == GLFW_MOUSE_BUTTON_LEFT ) { keys["Mouse1"] = RELEASED; return; }
+			if ( button == GLFW_MOUSE_BUTTON_MIDDLE ) { keys["Mouse2"] = RELEASED; return; }
+			if ( button == GLFW_MOUSE_BUTTON_RIGHT ) { keys["Mouse3"] = RELEASED; return; }
+		}
+	}
+	static void ScrollWell ( GLFWwindow* window, double xoffset, double yoffset ) {
+		if ( _ScrollWell != nullptr ) 
+		{ _ScrollWell ( window, xoffset, yoffset ); }
+	}
+	static void FreamBufferResize ( GLFWwindow* window, int width, int height ) {
+		ReKat::grapik::Internal::SCR_HEIGTH = height;
+		ReKat::grapik::Internal::SCR_WIDTH = width;
+		if ( _FreamBufferResize != nullptr ) 
+		{ _FreamBufferResize ( window, width, height ); }
+	}
+	static void Caracters ( GLFWwindow* window, unsigned int codepoint ) {
+		if ( _Caracters != nullptr ) 
+		{ _Caracters ( window, codepoint ); }
+	}
+	
+	static void Configure ( ) {
+		// add first 128 ascii caracters
+		for (char i = 32; i < 127; i++) {
+			keys[std::string(1,(char)i)] = NONE;
+		}
+		// add special caracters:
+		keys["Esc"] = NONE;
+		keys["Ctrl"] = NONE;
+		keys["Shift"] = NONE;
+		keys["Alt"] = NONE;
+		keys["Enter"] = NONE;
+		keys["Del"] = NONE;
+		keys["Mouse1"] = NONE;
+		keys["Mouse2"] = NONE;
+		keys["Mouse3"] = NONE;
+	}
+	static void Print_Status ( ) {
+		for ( auto k : keys ) 
+		{ std::cout << "Key: " << k.first << " Value: " << k.second << '\n'; }
+	}
+
+	static void Update ( ) {
+		for ( auto k = keys.begin(); k != keys.end(); k++ ) {
+			if ( k->second == PRESSED ) { k->second = HELD; }
+			if ( k->second == RELEASED ) { k->second = NONE; }
+		}
+	}
+	static bool Key_Down ( std::string key ) 
+	{ return ( keys[key] == PRESSED ? true : false ); }
+	static bool Key_Pressed ( std::string key ) 
+	{ return ( keys[key] != NONE ? true : false ); }
+	static bool Key_Up ( std::string key ) 
+	{ return ( keys[key] == RELEASED ? true : false ); }
 } /*Input*/
 
 	// Basic Grapik functions
@@ -54,6 +159,7 @@ namespace ReKat::grapik {
 	static int Start 
 	( std::string name, unsigned int SCR_WIDTH, unsigned int SCR_HEIGTH,  bool transparent, bool fullscreen, bool resizable ) {
 		Internal::SCR_HEIGTH = SCR_HEIGTH; Internal::SCR_WIDTH = SCR_WIDTH;
+		//Input::Configure();
 
 		glfwInit ( );
 		glfwWindowHint ( GLFW_CONTEXT_VERSION_MAJOR, 3 );

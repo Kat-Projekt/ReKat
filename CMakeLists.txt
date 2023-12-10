@@ -33,7 +33,7 @@ file(GLOB PROJECT_HEADERS Code/Include/*.hpp
 # production
 file(GLOB PROJECT_SOURCES Code/Src/main.cpp )
 # testing
-file(GLOB PROJECT_SOURCES Code/Test/audio_text.cpp )
+file(GLOB _PROJECT_SOURCES Code/Test/audio_text.cpp )
 
 file(GLOB PROJECT_SHADERS Code/Resources/Shaders/*.cs
                           Code/Resources/Shaders/*.fs

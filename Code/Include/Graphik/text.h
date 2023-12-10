@@ -2,6 +2,7 @@
 #define TEXT_H
 
 #include "shader.h"
+#include "texture.h"
 
 #include <map>
 #include <vector>
@@ -60,22 +61,11 @@ public:
             glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
             // load first 128 characters of ASCII set
-            for (unsigned char c = 0; c < 128; c++)
-            {
+            for (unsigned char c = 0; c < 128; c++) {
                 // Load character glyph 
                 if (FT_Load_Char(face, c, FT_LOAD_RENDER)) { continue; }
                 // generate texture
-                unsigned int texture;
-                glGenTextures(1, &texture);
-                glBindTexture(GL_TEXTURE_2D, texture);
-                glTexImage2D( GL_TEXTURE_2D, 0, GL_RED, face->glyph->bitmap.width, face->glyph->bitmap.rows, 0, GL_RED, GL_UNSIGNED_BYTE, face->glyph->bitmap.buffer );
-
-                // set texture options
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
+                unsigned int texture = Texture::Make ( face->glyph->bitmap.buffer, face->glyph->bitmap.width, face->glyph->bitmap.rows, 1 );
                 // now store character for later use
                 Character character = { texture,
                     glm::ivec2(face->glyph->bitmap.width, face->glyph->bitmap.rows),
@@ -176,15 +166,26 @@ public:
                 float w = ch.Size.x * scale;
                 float h = ch.Size.y * scale;
                 // update VBO for each character
-                float vertices[6][4] = {
-                    { xpos,     ypos + h,   0.0f, 0.0f },            
-                    { xpos,     ypos,       0.0f, 1.0f },
-                    { xpos + w, ypos,       1.0f, 1.0f },
+                float vertices[] = {
+                    xpos,     ypos + h,   0.0f, 0.0f,
+                    xpos,     ypos,       0.0f, 1.0f,
+                    xpos + w, ypos,       1.0f, 1.0f,
 
-                    { xpos,     ypos + h,   0.0f, 0.0f },
-                    { xpos + w, ypos,       1.0f, 1.0f },
-                    { xpos + w, ypos + h,   1.0f, 0.0f }           
+                    xpos,     ypos + h,   0.0f, 0.0f,
+                    xpos + w, ypos,       1.0f, 1.0f,
+                    xpos + w, ypos + h,   1.0f, 0.0f
                 };
+                /*float vertices[] = { 
+                    // pos                // tex
+                    xpos,     ypos + h,   0.0f, 1.0f,
+                    xpos + w, ypos,       1.0f, 0.0f,
+                    xpos,     ypos,       0.0f, 0.0f, 
+
+                    xpos,     ypos + h,   0.0f, 1.0f,
+                    xpos + w, ypos + h,   1.0f, 1.0f,
+                    xpos + w, ypos,       1.0f, 0.0f
+                };*/
+
                 // render glyph texture over quad
                 glBindTexture(GL_TEXTURE_2D, ch.TextureID);
                 // update content of VBO memory

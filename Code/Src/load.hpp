@@ -1,8 +1,11 @@
 #pragma once
 #include "controlls.hpp"
 #include "Enemies/enemy.h"
+#include "player.h"
 
-int Load_resources () {
+int Load_resources ( ) {
+    Setup_Input();
+
     int result = 0;
     // Load Shaders
     result += Manager::Shader_Load ( "text", "Shaders/text.vs", "Shaders/text.fs" );
@@ -61,6 +64,17 @@ int Load_resources () {
     if ( result != 0 ) 
     { std::cout << "Tilemaps Make Error: " << result <<'\n'; return 1; } std::cout << "Tilemaps Load Correctly\n";
     
+    // Create animation
+    Manager::Animator_Load ( "walk" );
+    Manager::Animator_Get  ( "walk" )->Create_Animation("walk")->Add_Frames({{0,0.2},{1,0.2},{2,0.2},{3,0.2}});
+
     Enemy_start();
     return result;
+}
+
+int Create_Scenes ( ) {
+    Manager::Scene_Load ( "main" );
+    Manager::Scene_Get ( "main" )->Add_object( Manager::Object_Get("Player") );
+
+    return 0;
 }

@@ -5,18 +5,22 @@
 #include "shader.h"
 #include "texture.h"
 #include "tilemap.h"
+#include "animator.h"
 #include "object.h"
 #include "button.h"
+#include "scene.h"
 
 #include <map>
 
 namespace Manager {
 // rescources
-    static std::map < std::string, Text* >    Texts;
-    static std::map < std::string, Shader* >  Shaders;
-    static std::map < std::string, Sprite* >  Sprites;
-    static std::map < std::string, Texture* > Textures;
-    static std::map < std::string, Tilemap* > Tilemaps;
+    static std::map < std::string, Text* >     Texts;
+    static std::map < std::string, Scene* >   Scenes;
+    static std::map < std::string, Shader* >   Shaders;
+    static std::map < std::string, Sprite* >   Sprites;
+    static std::map < std::string, Texture* >  Textures;
+    static std::map < std::string, Tilemap* >  Tilemaps;
+    static std::map < std::string, Animator* > Animators;
 
 // objects
     static std::map < std::string, Object* > Objects;
@@ -62,21 +66,39 @@ namespace Manager {
         Tilemaps.insert( { name, t } );
         return (*t).Make ( path );
     }
+// Animator logic 
+    static Animator* Animator_Get  ( std::string name ) 
+    { return Animators [name]; }
+    static int Animator_Load ( std::string name ) {
+        Animator *a = new Animator ( );
+        Animators.insert( { name, a } );
+        return 0;
+    }
+
 // Object logic 
     static Object* Object_Get  ( std::string name ) 
     { return Objects [name]; }
-    static int Object_Load ( std::string name, std::string sprite, glm::vec2 pos, glm::vec2 size  ) {
+    static Object* Object_Load ( std::string name, std::string sprite, glm::vec2 pos, glm::vec2 size  ) {
         Object *o = new Object ( name, Sprites[sprite], pos, size );
         Objects.insert( { name, o } );
-        return 0;
+        return o;
     }
 // Button logic 
     static Button* Button_Get  ( std::string name ) 
     { return Buttons [name]; }
-    static int Buttton_Load ( std::string name, std::string text, std::string sprite, glm::vec2 pos, glm::vec2 size, void(*click_callback)( ), int start_frame = 0 ) {
+    static Button* Button_Load ( std::string name, std::string text, std::string sprite, glm::vec2 pos, glm::vec2 size, void(*click_callback)( ), int start_frame = 0 ) {
         Button *b = new Button ( name, text, Sprites[sprite], pos, size, click_callback, start_frame );
         Buttons.insert( { name, b } );
-        return 0;
+        return b;
+    }
+
+// Scene logic 
+    static Scene* Scene_Get  ( std::string name ) 
+    { return Scenes [name]; }
+    static Scene* Scene_Load ( std::string name ) {
+        Scene *s = new Scene ( );
+        Scenes.insert( { name, s } );
+        return s;
     }
 
 // draw logic
@@ -114,6 +136,7 @@ namespace Manager {
     static void Update ( ) {
         for ( auto o : Objects ) 
         { o.second->Update(); }
+        ReKat::grapik::Input::Update();
     }
 
 }; // namespace Manager
