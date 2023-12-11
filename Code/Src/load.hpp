@@ -39,15 +39,15 @@ int Load_resources ( ) {
     // configure resources
     Manager::Shader_Get("text")->setMat4("projection", glm::ortho ( 0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT) ));
     Manager::Shader_Get("sprite_1x1")->setInt ("image", 0);
-    Manager::Shader_Get("sprite_1x1")->setMat4("projection", cam.GetWiew());
+    Manager::Shader_Get("sprite_1x1")->setMat4("projection", cam.Get_Wiew());
     Manager::Shader_Get("sprite_2x2")->setInt ("image", 0);
-    Manager::Shader_Get("sprite_2x2")->setMat4("projection", cam.GetWiew());
+    Manager::Shader_Get("sprite_2x2")->setMat4("projection", cam.Get_Wiew());
     Manager::Shader_Get("UI")->setInt ("image", 0);
-    Manager::Shader_Get("UI")->setMat4("projection", cam.GetWiew());
+    Manager::Shader_Get("UI")->setMat4("projection", cam.Get_Wiew());
     Manager::Shader_Get("empty_sprite")->setInt ("image", 0);
-    Manager::Shader_Get("empty_sprite")->setMat4("projection", cam.GetWiew());
+    Manager::Shader_Get("empty_sprite")->setMat4("projection", cam.Get_Wiew());
     Manager::Shader_Get("tilemap")->setInt ("image", 0 );
-    Manager::Shader_Get("tilemap")->setMat4("projection", cam.GetWiew());
+    Manager::Shader_Get("tilemap")->setMat4("projection", cam.Get_Wiew());
 
     // configure renderers
     Manager::Sprite_Load ( "Player", "sprite_1x1", "Player", {1,1} );
@@ -72,9 +72,27 @@ int Load_resources ( ) {
     return result;
 }
 
-int Create_Scenes ( ) {
+void button_callback ( ) { grapik::End(); }
+
+void Create_Objs ( ) {
+    // configure objects
+    Manager::Button_Load ( "start", "START", "UI", {100,100}, {100,100}, button_callback, 6 );
+
+    // configure player
+    Manager::Object_Load ( "Player", "Player", {100,100}, {100,100} );
+    Manager::Object_Load ( "Spada", "Spada",{100,100}, {100,100} );
+
+    Enemy_start ( );
+
+    Manager::Object_Get("Spada")->Set_Rotation_Pivot({0.5,1});
+    Manager::Object_Get("Player")->Add_Sub_Object ( "Spada", Manager::Object_Get("Spada") );
+    Manager::Object_Get("Player")->Add_component <Player> ( );
+
+    Manager::Start ( );
+    ReKat::grapik::Input::Configure();
+}
+
+void Create_Scenes ( ) {
     Manager::Scene_Load ( "main" );
     Manager::Scene_Get ( "main" )->Add_object( Manager::Object_Get("Player") );
-
-    return 0;
 }

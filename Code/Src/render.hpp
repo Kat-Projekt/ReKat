@@ -1,9 +1,5 @@
 #include "load.hpp"
 
-void button_callback ( ) {
-    grapik::End();
-}
-
 // Initilalize renderer
 void Grapik_Init ( ) {
     // start window
@@ -12,53 +8,39 @@ void Grapik_Init ( ) {
 
     Load_resources ( );
     
-    // configure objects
-    Manager::Button_Load ( "start", "START", "UI", {0,0}, {100,100}, button_callback, 6 );
-
-    // configure player
-    Manager::Object_Load ( "Player", "Player", {100,100}, {100,100} );
-    Manager::Object_Load ( "Spada", "Spada",{100,100}, {100,100} );
-
-    Enemy_start ( );
-
-    Manager::Object_Get("Spada")->Set_Rotation_Pivot({0.5,1});
-    Manager::Object_Get("Player")->Add_Sub_Object ( "Spada", Manager::Object_Get("Spada") );
-    Manager::Object_Get("Player")->Add_component <Player> ( );
-
-    Manager::Start ( );
-    ReKat::grapik::Input::Configure();
+    Create_Objs ( );
 }
 
 uint64_t spash_start = Get_Time();
-float duration = 500.0f;
+float duration = 5000.0f;
 int Render_splash ( ) {
     float alpha = ( Get_Time() - spash_start ) / duration;
     glClearColor(0, 0, 0, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
-    Manager::Shader_Get("text")->setMat4("projection", glm::ortho ( 0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT) ));
-
-    Manager::Text_Get ( "death_record" )->RenderText ( "made with", {SCR_WIDTH/2 - 250, SCR_HEIGHT/2 + 100 },
-                                                            {SCR_WIDTH-50.0f,200.0f}, 1.0f, glm::vec4(1.0, 1.0f, 1.0f,alpha));
-
-    Manager::Text_Get ( "death_record" )->RenderText ( "Real Engine 5", {SCR_WIDTH/2 - 250, SCR_HEIGHT/2 },
-                                                            {SCR_WIDTH-50.0f,200.0f}, 2.0f, glm::vec4(violet_fl,alpha));
-
+    Manager::Shader_Get("text")->setMat4("projection", cam.Get_UI_Wiew());                              
+    Manager::Draw_Text ( "death_record", "made with", {0.0f, 100.0f },
+                         {SCR_WIDTH-50.0f,200.0f}, 1.0f, glm::vec4(1.0, 1.0f, 1.0f,alpha));
+    Manager::Draw_Text ( "death_record", "4 Real Engine 5", {-95.0f, -5.0f },
+                                                            {500.0f,500.0f}, 2.0f, glm::vec4(green_fl,alpha/2));
+    Manager::Draw_Text ( "death_record", "4 Real Engine 5", {-100.0f, 0.0f },
+                                                            {500.0f,500.0f}, 2.0f, glm::vec4(violet_fl,alpha));
     if ( alpha > 1 ) { return 1; } 
     else { return 0;}
 }
 
-float duration_2 = 50.0f;
+float duration_2 = 500.0f;
 int Render_splash_fade ( ) {
     float alpha = ( duration_2 - ( Get_Time() - spash_start ) ) / duration_2;
-    Manager::Shader_Get("text")->setMat4("projection", glm::ortho ( 0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT) ));
+    Manager::Shader_Get("text")->setMat4("projection", cam.Get_UI_Wiew());
 
     Manager::Sprite_Get ( "empty_sprite" )->Draw_frame( 0, {0, 0}, {SCR_WIDTH,SCR_HEIGHT}, 0, glm::vec4{0.0f,0.0f,0.0f,alpha} );
 
-    Manager::Text_Get ( "death_record" )->RenderText ( "made with", {SCR_WIDTH/2 - 250, SCR_HEIGHT/2 + 100 },
-                                                            {SCR_WIDTH-50.0f,200.0f}, 1.0f, glm::vec4(1.0, 1.0f, 1.0f,alpha));
-
-    Manager::Text_Get ( "death_record" )->RenderText ( "Real Engine 5", {SCR_WIDTH/2 - 250, SCR_HEIGHT/2 },
-                                                            {SCR_WIDTH-50.0f,200.0f}, 2.0f, glm::vec4(violet_fl,alpha));
+    Manager::Draw_Text ( "death_record", "made with", {0.0f, 100.0f },
+                         {SCR_WIDTH-50.0f,200.0f}, 1.0f, glm::vec4(1.0, 1.0f, 1.0f,alpha));
+    Manager::Draw_Text ( "death_record", "4 Real Engine 5", {-95.0f, -5.0f },
+                                                            {500.0f,500.0f}, 2.0f, glm::vec4(green_fl,alpha/2));
+    Manager::Draw_Text ( "death_record", "4 Real Engine 5", {-100.0f, 0.0f },
+                                                            {500.0f,500.0f}, 2.0f, glm::vec4(violet_fl,alpha));
     if ( alpha < 0 ) { return 1; }
     else { return 0;} 
 }
@@ -75,9 +57,9 @@ float text_alpha = 0.5f;
 void Render_text ( ) {
     // command out; 
     if ( text_mode ) { text_alpha = 1.0f; } else { text_alpha = 0.5; }
-    int out = Manager::Text_Get ( "death_record" )->RenderText ( output.str(), {25.0f,SCR_HEIGHT-75.0f}, { SCR_WIDTH-50.0f, SCR_HEIGHT - 75.0f - 100.0f}, 1.0f, 
+    int out = Manager::Draw_Text ( "death_record", output.str(), {-500.0f,500.0f}, { 1000.0f, 1000.0f}, 1.0f, 
                                   glm::vec4(1-BGG, 1-BGR, 1-BGB,text_alpha), scrool );
-    int max_rows = Manager::Text_Get ( "death_record" )->Get_Max_Rows ( SCR_HEIGHT-75.0f - 100.0f,1.0f );
+    int max_rows = Manager::Text_Get ( "death_record" )->Get_Max_Rows ( 1000.0f );
 
     scrool = ( out >= max_rows ? out - max_rows : 0 );
 
@@ -97,7 +79,6 @@ void Render_text ( ) {
 }
 
 void Render ( ) {
-
     glClearColor(0, 0, 0, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
     if ( !text_mode ) { Render_text(); }
@@ -109,15 +90,16 @@ void Render ( ) {
     // updating camera projections
     cam.Move( Manager::Object_Get("Player")->Get_pos() );
 
-    Manager::Shader_Get( "sprite_1x1"  )->setMat4("projection", cam.GetWiew());
-    Manager::Shader_Get( "sprite_2x2"  )->setMat4("projection", cam.GetWiew());
-    Manager::Shader_Get( "tilemap" )->setMat4("projection", cam.GetWiew());
-    Manager::Shader_Get("text")->setMat4("projection", glm::ortho ( 0.0f, static_cast<float>(SCR_WIDTH), 0.0f, static_cast<float>(SCR_HEIGHT) ));
+    Manager::Shader_Get( "sprite_1x1"  )->setMat4("projection", cam.Get_Wiew());
+    Manager::Shader_Get( "sprite_2x2"  )->setMat4("projection", cam.Get_Wiew());
+    Manager::Shader_Get( "tilemap" )->setMat4("projection", cam.Get_Wiew());
+    Manager::Shader_Get( "text" )->setMat4("projection", cam.Get_UI_Wiew());
+    Manager::Shader_Get( "UI" )->setMat4("projection", cam.Get_UI_Wiew());
     
     
     // Manager::Sprite_Get( "sprite" )->Draw_frame( frame, {300,100},{100,100},0 );
     // Manager::Text_Get ( "death_record" )->RenderText ( "ciao", {25.0f,SCR_HEIGHT-75.0f}, { SCR_WIDTH-50.0f, 200.0f}, 1.0f, glm::vec3(0.21875f, 0, 0.21875f));
-    Manager::Tilemap_Get ( "tilemap" )->Draw({100,300},{50,50});
+    // Manager::Tilemap_Get ( "tilemap" )->Draw({100,300},{50,50});
 
     /// ------------------------------------------------------------------------- ///
     // -------------------------------------- UI --------------------------------- //

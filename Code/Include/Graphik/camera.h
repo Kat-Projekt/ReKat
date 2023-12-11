@@ -45,12 +45,23 @@ public:
 
     float GetScale ( ) { return scale; }
 
-    glm::mat4 GetWiew ( ) { // 0, width, heigth, 0
+    glm::mat4 Get_Wiew ( ) { // 0, width, heigth, 0
+        //glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(this->Width), static_cast<float>(this->Height), 0.0f, -1.0f, 1.0f);
+
+        // resize to mantain H = 1000 * scale
+        float X = (size.x / size.y * 500.0f * scale);
+        float Y = (500.0f * scale);
+        return glm::ortho ( pos.x - X, pos.x + X, 
+                            pos.y + Y, pos.y - Y,
+                            -1.0f, 1.0f );
+    }
+    glm::mat4 Get_UI_Wiew ( ) { // 0, width, heigth, 0
         //glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(this->Width), static_cast<float>(this->Height), 0.0f, -1.0f, 1.0f);
     
-        return glm::ortho ( pos.x - (size.x * scale) * 0.5f, pos.x + (size.x * scale) * 0.5f, 
-                            pos.y + (size.y * scale) * 0.5f, pos.y - (size.y * scale) * 0.5f,
-                            -1.0f, 1.0f );
+        // return glm::ortho ( - size.x / 2, size.x / 2, - size.y / 2, size.y / 2);
+        // resize to mantain H = 1000
+        float X = (size.x * 500.0f) / size.y;
+        return glm::ortho ( -X, X , -500.0f, 500.0f );
     }
 };
 

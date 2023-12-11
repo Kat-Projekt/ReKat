@@ -25,7 +25,6 @@ public:
              if ( hower && !click ) { obj.Change_frame (start_frame+1); }
         else if ( click ) { obj.Change_frame (start_frame+2); }
         else { obj.Change_frame(start_frame); }
-
         obj.Draw( ); 
     };
     void Update_mause ( glm::vec2 pos ) {

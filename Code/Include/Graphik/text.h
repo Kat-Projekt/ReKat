@@ -96,11 +96,16 @@ public:
         return SUCCESS;
     }
 
-    int Get_Max_Rows ( float heigth, float scale, int *wrap_h_out = nullptr, int wrap_h = -1 ) {
+    int Get_Max_Rows ( float heigth, int *wrap_h_out = nullptr, int wrap_h = -1 ) {
+        float max_size = 0;
+        float max_bearing = 0;
         if ( wrap_h == -1 ) {
-            // get heigth of A: 
-            Character A = Characters['A'];
-            wrap_h = (int)(A.Size.y * 1.5f * scale); }
+            for ( auto c : Characters ) {
+                if ( max_size < c.second.Size.y ) { max_size = c.second.Size.y; }
+                if ( max_bearing < c.second.Bearing.y ) { max_bearing = c.second.Bearing.y; }
+            }
+            
+            wrap_h = (int)(max_bearing); }
         if ( wrap_h_out != nullptr ) { *wrap_h_out = wrap_h; }
         return (int)(heigth / wrap_h);
     }
@@ -113,7 +118,7 @@ public:
     int start_rows = 0, int wrap_h = -1, Text_guistifiaction text_guistifiaction = LEFT ) {
         if ( _shader == nullptr ) { return SHADER_NOT_SET; }
         // calcualte max aviable rows
-        int max_rows = Get_Max_Rows ( dim.y, scale, &wrap_h );
+        int max_rows = Get_Max_Rows ( dim.y, &wrap_h );
 
         _shader->Use();
         _shader->setVec4 ( "textColor", color );
@@ -151,7 +156,7 @@ public:
         last_line > ( max_rows + first_line ) ? last_line = max_rows + first_line : 0;
 
         // render
-        float y = pos.y;
+        float y = pos.y - wrap_h * scale;
         int rendered_lines = 0;
         for ( size_t line_index = (first_line < 0 ? 0 : first_line); line_index < last_line; line_index++ ) {
             rendered_lines ++;
@@ -167,13 +172,13 @@ public:
                 float h = ch.Size.y * scale;
                 // update VBO for each character
                 float vertices[] = {
-                    xpos,     ypos + h,   0.0f, 0.0f,
+                    xpos,     ypos + h,           0.0f, 0.0f,
                     xpos,     ypos,       0.0f, 1.0f,
                     xpos + w, ypos,       1.0f, 1.0f,
 
-                    xpos,     ypos + h,   0.0f, 0.0f,
+                    xpos,     ypos + h,           0.0f, 0.0f,
                     xpos + w, ypos,       1.0f, 1.0f,
-                    xpos + w, ypos + h,   1.0f, 0.0f
+                    xpos + w, ypos + h,           1.0f, 0.0f
                 };
                 /*float vertices[] = { 
                     // pos                // tex
@@ -198,7 +203,7 @@ public:
                 // now advance cursors for next glyph (note that advance is number of 1/64 pixels)
                 x += (ch.Advance >> 6) * scale; // bitshift by 6 to get value in pixels (2^6 = 64 (divide amount of 1/64th pixels by 64 to get amount of pixels))
             }
-            y -= (scale * wrap_h );
+            y -= wrap_h * scale;
         }
 
         glBindVertexArray(0);

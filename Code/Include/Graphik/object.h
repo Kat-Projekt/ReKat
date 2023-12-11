@@ -8,6 +8,7 @@
 class Object {
 protected:
     bool Active = true;
+    bool Is_Solid = true;
     std::string name;
 
     // transform
@@ -68,6 +69,7 @@ public:
     template < class C > 
     C* Add_component ( ) {
         C* c = new C ( );
+        c->name = name;
         if ( std::is_base_of<Behaviour, C>::value ) 
         { components.push_back( std::shared_ptr < Behaviour > ( c ) ); }
         return c;
@@ -75,6 +77,7 @@ public:
 
     template < class C > 
     C* Add_component ( C* c ) {
+        c->name = name;
         if ( std::is_base_of<Behaviour, C>::value ) 
         { components.push_back( std::shared_ptr < Behaviour > ( c ) ); }
         return c;
@@ -91,6 +94,12 @@ public:
     }
 
     void Set_Active ( bool active ) { Active = active; }
+    std::string Get_Name ( ) { return name; }
+
+    void Andle_Collsions ( std::string obj, bool is_trigger ) {
+        for ( auto c : components ) 
+        { c->Collision( obj ); } 
+    };
 };
 
 

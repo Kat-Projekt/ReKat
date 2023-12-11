@@ -9,6 +9,8 @@
 #include "object.h"
 #include "button.h"
 #include "scene.h"
+#include "collision.h"
+#include "graphik.hpp"
 
 #include <map>
 
@@ -50,6 +52,12 @@ namespace Manager {
         Texts.insert( { name, t } );
         return (*t).Make(path, Shaders[shader]);
     }
+    static int Draw_Text ( std::string name,std::string text, glm::vec2 pos, glm::vec2 dim, float scale, glm::vec4 color = {0, 0, 0, 1}, 
+                           int start_rows = 0, int wrap_h = -1, Text::Text_guistifiaction text_guistifiaction = Text::LEFT ) {
+        return Text_Get(name)->RenderText( text, { pos.x * ReKat::grapik::Internal::SCR_WIDTH / ReKat::grapik::Internal::SCR_HEIGTH, pos.y }, 
+                                                 { dim.x * ReKat::grapik::Internal::SCR_WIDTH / ReKat::grapik::Internal::SCR_HEIGTH, dim.y }, 
+                                                 scale, color, start_rows, wrap_h, text_guistifiaction );
+    }
 // Sprite logic 
     static Sprite* Sprite_Get  ( std::string name ) 
     { return Sprites [name]; }
@@ -81,6 +89,7 @@ namespace Manager {
     static Object* Object_Load ( std::string name, std::string sprite, glm::vec2 pos, glm::vec2 size  ) {
         Object *o = new Object ( name, Sprites[sprite], pos, size );
         Objects.insert( { name, o } );
+        Collision::Add_Object( o );
         return o;
     }
 // Button logic 
@@ -105,8 +114,8 @@ namespace Manager {
     static void Draw ( ) {
         for ( auto o : Objects ) 
         { o.second->Draw ( ); }
-       // for ( auto b : Buttons ) 
-       // { b.second->Draw ( ); }
+        for ( auto b : Buttons ) 
+        { b.second->Draw ( ); }
     }
 
 // UI update logic
@@ -136,7 +145,9 @@ namespace Manager {
     static void Update ( ) {
         for ( auto o : Objects ) 
         { o.second->Update(); }
+
         ReKat::grapik::Input::Update();
+        Collision::Check_collisons( );
     }
 
 }; // namespace Manager

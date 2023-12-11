@@ -2,11 +2,16 @@
 #define BEHAVIOUR_H
 #include <iostream>
 
+#include <string>
 class Behaviour {
 public:
+    std::string name;
     Behaviour ( ) { }
     virtual void Start ( ) { }
-    virtual void Update ( ) { std::cout << " d"; }
+    virtual void Update ( ) { }
+
+    virtual void Collision ( std::string obj ) { }
+    virtual void CollisionTrigger ( std::string obj ) { }
 };
 
 #endif
