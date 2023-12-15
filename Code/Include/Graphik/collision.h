@@ -27,6 +27,26 @@ namespace Collision {
         }
         //std::cout <<'\n';        
     }
+    // check for collisions in a direction return position
+    static void Move ( Object *o, glm::vec2 _new_pos ) {
+        // create a new_position that can't collide with the objs
+        for ( auto _o : Objs ) {
+            if ( o == _o ) { continue; }
+            // collision x-axis?
+            bool collisionX = o->Get_pos().x +  o->Get_size().x >= _o->Get_pos().x &&
+                             _o->Get_pos().x + _o->Get_size().x >=  o->Get_pos().x;
+            // collision y-axis?
+            bool collisionY = o->Get_pos().y +  o->Get_size().y >= _o->Get_pos().y &&
+                             _o->Get_pos().y + _o->Get_size().y >=  o->Get_pos().y;
+                
+                // send collision call
+                if ( collisionX && collisionY ) {
+                    o->Andle_Collsions( _o->Get_Name(), true );
+                    _o->Andle_Collsions( o->Get_Name(), true );
+                }
+        }
+        
+    }
 };
 
 

@@ -50,12 +50,9 @@ int Texture::Make ( const char * file ) {
         this->Width = width;
         this->Height = height;
 
-        if (nrChannels == 1)
-            Format = GL_RED;
-        else if (nrChannels == 3)
-            Format = GL_RGB;
-        else if (nrChannels == 4)
-            Format = GL_RGBA;
+        if (nrChannels == 1) { Format = GL_RED; }
+        else if (nrChannels == 3) { Format = GL_RGB; }
+        else if (nrChannels == 4) { Format = GL_RGBA; }
 
         glBindTexture(GL_TEXTURE_2D, this->ID);
         glTexImage2D(GL_TEXTURE_2D, 0, Format, width, height, 0, Format, GL_UNSIGNED_BYTE, data);

@@ -13,15 +13,18 @@ protected:
 
     // transform
     // the position is the center of the sprite
-    glm::vec2 pos;
-    glm::vec2 size;
-    Sprite* sprite = nullptr;
-    std::unordered_map < std::string, Object* > Sub_Objects;
-    int frame;
     glm::vec2 parent_pos = {0,0};
-    float rot = 0;
     glm::vec2 pivot = {0.5,0.5};
+    glm::vec2 pos;
+    float altitude = 0;
+    glm::vec2 size;
+    float rot = 0;
 
+    Sprite* sprite = nullptr;
+    glm::vec4 color = {1,1,1,1};
+    int frame;
+
+    std::unordered_map < std::string, Object* > Sub_Objects;
     std::vector < std::shared_ptr<Behaviour> > components;
 
 public:
@@ -61,9 +64,10 @@ public:
     void DChange_frame ( int _frame ) { frame += _frame; }
     void Draw  ( ) { 
         if ( !Active ) { return; }
-        if ( sprite != nullptr ) { sprite->Draw_frame ( frame, pos+parent_pos - glm::vec2(size.x/2, size.y/2), size, rot, {1,1,1,1}, pivot ); }
         for ( auto o : Sub_Objects ) 
         { o.second->Draw( ); }
+
+        if ( sprite != nullptr ) { sprite->Draw_frame ( frame, glm::vec3{ pos+parent_pos-size*0.5f, altitude }, size, rot, color, pivot ); }
     }
     
     template < class C > 
@@ -100,6 +104,14 @@ public:
         for ( auto c : components ) 
         { c->Collision( obj ); } 
     };
+
+    void Set_Color ( glm::vec4 _color ) {
+        color = _color;
+    }
+
+    void Set_Altitude ( float a ) {
+        altitude = a / 1000.0f;
+    }
 };
 
 

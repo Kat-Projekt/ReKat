@@ -41,7 +41,8 @@ namespace Input {
 		RELEASED
 	};
 	static std::map < std::string, Mode > keys;
-	static glm::vec2 mouse_pos;
+	static glm::vec2 mouse_pos = {0,0};
+	static glm::vec2 old_mouse_pos;
 
 	static void(*_Keyboard)  (GLFWwindow*, int, int, int, int) = nullptr;
 	static void(*_Mouse_pos) (GLFWwindow*, double, double ) = nullptr;
@@ -79,6 +80,7 @@ namespace Input {
 	static void Mouse_pos ( GLFWwindow* window, double xpos, double ypos ) {
 		if ( _Mouse_pos != nullptr ) 
 		{ _Mouse_pos ( window, xpos, ypos ); }
+		old_mouse_pos = mouse_pos;
 		mouse_pos = {xpos, ypos};
 	}
 	static void Mouse_key ( GLFWwindow* window, int button, int action, int mode ) {
@@ -203,7 +205,7 @@ namespace ReKat::grapik {
 		{ return FAILED_LOAD_GLAD; }
 
 		glViewport ( 0, 0, Internal::SCR_WIDTH, Internal::SCR_HEIGTH );
-		glEnable ( GL_CULL_FACE ); glEnable ( GL_BLEND ); 
+		glEnable ( GL_CULL_FACE ); glEnable ( GL_BLEND ); glEnable(GL_DEPTH_TEST);
 		glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
 		return SUCCESS;

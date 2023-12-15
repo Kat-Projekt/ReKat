@@ -7,7 +7,7 @@
 #include "tilemap.h"
 #include "animator.h"
 #include "object.h"
-#include "button.h"
+#include "object_UI.h"
 #include "scene.h"
 #include "collision.h"
 #include "graphik.hpp"
@@ -17,7 +17,6 @@
 namespace Manager {
 // rescources
     static std::map < std::string, Text* >     Texts;
-    static std::map < std::string, Scene* >   Scenes;
     static std::map < std::string, Shader* >   Shaders;
     static std::map < std::string, Sprite* >   Sprites;
     static std::map < std::string, Texture* >  Textures;
@@ -26,7 +25,11 @@ namespace Manager {
 
 // objects
     static std::map < std::string, Object* > Objects;
-    static std::map < std::string, Button* > Buttons;
+    static std::map < std::string, UI_Object* > UI_Objects;
+
+// scene management
+    static std::map < std::string, Scene* > Scenes;
+    Scene* Active_Scene = nullptr;
 
 // Shader logic
     static Shader* Shader_Get  ( std::string name ) 
@@ -92,12 +95,12 @@ namespace Manager {
         Collision::Add_Object( o );
         return o;
     }
-// Button logic 
-    static Button* Button_Get  ( std::string name ) 
-    { return Buttons [name]; }
-    static Button* Button_Load ( std::string name, std::string text, std::string sprite, glm::vec2 pos, glm::vec2 size, void(*click_callback)( ), int start_frame = 0 ) {
-        Button *b = new Button ( name, text, Sprites[sprite], pos, size, click_callback, start_frame );
-        Buttons.insert( { name, b } );
+// UI_Object logic 
+    static UI_Object* UI_Object_Get  ( std::string name ) 
+    { return UI_Objects [name]; }
+    static UI_Object* UI_Object_Load ( std::string name, std::string text, std::string sprite, std::string text_renderer, glm::vec2 pos, glm::vec2 size, void(*click_callback)( ), int start_frame = 0 ) {
+        UI_Object *b = new UI_Object ( name, text, Sprites[sprite],Texts[text_renderer], pos, size, click_callback, start_frame );
+        UI_Objects.insert( { name, b } );
         return b;
     }
 
@@ -109,45 +112,42 @@ namespace Manager {
         Scenes.insert( { name, s } );
         return s;
     }
+    static Scene* Set_Active_Scene ( std::string name ) {
+        Active_Scene = Scenes[name];
+        return Active_Scene;
+    }
 
 // draw logic
-    static void Draw ( ) {
+    /*static void Draw ( ) {
         for ( auto o : Objects ) 
         { o.second->Draw ( ); }
         for ( auto b : Buttons ) 
         { b.second->Draw ( ); }
-    }
+    }*/
 
 // UI update logic
-    enum Mouse_Status { Pressed, Release };
     static void Update_Mouse_Position ( glm::vec2 pos ) {
-        for ( auto b : Buttons ) 
-        { b.second->Update_mause ( pos ); }
+        // traslate pos
+        pos -= glm::vec2 ( ReKat::grapik::Internal::SCR_WIDTH/2, ReKat::grapik::Internal::SCR_HEIGTH/2 );
+        // resize pos
+        pos = glm::vec2 ( pos.x / (ReKat::grapik::Internal::SCR_WIDTH) * 1000 * 
+                            ((float)ReKat::grapik::Internal::SCR_WIDTH / (float)ReKat::grapik::Internal::SCR_HEIGTH)
+                            , pos.y / ReKat::grapik::Internal::SCR_HEIGTH *1000 );
+        if ( Active_Scene != nullptr ) { Active_Scene->Update_Mouse_Position( pos ); }
     }
-    static void Update_Mouse_Status ( Mouse_Status status ) {
-        switch ( status ) {
-        case Pressed:
-            for ( auto b : Buttons ) 
-            { b.second->Pressed ( ); }
-            break;
-        case Release:
-            for ( auto b : Buttons ) 
-            { b.second->Release ( ); }
-            break;
-        }
+    static void Update_Mouse_Status ( Scene::Mouse_Status status ) {
+        if ( Active_Scene != nullptr ) { Active_Scene->Update_Mouse_Status ( status ); }
     }
 
     static void Start ( ) {
-        for ( auto o : Objects ) 
-        { o.second->Start(); }
+        if ( Active_Scene != nullptr ) { Active_Scene->Start ( ); }
     }
 
     static void Update ( ) {
-        for ( auto o : Objects ) 
-        { o.second->Update(); }
-
-        ReKat::grapik::Input::Update();
-        Collision::Check_collisons( );
+        Timer::Update_Delta_time ( );
+        Collision::Check_collisons ( );
+        if ( Active_Scene != nullptr ) { Active_Scene->Update ( ); }
+        ReKat::grapik::Pool ( );
     }
 
 }; // namespace Manager

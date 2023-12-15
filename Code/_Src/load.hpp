@@ -94,5 +94,5 @@ void Create_Objs ( ) {
 
 void Create_Scenes ( ) {
     Manager::Scene_Load ( "main" );
-    Manager::Scene_Get ( "main" )->Add_object( Manager::Object_Get("Player") );
+    Manager::Scene_Get ( "main" )->Add_Object( Manager::Object_Get("Player") );
 }

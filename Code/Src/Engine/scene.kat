@@ -1,0 +1,148 @@
+// unique name
+.load {
+    .shader {
+        {name, path, path, <path>, <path>, <path>}
+    }
+    .texture {
+        {name, path}
+    }
+    .text {
+        {name, path, .shader}
+    }
+    .sprite {
+        {name, .shader, .texture, <{x,y}>}
+    }
+    .tilemap {
+        {name, .sprite, path}
+    }
+}
+.obj {
+    .animator {
+        {name}
+    }
+    .animation {
+        {name, .animator, <{{int,float},{int,float}}>}
+    }
+    .object {
+        {name, <.sprite>, <{0,0}>, <{0,0}>}
+    }
+    .UI_object {
+        {nameui, titolo, <.sprite>,  <.text>, <{0,0}>, <{0,0}>, <call_back>, <frame>}
+        {nameui2, titolo, <.sprite>,  <.text>, <{0,0}>, <{0,0}>}
+    }
+    .sub {
+        {nameui,nameui2}
+    }
+    .component {
+        {name, component, <Argomenti> }
+        {Map,room_generator}
+        {Player,Player}
+    }
+}
+.scene {
+    .init {
+        {name}
+    }
+    .shader {
+        {name,.shader}
+    }
+    .UI_shader {
+        {name,.shader}
+    }
+    .UI_Sprite_shader {
+        {name,.shader}
+    }
+    .object {
+        {name, object}
+    }
+    .UI_object {
+        {name, UI_object}
+    } 
+}
+
+//esempio
+// per Tokenizing guarda tilemap.h
+
+.load {
+    .shader {
+        {text, Shaders/text.vs, Shaders/text.fs}
+        {sprite_1x1,  Shaders/sprite_animation.vs, Shaders/sprite_animation.fs}
+        {sprite_2x2,  Shaders/sprite_animation.vs, Shaders/sprite_animation.fs}
+        {empty_sprite,  Shaders/sprite_animation.vs, Shaders/sprite_animation.fs}
+        {tilemap, Shaders/sprite_animation.vs, Shaders/sprite_animation.fs}
+        {UI, Shaders/sprite_animation.vs, Shaders/sprite_animation.fs}
+    }
+    .texture {
+        {Player, Sprites/soldato.png}
+        {Spada, Sprites/SPADA.png}
+        {Buttons, Sprites/UI_menu.png}
+        {empty_sprite, Data/empty.png}
+        {tileset, Data/tile1.png}
+        {gobelino, Sprites/yoda.png}
+    }
+    .text {
+        {death_record, death_record.ttf, text}
+    }
+    .sprite {
+        {Player, sprite_1x1, Player}
+        {Spada, sprite_1x1, Spada}
+        {gobelino, sprite_2x2, gobelino, {2,3}}
+        {UI, UI, Buttons, {3,4}}
+        {empty_sprite, empty_sprite, empty_sprite}
+        {tilemap, tilemap, tileset, {32,32}}
+    }
+    .tilemap {
+        {tilemap, tilemap, Data/Tilemaps/Layer2.csv}
+    }
+}
+
+.obj {
+    .animator {
+        {walk}
+    }
+    .animation {
+        {walk, walk, <{{0,0.2},{1,0.2},{2,0.2},{3,0.2}}>}
+    }
+    .UI_object {
+        {start, START, UI, death_record, {100,0}, {100,100}, UI_Object_callback, 7}
+    }
+    .object {
+        {Player, Player, {100,100}, {100,100}}
+        {G, Player, {100,100}, {100,100}}
+        {Spada, Spada,{100,100}, {100,100}}
+        {Map, , {100,100}, {100,100}}
+    }
+    .sub {
+        {Player, Spada}
+    }
+    .component {
+        {Map, room_generator}
+        {Player, Player}
+    }
+}
+.scene {
+    .init {
+        {main}
+    }
+    .shader {
+        {main, sprite_1x1}
+    }
+    .UI_shader {
+        {main, text}
+    }
+    .UI_Sprite_shader {
+        {main, UI}
+    }
+    .object {
+        {main, Player}
+        {main, Map}
+        {main, G}
+    }
+    .UI_object {
+        {main, start}
+    } 
+}
+
+// esempio caricamento scena
+// std::vector < string > p {text,  Shaders/text.vs, Shaders/text.fs}
+// Manager::Shader_Load ( p[0], p[1], p[2])
