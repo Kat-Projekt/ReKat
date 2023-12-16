@@ -24,6 +24,8 @@ public:
 	~Mappa ( ) { rooms.clear(); }
 };
 
+int abs(int a)
+{ return ( a > 0 ? a : -a );}
 void Mappa::fill ( ) {
 	//std::cout << "stating to fill\n\n";
 	srand(this->seed);
@@ -41,6 +43,9 @@ void Mappa::fill ( ) {
 	}*/
 
 	for ( size_t i = 0; i < points.size() - 1; i++ ) {
+  int X = abs(points [i+1].x - points [i]);
+  int Y = abs(points [i+1].x - points [i]);
+  
 		for ( int x = 0; x < points[i+1].x - points[i].x; x++) {
 			// draw the line
 			std::cout << "e ";
