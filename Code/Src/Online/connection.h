@@ -79,7 +79,7 @@ void Check_connections ( ) {
             for (size_t i = 0; i < threads.size(); i++) { 
                 if ( ( s == threads[i].first.second ) && ( ( *threads[i].first.first ) == 0 ) ) 
                     { found = true; } }
-            found == true ? 0 : missing.push_back (s);
+            found == true ? (void)0 : missing.push_back (s);
         }
 
         int * end;

@@ -24,8 +24,11 @@ public:
 	~Mappa ( ) { rooms.clear(); }
 };
 
-int abs(int a)
+int abs ( int a )
 { return ( a > 0 ? a : -a );}
+int sing ( int a )
+{ return ( a < 0 ? -1 : 1 );}
+
 void Mappa::fill ( ) {
 	//std::cout << "stating to fill\n\n";
 	srand(this->seed);
@@ -43,15 +46,26 @@ void Mappa::fill ( ) {
 	}*/
 
 	for ( size_t i = 0; i < points.size() - 1; i++ ) {
-  int X = abs(points [i+1].x - points [i]);
-  int Y = abs(points [i+1].x - points [i]);
-  
-		for ( int x = 0; x < points[i+1].x - points[i].x; x++) {
-			// draw the line
-			std::cout << "e ";
-			fill_room ( {points[i].x+x,points[i].y}, 1);
-			/* code */
+  		int X = abs(points [i+1].x - points [i].x), X_s = sing (points [i+1].x - points [i].x);
+  		int Y = abs(points [i+1].y - points [i].y), Y_s = sing (points [i+1].y - points [i].y);
+		if ( X > Y ) {
+			float M = (float)(points[i+1].y - points[i].y) / (float)(points[i+1].y - points[i].y);// delta y / delta x
+			for ( int x = 0; x < X; x++) {
+				// draw the line
+				std::cout << "e ";
+				fill_room ( { points[i].x + x * X_s, points[i].y }, 1);
+				/* code */
+			}
+		} else {
+			for ( int y = 0; y < Y; y++) {
+				// draw the line
+				std::cout << "e ";
+				fill_room ( { points[i].x, points[i].y + y * Y_s }, 1);
+				/* code */
+			}
 		}
+  
+		
 		
 		/* code */
 	}

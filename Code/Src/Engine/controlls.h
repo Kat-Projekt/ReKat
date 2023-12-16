@@ -5,7 +5,7 @@
 float angle ( glm::vec2 v ) {
     float angle = 0;
     float X = v.x / sqrt( v.x * v.x + v.y *v.y );
-    if ( v.y > 0 ) { angle = M_PI-std::asin ( X ); } 
+    if ( v.y > 0 ) { angle = 3.1415-std::asin ( X ); } 
     else { angle = std::asin ( X ); }
     return angle;
 }

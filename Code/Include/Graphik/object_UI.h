@@ -5,6 +5,7 @@
 #include "unordered_map"
 #include "behaviour.h"
 #include "text.h"
+#include <memory>
 
 class UI_Object {
 private:

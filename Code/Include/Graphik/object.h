@@ -4,6 +4,7 @@
 #include "sprite.h"
 #include "unordered_map"
 #include "behaviour.h"
+#include <memory>
 
 class Object {
 protected:
