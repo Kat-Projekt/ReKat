@@ -73,8 +73,8 @@ void Mappa::fill ( ) {
 
 	// enlarge dungeon
 	for (size_t iteration = 1; iteration < 4; iteration++) {
-		for ( size_t x = 0; x < size.x; x++ ) {
-			for (size_t y = 0; y < size.y; y++) {
+		for ( int x = 0; x < size.x; x++ ) {
+			for (int y = 0; y < size.y; y++) {
 				if ( get_room( { x-1, y} ) == iteration || get_room( { x+1, y} ) == iteration || get_room( { x, y-1} ) == iteration || get_room( { x, y+1} ) == iteration ) 
 				{ fill_room ( {x,y}, iteration + 1 ); }
 			}

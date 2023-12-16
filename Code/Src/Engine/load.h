@@ -68,8 +68,8 @@ void UI_Object_callback ( ) { ReKat::grapik::End(); }
 void Create_Objs ( ) {
 	// configure UI objects
 	Manager::UI_Object_Load ( "start", "", "UI", "death_record", {-500,-450}, {100,100}, UI_Object_callback, 6 );
-	Manager::UI_Object_Load ( "output", "output", "empty_sprite", "death_record", {0,-250}, {1000,500}, nullptr, 6 )->Set_Color({0,1,0,1});
-	Manager::UI_Object_Load ( "input", "", "empty_sprite", "death_record", {0,250}, {1000,500}, nullptr, 6 )->Set_Color({1,0,0,1});
+	Manager::UI_Object_Load ( "output", "output", "empty_sprite", "death_record", {0,-200}, {1000,300}, nullptr, 6 )->Set_Color({0,1,0,1});
+	Manager::UI_Object_Load ( "input", "", "empty_sprite", "death_record", {0,200}, {1000,300}, nullptr, 6 )->Set_Color({1,0,0,1});
 	Manager::UI_Object_Load ( "Connecting", "Connecting", "empty_sprite", "death_record", {0,0}, {1000,1000}, nullptr, 6 )->Set_Color({1,1,1,1});
 
 	// configure player
