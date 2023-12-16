@@ -11,6 +11,6 @@ cd ReKat
 echo ended compilation (msg from compile)
 echo running (msg from compile)
 
-.\ReKat
+.\ReKat carlo a
 
 cd ../../

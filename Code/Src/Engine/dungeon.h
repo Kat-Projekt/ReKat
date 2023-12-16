@@ -1,6 +1,11 @@
 #pragma once
 #include "dungeon_special.h"
 
+inline int abs ( int a )
+{ return ( a > 0 ? a : -a );}
+inline int sing ( int a )
+{ return ( a < 0 ? -1 : 1 );}
+
 class Mappa {
 public:
 	struct vec2 { int x; int y; };
@@ -10,8 +15,9 @@ public:
 	void fill ( );
 	std::vector < int > rooms;
 
-	void fill_room ( vec2 pos, int val ) {
-		rooms [ pos.x * size.y + pos.y] = val;
+	void fill_room ( vec2 pos, int val ) { rooms [ pos.x * size.y + pos.y] = val; }
+	int get_room  ( vec2 pos ) { 
+		return rooms [ clamp(pos.x, 0, size.x) * size.y + clamp(pos.y, 0, size.y)]; 
 	}
 
 	Mappa ( ) { }
@@ -24,10 +30,6 @@ public:
 	~Mappa ( ) { rooms.clear(); }
 };
 
-int abs ( int a )
-{ return ( a > 0 ? a : -a );}
-int sing ( int a )
-{ return ( a < 0 ? -1 : 1 );}
 
 void Mappa::fill ( ) {
 	//std::cout << "stating to fill\n\n";
@@ -39,7 +41,7 @@ void Mappa::fill ( ) {
 	// allarga le carverne
 	// se una casella ha vicino n scrivi n+1
 	// in base alla distanza aggiungi layers
-	std::vector < vec2 > points = {{0,0}, {3,7}, {7,3}};
+	std::vector < vec2 > points = {{0,0}, {3,7}, {7,3}, {13,17}, {27,23}, {33,37}, {47,13}};
 	/*for (size_t i = 0; i < 3; i++) {
 		points.push_back ( { rand()%(size.x), rand()%(size.y) } );
 		 code 
@@ -48,27 +50,39 @@ void Mappa::fill ( ) {
 	for ( size_t i = 0; i < points.size() - 1; i++ ) {
   		int X = abs(points [i+1].x - points [i].x), X_s = sing (points [i+1].x - points [i].x);
   		int Y = abs(points [i+1].y - points [i].y), Y_s = sing (points [i+1].y - points [i].y);
+		std::cout << " Y: " << Y << " X: " << X;
+		float M = (float)(X) / (float)(Y);// delta y / delta x
+		std::cout << " M: " << M;
 		if ( X > Y ) {
-			float M = (float)(points[i+1].y - points[i].y) / (float)(points[i+1].y - points[i].y);// delta y / delta x
+			M = (float)(Y) / (float)(X);
 			for ( int x = 0; x < X; x++) {
 				// draw the line
-				std::cout << "e ";
-				fill_room ( { points[i].x + x * X_s, points[i].y }, 1);
+				std::cout << "x ";
+				fill_room ( { points[i].x + x * X_s, points[i].y + M * x }, 1);
 				/* code */
 			}
 		} else {
 			for ( int y = 0; y < Y; y++) {
 				// draw the line
-				std::cout << "e ";
-				fill_room ( { points[i].x, points[i].y + y * Y_s }, 1);
+				std::cout << "y ";
+				fill_room ( { points[i].x + M * y, points[i].y + y * Y_s }, 1);
 				/* code */
 			}
 		}
-  
-		
-		
-		/* code */
 	}
+
+	// enlarge dungeon
+	for (size_t iteration = 1; iteration < 4; iteration++) {
+		for ( size_t x = 0; x < size.x; x++ ) {
+			for (size_t y = 0; y < size.y; y++) {
+				if ( get_room( { x-1, y} ) == iteration || get_room( { x+1, y} ) == iteration || get_room( { x, y-1} ) == iteration || get_room( { x, y+1} ) == iteration ) 
+				{ fill_room ( {x,y}, iteration + 1 ); }
+			}
+		}
+	}
+	
+	
+	
 	
 }
 
@@ -91,12 +105,12 @@ private:
     Mappa mappa;
 public:
     void Start ( ) {
-        mappa = Mappa ( 12345, {10,10} );
+        mappa = Mappa ( 12345, {50,50} );
         std::cout << mappa;
-		for (size_t i = 0; i < 10; i++) {
-			for (size_t y = 0; y < 10; y++) {
-				glm::vec4 color = {i/10.0,y/10.0,y/10.0,1};
-				if ( mappa.rooms[i*mappa.size.y+y] == 0 ) { color = glm::vec4(1,1,1,1); }
+		for (size_t i = 0; i < 50; i++) {
+			for (size_t y = 0; y < 50; y++) {
+				glm::vec4 color = {i/50.0,y/50.0,y/50.0,1};
+				if ( mappa.rooms[i*mappa.size.y+y] == 0 ) { color = glm::vec4(1,1,1,1); continue; }
 				std::string n = "Tile:" + std::to_string(i) + ":" + std::to_string(y);
 				Manager::Object_Load( n, "empty_sprite",{100*y,100*i},{100,100})->Set_Color(color);
 				Manager::Object_Get(name)->Add_Sub_Object(n ,Manager::Object_Get(n));

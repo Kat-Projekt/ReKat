@@ -43,7 +43,6 @@ public:
 
         if ( Key_Down ( "C" ) ) { camera_centered = !camera_centered; }
         if ( Key_Down ( "Mouse3" ) ) { camera_centered = false; }
-        if ( Key_Up ( "Mouse3" ) ) { camera_centered = true; }
 
         if ( camera_centered ) {
             glm::vec2 pos = lerp ( Manager::Object_Get("Player")->Get_pos( ), Manager::Active_Scene->cam.Get_Pos(), Timer::delta_time * camera_speed );
