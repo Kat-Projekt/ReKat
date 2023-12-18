@@ -9,7 +9,6 @@
 #include "object.h"
 #include "object_UI.h"
 #include "scene.h"
-#include "collision.h"
 #include "graphik.hpp"
 
 #include <map>
@@ -92,7 +91,6 @@ namespace Manager {
     static Object* Object_Load ( std::string name, std::string sprite, glm::vec2 pos, glm::vec2 size  ) {
         Object *o = new Object ( name, Sprites[sprite], pos, size );
         Objects.insert( { name, o } );
-        Collision::Add_Object( o );
         return o;
     }
 // UI_Object logic 
@@ -145,7 +143,6 @@ namespace Manager {
 
     static void Update ( ) {
         Timer::Update_Delta_time ( );
-        Collision::Check_collisons ( );
         if ( Active_Scene != nullptr ) { Active_Scene->Update ( ); }
         ReKat::grapik::Pool ( );
     }

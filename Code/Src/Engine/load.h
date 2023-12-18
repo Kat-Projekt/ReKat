@@ -67,7 +67,7 @@ void UI_Object_callback ( ) { ReKat::grapik::End(); }
 
 void Create_Objs ( ) {
 	// configure UI objects
-	Manager::UI_Object_Load ( "start", "", "UI", "death_record", {-500,-450}, {100,100}, UI_Object_callback, 6 );
+	Manager::UI_Object_Load ( "start", "exit", "UI", "death_record", {-500,-450}, {100,100}, UI_Object_callback, 6 );
 	Manager::UI_Object_Load ( "output", "output", "empty_sprite", "death_record", {0,-200}, {1000,300}, nullptr, 6 )->Set_Color({0,1,0,1});
 	Manager::UI_Object_Load ( "input", "", "empty_sprite", "death_record", {0,200}, {1000,300}, nullptr, 6 )->Set_Color({1,0,0,1});
 	Manager::UI_Object_Load ( "Connecting", "Connecting", "empty_sprite", "death_record", {0,0}, {1000,1000}, nullptr, 6 )->Set_Color({1,1,1,1});
@@ -106,7 +106,7 @@ void Create_Scenes ( ) {
 	Manager::Scene_Get ( "main" )->Add_UI_Sprite_Shader ( Manager::Shader_Get("UI") );
 	Manager::Scene_Get ( "main" )->Add_UI_Shader ( Manager::Shader_Get("text") );
 	Manager::Scene_Get ( "main" )->Add_Object ( Manager::Object_Get("Player") );
-	Manager::Scene_Get ( "main" )->Add_Object ( Manager::Object_Get("Map") );
+	// Manager::Scene_Get ( "main" )->Add_Object ( Manager::Object_Get("Map") );
 	// Manager::Scene_Get ( "main" )->Add_Object ( Manager::Object_Get("G") );
 	Manager::Scene_Get ( "main" )->Add_UI_Object ( Manager::UI_Object_Get( "start" ) );
 }

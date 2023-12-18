@@ -5,6 +5,13 @@
 #include <iostream>
 #include <stdlib.h>
 
+// camps n tra a e b
+int clamp ( int n, int a, int b ) {
+	if ( n > b ) { n = b; }
+	if ( n < a ) { n = a; }
+	return n;
+}
+
 enum dir {
 	NORD,
 	SUD,
@@ -107,12 +114,7 @@ std::ostream& operator << (std::ostream& os, const std::vector < room > & map ) 
     return os;
 }
 
-// camps n tra a e b
-int clamp ( int n, int a, int b ) {
-	if ( n > b ) { n = a; }
-	if ( n < a ) { n = b; }
-	return n;
-}
+
 
 class Map {
 public:

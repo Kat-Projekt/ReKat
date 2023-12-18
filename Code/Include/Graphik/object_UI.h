@@ -77,8 +77,7 @@ public:
         if ( sprite != nullptr ) { sprite->Draw_frame ( frame, { pos.x+parent_pos.x-size.x, pos.y+parent_pos.y, altitude }, size, rot, color, pivot ); }
         if ( text_renderer != nullptr ) { 
             text_renderer->RenderText(text,glm::vec2(pos.x, -pos.y) - glm::vec2 (size.x/2, -size.y/2),size,1); 
-            std::cout << text;
-            std::cout << pos.x << " x " << pos.y << '\n'
+            std::cout << "text: " << text << " " << pos.x << " x " << pos.y << " " << size.x << " x " << size.y << '\n';
         }
     };
     

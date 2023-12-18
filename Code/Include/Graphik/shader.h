@@ -151,7 +151,7 @@ public:
     }
     // activate the shader
     // ------------------------------------------------------------------------
-    void Use() { glUseProgram(ID); }
+    void Use() { std::cout << "using " << ID <<'\n'; glUseProgram(ID); }
     // utility uniform functions
     // ------------------------------------------------------------------------
     void setBool(const std::string &name, bool value) { Use(); glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value); }

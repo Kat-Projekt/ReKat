@@ -15,9 +15,11 @@ public:
 	void fill ( );
 	std::vector < int > rooms;
 
-	void fill_room ( vec2 pos, int val ) { rooms [ pos.x * size.y + pos.y] = val; }
+	void fill_room ( vec2 pos, int val ) { 
+		rooms [ clamp(pos.x, 0, size.x-1) * size.y + clamp(pos.y, 0, size.y-1)] = val; 
+	}
 	int get_room  ( vec2 pos ) { 
-		return rooms [ clamp(pos.x, 0, size.x) * size.y + clamp(pos.y, 0, size.y)]; 
+		return rooms [ clamp(pos.x, 0, size.x-1) * size.y + clamp(pos.y, 0, size.y-1)]; 
 	}
 
 	Mappa ( ) { }
@@ -58,14 +60,14 @@ void Mappa::fill ( ) {
 			for ( int x = 0; x < X; x++) {
 				// draw the line
 				std::cout << "x ";
-				fill_room ( { points[i].x + x * X_s, points[i].y + M * x }, 1);
+				fill_room ( { points[i].x + x * X_s, points[i].y + (int)(M * x) }, 1);
 				/* code */
 			}
 		} else {
 			for ( int y = 0; y < Y; y++) {
 				// draw the line
 				std::cout << "y ";
-				fill_room ( { points[i].x + M * y, points[i].y + y * Y_s }, 1);
+				fill_room ( { points[i].x + (int)(M * y), points[i].y + y * Y_s }, 1);
 				/* code */
 			}
 		}

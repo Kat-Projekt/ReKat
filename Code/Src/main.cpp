@@ -30,6 +30,8 @@ int main(int argc, char const *argv[]) {
     Manager::Set_Active_Scene ( "main" );
     Manager::Start ( );
 
+    int Fps;
+
     while ( ReKat::grapik::IsEnd ( ) ) {
         Send_positon ( );
         Manager::Update ( );

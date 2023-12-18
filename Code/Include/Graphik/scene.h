@@ -50,7 +50,7 @@ public:
         for ( auto s : UI_Shaders ) 
         { s->setMat4( "projection", cam.Get_UI_Wiew() ); }
         for ( auto s : UI_Sprite_Shaders ) 
-        { s->setMat4( "projection", cam.Get_UI_Sprite_Wiew() ); }
+        { s->setMat4( "projection", cam.Get_UI_Wiew() ); }
 
         // Update objects
         for ( auto o : Objects ) 

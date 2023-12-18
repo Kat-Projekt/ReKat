@@ -63,6 +63,7 @@ public:
         // resize to mantain H = 1000
         float X = ((float)ReKat::grapik::Internal::SCR_WIDTH * 500.0f) / (float)ReKat::grapik::Internal::SCR_HEIGTH;
         return glm::ortho ( -X, X , -500.0f, 500.0f );
+		std::cout << "forgin UI Wiew " << X << '\n';
     }
     glm::mat4 Get_UI_Sprite_Wiew ( ) { // 0, width, heigth, 0
         //glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(this->Width), static_cast<float>(this->Height), 0.0f, -1.0f, 1.0f);
