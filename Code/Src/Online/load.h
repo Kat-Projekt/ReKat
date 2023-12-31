@@ -68,5 +68,6 @@ int End_Online ( ) {
         conn_thread.detach ( );
     }
     std::cout << "--------------------------- END --------------------------\n";
+	ReKat::online::End();
     return 0;
 }

@@ -6,6 +6,7 @@
 #include "camera.h"
 #include "manager.h"
 #include "tilemap.h"
+#include "graphik.hpp"
 
 class Scene {
 private:
@@ -13,19 +14,19 @@ private:
     std::vector < UI_Object* > UI_Objects;
     std::vector < Shader* > Shaders;
     std::vector < Shader* > UI_Shaders;
-    std::vector < Shader* > UI_Sprite_Shaders;
     std::vector < Tilemap* > Tilemaps;
 public:
     Camera cam;
+	glm::vec2 world_mouse_pos;
 
     Scene ( ) { }
 
-    void Add_Object    ( Object* _obj )        { Objects.push_back(_obj); }
-    void Add_UI_Object ( UI_Object* _obj )     { UI_Objects.push_back(_obj); }
-    void Add_Shader    ( Shader* _obj )        { Shaders.push_back(_obj); }
-    void Add_UI_Shader ( Shader* _obj )        { UI_Shaders.push_back(_obj); }
-    void Add_UI_Sprite_Shader ( Shader* _obj ) { UI_Sprite_Shaders.push_back(_obj); }
-    void Add_Tilemap   ( Tilemap* _obj )       { Tilemaps.push_back(_obj); }
+    Scene* Add_Object    ( Object* _obj )        { Objects.push_back(_obj); return this; }
+    //Scene* Rem_Object	   ( Object* _obj )		   { Objects.remove_if ( Object.begin(), Object.end() ); return this;}
+	Scene* Add_UI_Object ( UI_Object* _obj )     { UI_Objects.push_back(_obj); return this; }
+    Scene* Add_Shader    ( Shader* _obj )        { Shaders.push_back(_obj); return this; }
+    Scene* Add_UI_Shader ( Shader* _obj )        { UI_Shaders.push_back(_obj); return this; }
+    Scene* Add_Tilemap   ( Tilemap* _obj )       { Tilemaps.push_back(_obj); return this; }
 
     enum Mouse_Status { Pressed, Release };
     void Update_Mouse_Position ( glm::vec2 pos ) {
@@ -38,28 +39,32 @@ public:
     }
 
     void Start ( ) {
+		Objects.reserve(100);
         for ( auto o : Objects ) 
         { o->Start(); }
     }
+
     void Update ( ) {
+		world_mouse_pos = cam.Get_Pos() + ReKat::grapik::Input::mouse_pos;
+
         glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); 
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
         // Update camera projection
         for ( auto s : Shaders ) 
         { s->setMat4( "projection", cam.Get_Wiew() ); }
         for ( auto s : UI_Shaders ) 
         { s->setMat4( "projection", cam.Get_UI_Wiew() ); }
-        for ( auto s : UI_Sprite_Shaders ) 
-        { s->setMat4( "projection", cam.Get_UI_Wiew() ); }
 
         // Update objects
-        for ( auto o : Objects ) 
-        { o->Draw(); 
-          o->Update(); }
+        for ( auto o : Objects ) {
+			if ( o == nullptr ) { continue; }
+			o->Draw(); 
+			o->Update(); 
+		}
         for ( auto o : UI_Objects ) 
         { o->Draw(); }
-        
-        ReKat::grapik::Input::Update();
+		glDisable(GL_DEPTH_TEST);
     }
 };
 

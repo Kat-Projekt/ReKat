@@ -33,13 +33,13 @@ public:
         unsigned int VBO;
         float vertices[] = { 
             // pos      // tex
-            0.0f, 1.0f, 0.0f, 1.0f,
-            1.0f, 0.0f, 1.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 0.0f, 
+            0.0f, 1.0f, 0.0f, 0.0f,
+            0.0f, 0.0f, 0.0f, 1.0f,
+            1.0f, 0.0f, 1.0f, 1.0f,
 
-            0.0f, 1.0f, 0.0f, 1.0f,
-            1.0f, 1.0f, 1.0f, 1.0f,
-            1.0f, 0.0f, 1.0f, 0.0f
+            0.0f, 1.0f, 0.0f, 0.0f,
+            1.0f, 0.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f, 0.0f
         };
 
         glGenVertexArrays(1, &this->quadVAO);

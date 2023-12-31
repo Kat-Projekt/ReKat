@@ -5,8 +5,8 @@
 float angle ( glm::vec2 v ) {
     float angle = 0;
     float X = v.x / sqrt( v.x * v.x + v.y *v.y );
-    if ( v.y > 0 ) { angle = 3.1415-std::asin ( X ); } 
-    else { angle = std::asin ( X ); }
+    if ( v.y > 0 ) { angle = 3.1415+std::asin ( X ); } 
+    else { angle = -std::asin ( X ); }
     return angle;
 }
 
@@ -17,11 +17,9 @@ static void __Keyboard ( GLFWwindow* window, int key, int scancode, int action, 
 }
 static void __Mouse_pos ( GLFWwindow* window, double xposIn, double yposIn ) {
     // update UI
-    Manager::Update_Mouse_Position ( {xposIn, yposIn} );
+    Manager::Update_Mouse_Position ( );
 
-    // spada rotation
-    Manager::Object_Get("Player")->Get_Sub_Object("Spada")->Rotate( angle( { xposIn - ReKat::grapik::Internal::SCR_WIDTH/2, yposIn - ReKat::grapik::Internal::SCR_HEIGTH/2 } ) );
-}
+    }
 static void __Mouse_key ( GLFWwindow *window, int button, int action, int mods ) {
     if ( button == GLFW_MOUSE_BUTTON_LEFT ) {
         if ( action == GLFW_PRESS )   { Manager::Update_Mouse_Status(Scene::Pressed); }

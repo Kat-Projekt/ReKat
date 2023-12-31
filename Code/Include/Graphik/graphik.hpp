@@ -82,6 +82,13 @@ namespace Input {
 		{ _Mouse_pos ( window, xpos, ypos ); }
 		old_mouse_pos = mouse_pos;
 		mouse_pos = {xpos, ypos};
+        // traslate mouse_pos
+        mouse_pos.x -= ReKat::grapik::Internal::SCR_WIDTH/2;
+		mouse_pos.y = -mouse_pos.y + ReKat::grapik::Internal::SCR_HEIGTH/2;
+        // resize mouse_pos
+        mouse_pos = glm::vec2 ( mouse_pos.x / (ReKat::grapik::Internal::SCR_WIDTH) * 1000 * 
+                            ((float)ReKat::grapik::Internal::SCR_WIDTH / (float)ReKat::grapik::Internal::SCR_HEIGTH)
+                            , mouse_pos.y / ReKat::grapik::Internal::SCR_HEIGTH * 1000 );
 	}
 	static void Mouse_key ( GLFWwindow* window, int button, int action, int mode ) {
 		if ( _Mouse_key != nullptr ) 

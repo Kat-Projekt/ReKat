@@ -172,13 +172,13 @@ public:
                 float h = ch.Size.y * scale;
                 // update VBO for each character
                 float vertices[] = {
-                    xpos,     ypos + h,           0.0f, 0.0f,
+                    xpos,     ypos + h,   0.0f, 0.0f,
                     xpos,     ypos,       0.0f, 1.0f,
                     xpos + w, ypos,       1.0f, 1.0f,
 
-                    xpos,     ypos + h,           0.0f, 0.0f,
+                    xpos,     ypos + h,   0.0f, 0.0f,
                     xpos + w, ypos,       1.0f, 1.0f,
-                    xpos + w, ypos + h,           1.0f, 0.0f
+                    xpos + w, ypos + h,   1.0f, 0.0f
                 };
                 /*float vertices[] = { 
                     // pos                // tex

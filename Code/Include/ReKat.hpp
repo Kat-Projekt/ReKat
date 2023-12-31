@@ -25,6 +25,7 @@
 		#include <Graphik/shader.h>
 		#include <Graphik/text.h>
 		//#include <Graphik/texture.h>
+		#include <Graphik/framebuffer.h>
 		#include <Graphik/camera.h>
 		#include <Graphik/sprite.h>
 		#include <Graphik/button.h>
@@ -35,6 +36,7 @@
 		#include <Graphik/animator.h>
 		#include <Graphik/behaviour.h>
 		#include <Graphik/scene.h>
+		#include <Graphik/collision.h>
 	#endif
 #endif
 

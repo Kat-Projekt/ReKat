@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.13)
 
 project(ReKat)
 
+## remove examples
+option(OPENAL_BUILD_EXAMPLES OFF)
+add_subdirectory(Code/Lib/openal-soft)
+
 option(GLFW_BUILD_DOCS OFF)
 option(GLFW_BUILD_EXAMPLES OFF)
 option(GLFW_BUILD_TESTS OFF)
@@ -25,7 +29,8 @@ include_directories(Code/Include/
                     Code/Lib/freetype/include/
                     Code/Lib/glfw/include/
                     Code/Lib/glm/
-                    Code/Lib/stb/ )
+                    Code/Lib/stb/
+					Code/Lib/openal-soft/include )
 
 file(GLOB LIBS_SOURCES    Code/Lib/glad/src/glad.c)
 file(GLOB PROJECT_HEADERS Code/Include/*.hpp
@@ -57,7 +62,7 @@ add_executable(${PROJECT_NAME} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
                                ${PROJECT_SHADERS} ${PROJECT_CONFIGS}
                                ${LIBS_SOURCES})
 
-target_link_libraries(${PROJECT_NAME} glfw freetype
+target_link_libraries(${PROJECT_NAME} glfw freetype OpenAL::OpenAL
                       ${GLFW_LIBRARIES} ${GLAD_LIBRARIES} ${WINSOCK_LIBRARIES} )
 
 set_target_properties(${PROJECT_NAME} PROPERTIES

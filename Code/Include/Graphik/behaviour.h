@@ -12,6 +12,10 @@ public:
 
     virtual void Collision ( std::string obj ) { }
     virtual void CollisionTrigger ( std::string obj ) { }
+	virtual void CollisionEnter ( std::string obj ) { }
+	virtual void CollisionExit ( std::string obj ) { }
+	virtual void CollisionTriggerEnter ( std::string obj ) { }
+	virtual void CollisionTriggerExit ( std::string obj ) { }
 };
 
 #endif

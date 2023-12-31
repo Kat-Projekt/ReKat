@@ -43,7 +43,7 @@ void Mappa::fill ( ) {
 	// allarga le carverne
 	// se una casella ha vicino n scrivi n+1
 	// in base alla distanza aggiungi layers
-	std::vector < vec2 > points = {{0,0}, {3,7}, {7,3}, {13,17}, {27,23}, {33,37}, {47,13}};
+	std::vector < vec2 > points = { {7,3}, {13,17}, {27,23}, {33,37}, {47,13} };
 	/*for (size_t i = 0; i < 3; i++) {
 		points.push_back ( { rand()%(size.x), rand()%(size.y) } );
 		 code 
@@ -52,24 +52,14 @@ void Mappa::fill ( ) {
 	for ( size_t i = 0; i < points.size() - 1; i++ ) {
   		int X = abs(points [i+1].x - points [i].x), X_s = sing (points [i+1].x - points [i].x);
   		int Y = abs(points [i+1].y - points [i].y), Y_s = sing (points [i+1].y - points [i].y);
-		std::cout << " Y: " << Y << " X: " << X;
-		float M = (float)(X) / (float)(Y);// delta y / delta x
-		std::cout << " M: " << M;
 		if ( X > Y ) {
-			M = (float)(Y) / (float)(X);
-			for ( int x = 0; x < X; x++) {
-				// draw the line
-				std::cout << "x ";
-				fill_room ( { points[i].x + x * X_s, points[i].y + (int)(M * x) }, 1);
-				/* code */
-			}
+			float M = (float)(Y) / (float)(X);
+			for ( int x = 0; x < X; x++) 
+			{ fill_room ( { points[i].x + x * X_s, points[i].y + (int)(M * x) }, 1); }
 		} else {
-			for ( int y = 0; y < Y; y++) {
-				// draw the line
-				std::cout << "y ";
-				fill_room ( { points[i].x + (int)(M * y), points[i].y + y * Y_s }, 1);
-				/* code */
-			}
+			float M = (float)(X) / (float)(Y);
+			for ( int y = 0; y < Y; y++) 
+			{ fill_room ( { points[i].x + (int)(M * y), points[i].y + y * Y_s }, 1); }
 		}
 	}
 
@@ -77,15 +67,12 @@ void Mappa::fill ( ) {
 	for (size_t iteration = 1; iteration < 4; iteration++) {
 		for ( int x = 0; x < size.x; x++ ) {
 			for (int y = 0; y < size.y; y++) {
-				if ( get_room( { x-1, y} ) == iteration || get_room( { x+1, y} ) == iteration || get_room( { x, y-1} ) == iteration || get_room( { x, y+1} ) == iteration ) 
-				{ fill_room ( {x,y}, iteration + 1 ); }
+				if ( get_room( { x-1, y} ) == iteration || get_room( { x+1, y} ) == iteration || 
+					 get_room( { x, y-1} ) == iteration || get_room( { x, y+1} ) == iteration ) 
+				{ if ( get_room ( { x, y } ) == 0) { fill_room ( {x,y}, iteration + 1 ); } }
 			}
 		}
 	}
-	
-	
-	
-	
 }
 
 std::ostream& operator << (std::ostream& os, const Mappa& map) {
@@ -111,10 +98,12 @@ public:
         std::cout << mappa;
 		for (size_t i = 0; i < 50; i++) {
 			for (size_t y = 0; y < 50; y++) {
-				glm::vec4 color = {i/50.0,y/50.0,y/50.0,1};
-				if ( mappa.rooms[i*mappa.size.y+y] == 0 ) { color = glm::vec4(1,1,1,1); continue; }
+				glm::vec4 color = {mappa.rooms[i*mappa.size.y+y]/4,0,0,1};
+				if ( mappa.rooms[i*mappa.size.y+y] == 0 ) { continue; }
 				std::string n = "Tile:" + std::to_string(i) + ":" + std::to_string(y);
 				Manager::Object_Load( n, "empty_sprite",{100*y,100*i},{100,100})->Set_Color(color);
+				if ( mappa.rooms[i*mappa.size.y+y] == 4 )
+				{ Manager::Add_Collider ( n )->Set_size({100,100})->Set_movable(false); std::cout << "col"; }
 				Manager::Object_Get(name)->Add_Sub_Object(n ,Manager::Object_Get(n));
 			}
 		}

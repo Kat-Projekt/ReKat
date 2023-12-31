@@ -1,15 +1,17 @@
 #ifndef MANAGER
 #define MANAGER
 #include "text.h"
+#include "scene.h"
 #include "sprite.h"
 #include "shader.h"
+#include "object.h"
 #include "texture.h"
 #include "tilemap.h"
 #include "animator.h"
-#include "object.h"
 #include "object_UI.h"
-#include "scene.h"
 #include "graphik.hpp"
+#include "collision.h"
+#include "framebuffer.h"
 
 #include <map>
 
@@ -21,6 +23,7 @@ namespace Manager {
     static std::map < std::string, Texture* >  Textures;
     static std::map < std::string, Tilemap* >  Tilemaps;
     static std::map < std::string, Animator* > Animators;
+	static std::map < std::string, Framebuffer* > Framebuffers;
 
 // objects
     static std::map < std::string, Object* > Objects;
@@ -54,17 +57,16 @@ namespace Manager {
         Texts.insert( { name, t } );
         return (*t).Make(path, Shaders[shader]);
     }
-    static int Draw_Text ( std::string name,std::string text, glm::vec2 pos, glm::vec2 dim, float scale, glm::vec4 color = {0, 0, 0, 1}, 
-                           int start_rows = 0, int wrap_h = -1, Text::Text_guistifiaction text_guistifiaction = Text::LEFT ) {
-        return Text_Get(name)->RenderText( text, { pos.x * ReKat::grapik::Internal::SCR_WIDTH / ReKat::grapik::Internal::SCR_HEIGTH, pos.y }, 
-                                                 { dim.x * ReKat::grapik::Internal::SCR_WIDTH / ReKat::grapik::Internal::SCR_HEIGTH, dim.y }, 
-                                                 scale, color, start_rows, wrap_h, text_guistifiaction );
-    }
 // Sprite logic 
     static Sprite* Sprite_Get  ( std::string name ) 
     { return Sprites [name]; }
     static int Sprite_Load ( std::string name, std::string shader, std::string texture, glm::vec2 set = {1,1} ) {
         Sprite *s = new Sprite ( Shaders[shader], Textures[texture], set );
+        Sprites.insert( { name, s } );
+        return 0;
+    }
+    static int Sprite_Load ( std::string name, std::string shader, Framebuffer * F, glm::vec2 set = {1,1} ) {
+        Sprite *s = new Sprite ( Shaders[shader], F, set );
         Sprites.insert( { name, s } );
         return 0;
     }
@@ -101,6 +103,22 @@ namespace Manager {
         UI_Objects.insert( { name, b } );
         return b;
     }
+// Framebuffer logic 
+    static Framebuffer* Framebuffer_Get  ( std::string name ) 
+    { return Framebuffers [name]; }
+    static int Framebuffer_Load ( std::string name, int W, int H ) {
+        Framebuffer *b = new Framebuffer ( );
+        Framebuffers.insert( { name, b } );
+        return (*b).Make( W, H );
+    }
+
+// collider logic
+	static Collider* Add_Collider ( std::string name ) {
+		Collider * c = Manager::Object_Get(name)->Add_component<Collider> ( );
+		c->Set_Obj(Manager::Object_Get(name));
+		c->Start();
+		return c;
+	}
 
 // Scene logic 
     static Scene* Scene_Get  ( std::string name ) 
@@ -115,36 +133,33 @@ namespace Manager {
         return Active_Scene;
     }
 
-// draw logic
-    /*static void Draw ( ) {
-        for ( auto o : Objects ) 
-        { o.second->Draw ( ); }
-        for ( auto b : Buttons ) 
-        { b.second->Draw ( ); }
-    }*/
-
 // UI update logic
-    static void Update_Mouse_Position ( glm::vec2 pos ) {
-        // traslate pos
-        pos -= glm::vec2 ( ReKat::grapik::Internal::SCR_WIDTH/2, ReKat::grapik::Internal::SCR_HEIGTH/2 );
-        // resize pos
-        pos = glm::vec2 ( pos.x / (ReKat::grapik::Internal::SCR_WIDTH) * 1000 * 
-                            ((float)ReKat::grapik::Internal::SCR_WIDTH / (float)ReKat::grapik::Internal::SCR_HEIGTH)
-                            , pos.y / ReKat::grapik::Internal::SCR_HEIGTH *1000 );
-        if ( Active_Scene != nullptr ) { Active_Scene->Update_Mouse_Position( pos ); }
+    static void Update_Mouse_Position ( ) {
+        if ( Active_Scene != nullptr ) { Active_Scene->Update_Mouse_Position( ReKat::grapik::Input::mouse_pos ); }
     }
     static void Update_Mouse_Status ( Scene::Mouse_Status status ) {
         if ( Active_Scene != nullptr ) { Active_Scene->Update_Mouse_Status ( status ); }
     }
+
+	static void Empty ( ) {
+		// adds empty values
+		Texts.insert ( {"", nullptr} );
+    	Shaders.insert ( {"", nullptr} );
+    	Sprites.insert ( {"", nullptr} );
+    	Textures.insert ( {"", nullptr} );
+    	Tilemaps.insert ( {"", nullptr} );
+    	Animators.insert ( {"", nullptr} );
+	}
 
     static void Start ( ) {
         if ( Active_Scene != nullptr ) { Active_Scene->Start ( ); }
     }
 
     static void Update ( ) {
+		Collision::Check_collisions ( );
         Timer::Update_Delta_time ( );
         if ( Active_Scene != nullptr ) { Active_Scene->Update ( ); }
-        ReKat::grapik::Pool ( );
+        ReKat::grapik::Input::Update();
     }
 
 }; // namespace Manager
