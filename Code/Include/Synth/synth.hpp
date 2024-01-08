@@ -30,6 +30,7 @@ namespace synth {
 	static ALfloat listenerOri[] = { 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
 	static std::unordered_map < std::string, ALuint > Buffers;
 	static std::unordered_map < std::string, ALuint > Sources;
+	static std::unordered_map < std::string, ALuint > P_Sources;
 
     enum STATUS {
         SUCCESS,
@@ -39,6 +40,7 @@ namespace synth {
         FAILED_CHECK,
 		FAILED_OPENING_FILE,
 		FAILED_BUFFER_CRETION,
+		FAILED_BUFFER_COPY,
 		FAILED_SOURCE_CRETION,
 		FAILED_BINDING,
 		FAILED_PLAYING,
@@ -65,10 +67,14 @@ namespace synth {
 } /* Synth */ } // ReKat
 
 // implementation
+#include <iostream>
+ALenum Errore;
 namespace ReKat::synth {
-	#define CHECK_ERROR( e ) 			 \
-		if (alGetError() != AL_NO_ERROR) \
-		{ return e; }
+	#define _CHECK_ERROR( e, l ) 		\
+		Errore = alGetError();			\
+		if (Errore != AL_NO_ERROR) 		\
+		{ std::cout << "\terrore: " << Errore << " at line: " << l << '\t'; return e; }
+	#define CHECK_ERROR(e) _CHECK_ERROR(e,__LINE__)
 
     static int Start ( ) {
 		// creating device
@@ -88,6 +94,8 @@ namespace ReKat::synth {
 		CHECK_ERROR(FAILED_LISTENER);
 		alListenerfv(AL_ORIENTATION, listenerOri);
 		CHECK_ERROR(FAILED_LISTENER);
+
+		return SUCCESS;
 	}
     static void End ( ) {
 		// ternimating source
@@ -95,6 +103,8 @@ namespace ReKat::synth {
 		{ alDeleteBuffers ( 1, &B.second ); }
 		// terminating buffers
 		for ( auto S : Sources )
+		{ alDeleteSources ( 1, &S.second );}
+		for ( auto S : P_Sources )
 		{ alDeleteSources ( 1, &S.second );}
 
 		// terminating device and context
@@ -110,12 +120,34 @@ namespace ReKat::synth {
 		CHECK_ERROR(FAILED_BUFFER_CRETION);
 
 		alBufferData ( buffer, AL_FORMAT_MONO16, _buf, _len, SAMPLE_FREQ );
-		std::cout << "_len: " << _len << " _sam: " << SAMPLE_FREQ << '\n';
-		CHECK_ERROR(FAILED_BUFFER_CRETION);
+		CHECK_ERROR(FAILED_BUFFER_COPY);
 
 		Buffers.insert ( { name, buffer } );
+		//std::cout << "name: " << name << " _len: " << _len << " _sam: " << SAMPLE_FREQ << '\n';
 		return SUCCESS;
 	}
+	
+	static int Create_Buffer ( std::string name, double *data, long _len ) {
+		ALuint buffer;
+		// reformat data
+		short *_buf = (short*) calloc ( ( _len % 2 == 0 ? _len : _len + 1 ), sizeof (short) );
+		for (size_t i = 0; i < _len; i++) {
+			// convert float from (-1) - (1) to (-32.768) - (32.767)
+			_buf[i] = data[i] * 32000.0f;
+			// std::cout << i << "\t" << _buf[i] << '\n';
+		}
+
+		alGenBuffers(1, &buffer);
+		CHECK_ERROR(FAILED_BUFFER_CRETION);
+
+		alBufferData ( buffer, AL_FORMAT_MONO16, _buf, _len, SAMPLE_FREQ );
+		CHECK_ERROR(FAILED_BUFFER_COPY);
+
+		Buffers.insert ( { name, buffer } );
+		//std::cout << "name: " << name << " _len: " << _len << " _sam: " << SAMPLE_FREQ << '\n';
+		return SUCCESS;
+	}
+
 	static int Create_Buffer ( std::string name, std::string path ) {
 		AudioFile < float > a;
 		if ( ! a.load ( path ) ) 
@@ -126,7 +158,7 @@ namespace ReKat::synth {
 		float * data = a.samples[0].data();
 
 		// reformat data
-		short *_buf = (short*) calloc ( _len, sizeof (short) );
+		short *_buf = (short*) calloc ( ( _len % 2 == 0 ? _len : _len + 1 ), sizeof (short) );
 		for (size_t i = 0; i < _len; i++) {
 			// convert float from (-1) - (1) to (-32.768) - (32.767)
 			_buf[i] = data[i] * 32000.0f;
@@ -137,15 +169,15 @@ namespace ReKat::synth {
 		alGenBuffers(1, &buffer);
 		CHECK_ERROR(FAILED_BUFFER_CRETION);
 
-		alBufferData ( buffer, AL_FORMAT_MONO16, _buf, _len, _sample_rate );
-		std::cout << "_len: " << _len << " _sam: " << _sample_rate << '\n';
-		CHECK_ERROR(FAILED_BUFFER_CRETION);
+		alBufferData ( buffer, (a.getNumChannels() == 1 ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16), _buf, ( _len % 2 == 0 ? _len : _len + 1 ), _sample_rate );
+		CHECK_ERROR(FAILED_BUFFER_COPY);
 
 		Buffers.insert ( { name, buffer } );
+		//std::cout << "name: " << name << " _len: " << _len << " _sam: " << _sample_rate << '\n';
 		return 0;
 	}
 
-	static int Create_Source ( std::string name, glm::vec3 _pos ) {
+	static int Create_Source ( std::string name, glm::vec3 _pos, bool internal = false ) {
 		ALuint source;
 		alGenSources((ALuint)1, &source);
 		CHECK_ERROR(FAILED_SOURCE_CRETION);
@@ -162,12 +194,14 @@ namespace ReKat::synth {
 		alSourcei(source, AL_LOOPING, AL_FALSE);
 		CHECK_ERROR(FAILED_SOURCE_CRETION);
 
+		if ( internal ) { P_Sources.insert ( { name, source } ); return SUCCESS; }
 		Sources.insert ( { name, source } );
+		//std::cout << "name: " << name << '\n';
 		return SUCCESS;
 	}
 
 	static int Play ( std::string where, std::string what, bool wait ) {
-		std::cout << "playing: " << where << " " << what << '\n';
+		//std::cout << "playing: " << where << " " << what << '\n';
 		alSourcei( Sources[where], AL_BUFFER, Buffers[what] );
 		CHECK_ERROR(FAILED_BINDING);
 
@@ -178,13 +212,37 @@ namespace ReKat::synth {
 			ALint source_state;
 			alGetSourcei ( Sources[where], AL_SOURCE_STATE, &source_state );
 			CHECK_ERROR(FAILED_STATUS_GET);
-			while (source_state == AL_PLAYING) {
+			while ( source_state == AL_PLAYING ) {
 				alGetSourcei(Sources[where], AL_SOURCE_STATE, &source_state);
 				CHECK_ERROR(FAILED_STATUS_GET);
 			}
 		}
-		std::cout << "Played\n";
+		return SUCCESS;
+	}
+	static int Play ( std::string what ) {
+		// get a free source
+		std::string source = "";
+		for ( auto s : P_Sources ) {
+			ALint source_state;
+			alGetSourcei ( s.second, AL_SOURCE_STATE, &source_state );
+			CHECK_ERROR(FAILED_STATUS_GET);
+			if ( source_state != AL_PLAYING ) { source = s.first; break; }
+		}
+		// if no aviable source create new
+		if ( source == "" ) { 
+			source = "s" + std::to_string ( P_Sources.size( ) );
+			Create_Source ( source , {0,0,0}, true ); 
+		}
+		std::cout << "playing: " << source << " - " << what << '\n';
+		
+		alSourcei( P_Sources[source], AL_BUFFER, Buffers[what] );
+		CHECK_ERROR(FAILED_BINDING);
 
+		alSourcePlay( P_Sources[source] );
+		CHECK_ERROR(FAILED_PLAYING);
+
+		std::cout << "p\n";
+		
 		return SUCCESS;
 	}
 }

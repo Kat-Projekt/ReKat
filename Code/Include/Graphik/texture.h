@@ -75,6 +75,7 @@ int Texture::Make ( unsigned char* data, unsigned int width, unsigned int height
     int Format;
     glGenTextures(1, &ID);
     if (data) {
+        Format = GL_RED;
         switch ( nrChannels ) {
         case 1: Format = GL_RED; break;
         case 3: Format = GL_RGB; break;

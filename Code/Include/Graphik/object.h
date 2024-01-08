@@ -24,6 +24,8 @@ protected:
     float altitude = 0;
     glm::vec2 size;
     float rot = 0;
+	float old_rot = 0;
+	glm::vec2 rot_vector = {0,0};
 
     Sprite* sprite = nullptr;
     glm::vec4 color = {1,1,1,1};
@@ -52,13 +54,13 @@ public:
 
     void PMove ( glm::vec2 move ) { old_p_pos = parent_pos; parent_pos = move; }
     void PDMove ( glm::vec2 move ) { old_p_pos = parent_pos; parent_pos += move; }
-    void DMove ( glm::vec2 move ) { 
+    void DMove ( glm::vec2 move ) {
 		old_pos = pos;
         pos += move;
         for ( auto o : Sub_Objects ) 
         { o.second->PDMove(move); }
     }
-    void Move  ( glm::vec2 move ) { 
+    void Move  ( glm::vec2 move ) {
 		old_pos = pos;
         pos = move;
         for ( auto o : Sub_Objects ) 
@@ -80,10 +82,14 @@ public:
 		_pos += parent_pos;
 		// center to sprite
 		glm::vec2 p = pivot - glm::vec2{0.5,0.5};
-		_pos -= glm::vec2{ size.x * ( p.x*cos(rot) - p.y*sin(rot) ), size.y * ( p.x*sin(rot) + p.y * cos(rot) ) };
+		if ( old_rot != rot ) 
+		{ rot_vector = glm::vec2{ size.x * ( p.x*cos(rot) - p.y*sin(rot) ), size.y * ( p.x*sin(rot) + p.y * cos(rot) ) }; }
+		old_rot = rot;
+		_pos -= rot_vector;
 		std::cout << name << " : " << _pos.x << " x " << _pos.y << '\n';
 	}
     glm::vec2 Get_pos ( ) {
+		Update_pos();
 		return _pos; 
 	}
     glm::vec2 Get_size ( ) { return size; }
@@ -132,7 +138,6 @@ public:
 	}
 
     virtual void Update ( ) {
-		Update_pos(); 
         if ( !Active ) { return; }
         for ( auto o : Sub_Objects ) 
         { o.second->Update ( ); }

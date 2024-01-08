@@ -88,7 +88,7 @@ int main(int argc, char const *argv[]) {
 		Fps ++;
 		if ( t + 1 == time(0) ) { 
 			t = time (0); 
-			std::cout << "Fps: " << Fps << '\n'; 
+			std::cout << "\n-------------- Fps: " << Fps << '\n'; 
 			Fps = 0; 
 		}
         Send_positon ( );

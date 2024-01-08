@@ -4,17 +4,20 @@
 #include "object.h"
 #include "unordered_map"
 #include "text.h"
+#include "ReKat.hpp"
 #include <memory>
 
 class UI_Object : public Object {
 private:
+	glm::vec2 pivot = {0,0};
+	float ration = 1;
+
     bool hower = false;
     bool click = false;
 
     std::string text;
 
     Sprite *sprite;
-    glm::vec4 color = {1,1,1,1};
     Text *text_renderer;
     int start_frame = 0;
     int frame = 0;
@@ -41,8 +44,9 @@ public:
     UI_Object* Get_Sub_Object ( std::string name ) 
     { return Sub_Objects[name]; }
 
-
     void Draw ( ) {
+		if ( ration != ReKat::grapik::Input::screen_ration ) 
+		{ Update_screen_ratio(); }
         if ( !Active ) { return; }
         if ( hower && !click ) { frame = start_frame+1; }
         else if ( click ) { frame = start_frame+2; }
@@ -52,7 +56,7 @@ public:
         { o.second->Draw( ); }
 
         if ( sprite != nullptr ) 
-		{ sprite->Draw_frame ( frame, { pos.x+parent_pos.x-size.x, pos.y+parent_pos.y, altitude }, size, rot, color, pivot ); }
+		{ sprite->Draw_frame ( frame, { pos.x+parent_pos.x-size.x/2, pos.y+parent_pos.y-size.y/2, altitude }, size, rot, color, pivot ); }
         if ( text_renderer != nullptr ) 
 		{ text_renderer->RenderText(text,pos - glm::vec2 (size.x/2, -size.y/2) + parent_pos,size,1); }
     };
@@ -76,6 +80,21 @@ public:
             click = false;
         }
     }
+
+	// pivot goes from {-100,-100} (bottom rigth) to {100,100} (top left), {0,0} is defualt and points to center
+	void Set_postion ( glm::vec2 _pos, glm::vec2 _pivot = {0,0} ) {
+		// convert pos to center pivot
+		pos = glm::vec2 { _pos.x + _pivot.x * ReKat::grapik::Input::screen_ration, _pos.y + _pivot.y };
+		ration = ReKat::grapik::Input::screen_ration;
+		pivot = _pivot;
+	}
+	void Update_screen_ratio ( ) {
+		//std::cout << "ration " << ration << " x " << ReKat::grapik::Input::screen_ration << '\n';
+		//std::cout << " op: " << pos.x << " x " << pos.y <<'\n';
+		pos.x = pos.x - pivot.x * ration + pivot.x * ReKat::grapik::Input::screen_ration;
+		ration = ReKat::grapik::Input::screen_ration;
+		// std::cout << " np: " << pos.x << " x " << pos.y <<'\n';
+	}
 
     std::string Get_text ( ) { return text; }
     void Add_text ( char _t ) { text+=_t; }

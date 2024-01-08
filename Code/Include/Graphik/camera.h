@@ -26,7 +26,7 @@ const float ZOOM        =  45.0f;
 class Camera {
 private:
     // pos is the center of the camera
-    glm::vec2 pos;
+    glm::vec2 pos = {0,0};
     glm::vec2 size;
     float scale = 1.0f;
 
@@ -50,7 +50,7 @@ public:
         //glm::mat4 projection = glm::ortho(0.0f, static_cast<float>(this->Width), static_cast<float>(this->Height), 0.0f, -1.0f, 1.0f);
 
         // resize to mantain H = 1000 * scale
-        float X = ((float)ReKat::grapik::Internal::SCR_WIDTH / (float)ReKat::grapik::Internal::SCR_HEIGTH * 500.0f * scale);
+        float X = (ReKat::grapik::Input::screen_ration * 500.0f * scale);
         float Y = (500.0f * scale);
         return glm::ortho ( pos.x - X, pos.x + X, 
                             pos.y - Y, pos.y + Y,
@@ -61,9 +61,9 @@ public:
     
         // return glm::ortho ( - size.x / 2, size.x / 2, - size.y / 2, size.y / 2);
         // resize to mantain H = 1000
-        float X = ((float)ReKat::grapik::Internal::SCR_WIDTH * 500.0f) / (float)ReKat::grapik::Internal::SCR_HEIGTH;
+        float X = ReKat::grapik::Input::screen_ration * 500.0f;
         return glm::ortho ( -X, X , -500.0f, 500.0f );
-		std::cout << "forgin UI Wiew " << X << '\n';
+		// std::cout << "forgin UI Wiew " << X << '\n';
     }
 };
 

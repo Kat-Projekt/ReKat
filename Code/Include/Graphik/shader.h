@@ -98,7 +98,7 @@ public:
         { return FAILED_COMPILING_FRAGMENT; }
 
         // if geometry shader is given, compile geometry shader
-        unsigned int geometry;
+        unsigned int geometry = -1;
         if ( geometryPath != nullptr ) {
             const char * gShaderCode = geometryCode.c_str();
             geometry = glCreateShader(GL_GEOMETRY_SHADER);
@@ -108,7 +108,7 @@ public:
             { return FAILED_COMPILING_GEOMETRY; }
         }
         // if tessellation control shader is given, compile tessellation shader
-        unsigned int tessControl;
+        unsigned int tessControl = -1;
         if ( tessControlPath != nullptr ) {
             const char * tcShaderCode = tessControlCode.c_str();
             tessControl = glCreateShader(GL_TESS_CONTROL_SHADER);
@@ -119,7 +119,7 @@ public:
 
         }
         // if tessellation evaluation shader is given, compile tessellation shader
-        unsigned int tessEval;
+        unsigned int tessEval = -1;
         if ( tessEvalPath != nullptr ) {
             const char * teShaderCode = tessEvalCode.c_str();
             tessEval = glCreateShader(GL_TESS_EVALUATION_SHADER);

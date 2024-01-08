@@ -63,7 +63,7 @@ public:
 			o->Update(); 
 		}
         for ( auto o : UI_Objects ) 
-        { o->Draw(); }
+        { o->Draw(); o->Update(); }
 		glDisable(GL_DEPTH_TEST);
     }
 };

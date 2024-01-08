@@ -43,6 +43,7 @@ namespace Input {
 	static std::map < std::string, Mode > keys;
 	static glm::vec2 mouse_pos = {0,0};
 	static glm::vec2 old_mouse_pos;
+	static float screen_ration = 1;
 
 	static void(*_Keyboard)  (GLFWwindow*, int, int, int, int) = nullptr;
 	static void(*_Mouse_pos) (GLFWwindow*, double, double ) = nullptr;
@@ -70,9 +71,16 @@ namespace Input {
 			if ( key == GLFW_KEY_DELETE || key == GLFW_KEY_BACKSPACE ) { keys["Del"] = RELEASED; return; }
 			if ( key == GLFW_KEY_ENTER ) { keys["Enter"] = RELEASED; return; }
 			if ( key == GLFW_KEY_ESCAPE ) { keys["Esc"] = RELEASED; return; }
+			
+			
 		}
-		// adding caracter keys;
+		// adding caracter keys
 		if ( GLFW_KEY_A <= key && key <= GLFW_KEY_Z ) { 
+			if ( action == GLFW_PRESS ) { keys[std::string(1,(char)key)] = PRESSED; }
+			if ( action == GLFW_RELEASE ) { keys[std::string(1,(char)key)] = RELEASED; }
+		}
+		// adding number keys
+		if ( key >= GLFW_KEY_0 && key <= GLFW_KEY_9 ) {
 			if ( action == GLFW_PRESS ) { keys[std::string(1,(char)key)] = PRESSED; }
 			if ( action == GLFW_RELEASE ) { keys[std::string(1,(char)key)] = RELEASED; }
 		}
@@ -111,6 +119,7 @@ namespace Input {
 	static void FreamBufferResize ( GLFWwindow* window, int width, int height ) {
 		ReKat::grapik::Internal::SCR_HEIGTH = height;
 		ReKat::grapik::Internal::SCR_WIDTH = width;
+		screen_ration = (float)ReKat::grapik::Internal::SCR_WIDTH / (float)ReKat::grapik::Internal::SCR_HEIGTH;
 		if ( _FreamBufferResize != nullptr ) 
 		{ _FreamBufferResize ( window, width, height ); }
 	}
@@ -169,6 +178,8 @@ namespace ReKat::grapik {
 	static int Start 
 	( std::string name, unsigned int SCR_WIDTH, unsigned int SCR_HEIGTH,  bool transparent, bool fullscreen, bool resizable ) {
 		Internal::SCR_HEIGTH = SCR_HEIGTH; Internal::SCR_WIDTH = SCR_WIDTH;
+		Input::screen_ration = (float)ReKat::grapik::Internal::SCR_WIDTH / (float)ReKat::grapik::Internal::SCR_HEIGTH;
+
 		//Input::Configure();
 
 		glfwInit ( );

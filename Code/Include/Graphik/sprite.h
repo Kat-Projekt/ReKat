@@ -10,7 +10,7 @@
 class Sprite {
 private:
     Shader       *shader; 
-    Texture      *texture;
+    Texture      *texture = nullptr;
     unsigned int quadVAO;
     glm::vec2 sprite_dim;
 public:
@@ -74,9 +74,10 @@ public:
 
         // render textured quad
         this->shader->setVec3("spriteColor", color);
-
-        glActiveTexture(GL_TEXTURE0);
-        this->texture->Bind();
+ 		
+		glActiveTexture(GL_TEXTURE0); 
+        if ( texture != nullptr ) 
+		{ this->texture->Bind(); }
 
         glBindVertexArray(this->quadVAO);
         glDrawArrays(GL_TRIANGLES, 0, 6);

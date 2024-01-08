@@ -33,7 +33,7 @@ public:
 		if ( life <= 0 ) { 
 			Manager::Object_Get ( name )->Set_Active(false); 
 			// Manager::Object_Get ( "Player")->Get_component < Player > ()->Kill ();
-			std::cout << "play result " << ReKat::synth::Play ( "Bals", "Bals" ) << '\n';
+			// std::cout << "play result " << ReKat::synth::Play ( "Bals", "Bals" ) << '\n';
 		}
         // std::cout << name << " collison with: " << obj << '\n';
 	}
