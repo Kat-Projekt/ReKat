@@ -44,7 +44,7 @@ void ordina ( std::vector < complex < T > > &vec ) {
 	for ( int j = 0 ; j < n ; j++ )
 	{ vec [ j ] = vec2 [ j ] ; }
 }
-
+/*
 template < typename T >
 void FFT ( std::vector < complex < T > > &vec1, T t ) {
 	// resise vec1 so it will have size as a power of 2
@@ -173,7 +173,7 @@ std::vector < complex < T > > Get_Tranform ( std::vector < T > &_vec, T _sample_
 	for ( auto p : v ) 
 	{ output << p.real() << '\t'; }
 	return 0;
-}*/
+}
 
 
 int _main ( ) {
@@ -302,4 +302,4 @@ int _main ( ) {
 
 	output . close ( ) ;
 	return 0 ; 
-}
+}*/

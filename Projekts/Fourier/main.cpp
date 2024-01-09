@@ -120,17 +120,8 @@ std::complex<double> * Get_Tone ( std::complex<double>* _base, size_t _base_size
 	std::cout << "#COPY\n";
 	std::cout << "base :: " << _base_size << '\n'; 
 	std::complex<double> * _buf = ( std::complex<double> * ) calloc ( _base_size, sizeof(std::complex<double>) );
-	for ( size_t i = 0; i < _base_size; i++ ) { 
-		try {
-			/* code */
-		_buf [i] = r[i]; std::cout << " " << i; 
-		}
-		catch(const std::exception& e)
-		{
-			std::cerr << e.what() << '\n';
-		}
-		
-	}
+	for ( size_t i = 0; i < _base_size; i++ ) 
+	{ _buf [i] = r[i]; std::cout << " " << i; }
 	
 	return _buf;	
 }

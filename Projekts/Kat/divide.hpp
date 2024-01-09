@@ -53,6 +53,62 @@ size_t log2 ( size_t N ) {
 	return i -1;
 }
 
+std::complex<double> * Get_Tone ( std::complex<double>* _base, size_t _base_size ) {
+	std::cout << "#CALL\n";
+	int block_size = 10;
+
+	std::vector < std::vector < std::complex<double> > > fileTagliati;
+	std::vector < std::complex<double> > fileTagliato;
+	int paus = 0;
+
+	std::cout << "#DIVISION\n";
+	int sizzze = 0;
+	for (size_t i = 0; i < _base_size; i++ ) {
+		auto el = _base[i];
+		if ( abs(el) == 0 ) {
+			paus += 1;
+            fileTagliato.push_back ( el );
+		
+			if ( paus == 10 ) {
+				std::cout << "\t sample size: " << fileTagliato.size();
+				sizzze += fileTagliato.size();
+				fileTagliati.push_back ( fileTagliato );
+                fileTagliato.clear();
+                paus = 0;
+			}
+		} else {
+            paus = 0;
+            fileTagliato.push_back ( el );
+		}
+	}
+	std::cout << "\nto size: " << sizzze + fileTagliato.size();
+	std::cout << "\n#DIVIDED\n";
+	fileTagliati.push_back ( fileTagliato );
+	std::vector < std::complex<double> > r;
+	r.reserve ( _base_size );
+	// per ogni intervallo prendi il massimo
+	int porceseded = 0;
+	for ( auto el : fileTagliati ) {
+		auto max = el[0];
+		for ( auto e : el ) { if ( abs ( e ) > abs ( max ) ) { max = e; } }
+		for ( auto e : el ) {
+			if ( e != max ) { r.push_back ( 0 ); }
+			else { r.push_back ( max ); }
+			porceseded++;
+		}
+	}
+	std::cout << "\tsamples procesed: " << porceseded << '\n';
+	std::cout << "\t size of procesed: " << r.size() << '\n';
+
+	std::cout << "#COPY\n";
+	std::cout << "base :: " << _base_size << '\n'; 
+	std::complex<double> * _buf = ( std::complex<double> * ) calloc ( _base_size, sizeof(std::complex<double>) );
+	for ( size_t i = 0; i < _base_size; i++ ) 
+	{ _buf [i] = r[i]; std::cout << " " << i; }
+	
+	return _buf;	
+}
+
 int Taglia ( std::string path, std::vector<std::string> alphabet, double deltaNoise = 0.0625, double pausa = 10000 ) {
 	std::cout << "carico il file\n";
 	AudioFile < double > a;
@@ -147,6 +203,11 @@ int Taglia ( std::string path, std::vector<std::string> alphabet, double deltaNo
 		auto FFT = FastFourierTransform( S2 );
 		//std::cout << "fourier\n";
 		auto FFT_1 = FFT.fft1 ( sample.data() );
+
+		clear_signal ( FFT_1, S2, 50.0 );
+		FFT_1 = Get_Tone ( FFT_1, S2 );
+
+		auto IFFT  = FFT.ifft1 ( FFT_1 );
 		//std::cout << "clear\n";
 		//clear_signal ( FFT_1, S2, 10.0);
 		//FFT_1 = Derviate_Main ( FFT_1, S2 );
@@ -156,7 +217,6 @@ int Taglia ( std::string path, std::vector<std::string> alphabet, double deltaNo
 			}
 		}*/
 		//std::cout << "inverse fourier\n";
-		auto IFFT  = FFT.ifft1 ( FFT_1 );
 
 		std::vector<double> sample2;
 		sample2.resize ( S2 );
@@ -167,7 +227,6 @@ int Taglia ( std::string path, std::vector<std::string> alphabet, double deltaNo
 		std::cout << "end\n";
 	}
 
-	std::cout << "creo i files\n";
 	for (size_t i = 0; i < LowPass.size(); i++) 
 	{ Save ( alphabet[i] + ".wav",  LowPass[i], a.getSampleRate ( ) ); }
 
