@@ -217,6 +217,8 @@ namespace ReKat::grapik {
 		glfwSetFramebufferSizeCallback ( Internal::window, Input::FreamBufferResize );
 		glfwSetCharCallback( Internal::window, Input::Caracters );
 
+		glfwSetInputMode ( Internal::window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN );
+
 		// glad: load all OpenGL function pointers
 		// ---------------------------------------
 		if ( !gladLoadGLLoader ( (GLADloadproc)glfwGetProcAddress ) ) 

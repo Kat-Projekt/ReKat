@@ -47,7 +47,7 @@ source_group("Libs" FILES ${LIBS_SOURCES})
 add_definitions(-DGLFW_INCLUDE_NONE
 				-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
 
-set(PROJEKTS Fourier Kat )
+set(PROJEKTS Le_Gaym)
 
 foreach(PROJEKT ${PROJEKTS})
 	file(GLOB PROJECT_SOURCES Projekts/${PROJEKT}/main.cpp )
@@ -62,7 +62,7 @@ foreach(PROJEKT ${PROJEKTS})
 
 	add_custom_command(
 		TARGET ${PROJEKT} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Resources/${PROJEKT} $<TARGET_FILE_DIR:${PROJEKT}>)
+		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Projekts/${PROJEKT}/Resources $<TARGET_FILE_DIR:${PROJEKT}>)
 endforeach(PROJEKT)
 
 

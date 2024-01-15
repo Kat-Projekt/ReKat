@@ -2,14 +2,6 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
-float angle ( glm::vec2 v ) {
-    float angle = 0;
-    float X = v.x / sqrt( v.x * v.x + v.y *v.y );
-    if ( v.y > 0 ) { angle = 3.1415+std::asin ( X ); } 
-    else { angle = -std::asin ( X ); }
-    return angle;
-}
-
 static void __Keyboard ( GLFWwindow* window, int key, int scancode, int action, int mode ) {
     if ( ( action == GLFW_PRESS || action == GLFW_REPEAT ) ) {
         if ( key == GLFW_KEY_ESCAPE ) { ReKat::grapik::End(); }

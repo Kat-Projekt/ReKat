@@ -37,6 +37,7 @@
 		#include <Graphik/behaviour.h>
 		#include <Graphik/scene.h>
 		#include <Graphik/collision.h>
+		#include <Graphik/math.h>
 	#endif
 #endif
 

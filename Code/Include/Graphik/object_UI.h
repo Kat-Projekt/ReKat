@@ -20,7 +20,6 @@ private:
     Sprite *sprite;
     Text *text_renderer;
     int start_frame = 0;
-    int frame = 0;
 
     void (* _call ) ();
 
@@ -48,9 +47,12 @@ public:
 		if ( ration != ReKat::grapik::Input::screen_ration ) 
 		{ Update_screen_ratio(); }
         if ( !Active ) { return; }
-        if ( hower && !click ) { frame = start_frame+1; }
-        else if ( click ) { frame = start_frame+2; }
-        else { frame = start_frame; }
+		if ( frame == start_frame ) {
+			if ( hower && !click ) { frame = start_frame+1; }
+        	else if ( click ) { frame = start_frame+2; }
+        	else { frame = start_frame; } 
+		}
+        
         
         for ( auto o : Sub_Objects )
         { o.second->Draw( ); }
@@ -58,7 +60,8 @@ public:
         if ( sprite != nullptr ) 
 		{ sprite->Draw_frame ( frame, { pos.x+parent_pos.x-size.x/2, pos.y+parent_pos.y-size.y/2, altitude }, size, rot, color, pivot ); }
         if ( text_renderer != nullptr ) 
-		{ text_renderer->RenderText(text,pos - glm::vec2 (size.x/2, -size.y/2) + parent_pos,size,1); }
+		{ text_renderer->RenderText ( text,pos - glm::vec2 (size.x/2, -size.y/2) + parent_pos,size,1 ); }
+		frame = start_frame;
     };
     
     void Update_mause_pos ( glm::vec2 _pos ) {        

@@ -83,9 +83,9 @@ public:
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
     }
-    void Draw_frame ( int frame,  glm::vec2 position, glm::vec2 size, float rotate, glm::vec4 color = {1,1,1,1}, glm::vec2 Rot_pivot = {0.5,0.5}) {
+    void Draw_frame ( int frame,  glm::vec2 position, glm::vec2 size, float rotate, glm::vec4 color = {1,1,1,1}, glm::vec2 Rot_pivot = {0.5,0.5} ) {
        Draw_frame ( frame, glm::vec3(position,0.0f), size, rotate, color, Rot_pivot ); }
-    void Draw_frame ( int frame,  glm::vec3 position, glm::vec2 size, float rotate, glm::vec4 color = {1,1,1,1}, glm::vec2 Rot_pivot = {0.5,0.5}) {
+    void Draw_frame ( int frame,  glm::vec3 position, glm::vec2 size, float rotate, glm::vec4 color = {1,1,1,1}, glm::vec2 Rot_pivot = {0.5,0.5} ) {
         // modify pos based on pivot (alwais on center)
         position += glm::vec3{ Rot_pivot.x * size.x, - Rot_pivot.y * size.y, 0.0f };
 
@@ -111,6 +111,32 @@ public:
         glDrawArrays(GL_TRIANGLES, 0, 6);
         glBindVertexArray(0);
     }
+
+	void Draw_frame ( Texture *texture, int frame, glm::vec3 position, glm::vec2 size, float rotate, glm::vec4 color = {1,1,1,1}, glm::vec2 Rot_pivot = {0.5,0.5} ) {
+        position += glm::vec3{ Rot_pivot.x * size.x, - Rot_pivot.y * size.y, 0.0f };
+
+        // prepare transformations
+        glm::mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, position);  // first translate (transformations are: scale happens first, then rotation, and then final translation happens; reversed order)
+
+        model = glm::translate(model, glm::vec3(Rot_pivot.x * size.x, Rot_pivot.y * size.y, 0.0f)); // move origin of rotation to center of quad
+        model = glm::rotate(model, rotate, glm::vec3(0.0f, 0.0f, 1.0f)); // then rotate
+        model = glm::translate(model, glm::vec3(-Rot_pivot.x * size.x, -Rot_pivot.y * size.y, 0.0f)); // move origin back
+
+        model = glm::scale(model, glm::vec3(size, 1.0f)); // last scale
+        
+        // set uniforms
+        this->shader->setMat4 ("model", model);
+        this->shader->setVec4 ("spriteColor", color);
+        this->shader->setInt ("frame", frame);
+
+        glActiveTexture(GL_TEXTURE0);
+        texture->Bind();
+
+        glBindVertexArray(this->quadVAO);
+        glDrawArrays(GL_TRIANGLES, 0, 6);
+        glBindVertexArray(0);
+	}
 };
 
 #endif

@@ -10,12 +10,12 @@
 namespace Timer {
     auto start = std::chrono::system_clock::now();
     float delta_time = 0;
-    float old_time = 0;
+    float current_time = 0;
     float Get_Time () 
     { return (float)( std::chrono::system_clock::now ( ) - start ).count( ) / 10000000.0; }
     void Update_Delta_time ( ) {
-        delta_time = Get_Time () - old_time;
-        old_time = Get_Time ();
+        delta_time = Get_Time () - current_time;
+        current_time = Get_Time ();
     }
 
 } // namespace Timer

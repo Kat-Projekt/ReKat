@@ -90,11 +90,17 @@ namespace Manager {
 // Object logic 
     static Object* Object_Get  ( std::string name ) 
     { return Objects [name]; }
-    static Object* Object_Load ( std::string name, std::string sprite, glm::vec2 pos, glm::vec2 size  ) {
+    static Object* Object_Load ( std::string name, std::string sprite, glm::vec2 pos, glm::vec2 size ) {
         Object *o = new Object ( name, Sprites[sprite], pos, size );
         Objects.insert( { name, o } );
         return o;
     }
+	static void Object_Delete ( std::string name ) {
+		auto o =  Object_Get ( name );
+		for ( auto s : Scenes ) 
+		{ s.second->Rem_Object ( o ); }
+		Objects.erase ( name );
+	}
 // UI_Object logic 
     static UI_Object* UI_Object_Get  ( std::string name ) 
     { return UI_Objects [name]; }

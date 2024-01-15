@@ -1,5 +1,6 @@
 {
-    "files.associations": {
+	"files.associations": {
+		"filesystem": "cpp",
 		"iostream": "cpp",
 		"algorithm": "cpp",
 		"array": "cpp",
@@ -28,7 +29,6 @@
 		"cwchar": "cpp",
 		"deque": "cpp",
 		"exception": "cpp",
-		"filesystem": "cpp",
 		"format": "cpp",
 		"forward_list": "cpp",
 		"fstream": "cpp",
@@ -82,7 +82,6 @@
 		"xstring": "cpp",
 		"xtr1common": "cpp",
 		"xtree": "cpp",
-		"xutility": "cpp",
-		"resumable": "cpp"
+		"xutility": "cpp"
 	}
 }

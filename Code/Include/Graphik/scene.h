@@ -8,6 +8,15 @@
 #include "tilemap.h"
 #include "graphik.hpp"
 
+template < typename T >
+_NODISCARD _CONSTEXPR20 void remove_element ( std::vector<T>&vec, T element ) {
+	// find
+	auto it = std::find ( vec.begin(), vec.end(), element );
+	if ( it == vec.end() ) { return; }
+	// remove
+	vec.erase ( it );
+}
+
 class Scene {
 private:
     std::vector < Object* > Objects;
@@ -22,7 +31,7 @@ public:
     Scene ( ) { }
 
     Scene* Add_Object    ( Object* _obj )        { Objects.push_back(_obj); return this; }
-    //Scene* Rem_Object	   ( Object* _obj )		   { Objects.remove_if ( Object.begin(), Object.end() ); return this;}
+    Scene* Rem_Object	 ( Object* _obj )		 { remove_element ( Objects, _obj ); return this;}
 	Scene* Add_UI_Object ( UI_Object* _obj )     { UI_Objects.push_back(_obj); return this; }
     Scene* Add_Shader    ( Shader* _obj )        { Shaders.push_back(_obj); return this; }
     Scene* Add_UI_Shader ( Shader* _obj )        { UI_Shaders.push_back(_obj); return this; }
@@ -39,15 +48,18 @@ public:
     }
 
     void Start ( ) {
+		std::cout << "stating scene: ";
 		Objects.reserve(100);
         for ( auto o : Objects ) 
-        { o->Start(); }
+        { std::cout << o->Get_Name() << ", "; o->Start(); }
+        for ( auto o : UI_Objects ) 
+        { std::cout << o->Get_Name() << ", "; o->Start(); }
     }
 
     void Update ( ) {
 		world_mouse_pos = cam.Get_Pos() + ReKat::grapik::Input::mouse_pos;
 
-        glClearColor(0.0f, 1.0f, 1.0f, 1.0f);
+        glClearColor(0.6, 0.4, 0.5, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
         // Update camera projection

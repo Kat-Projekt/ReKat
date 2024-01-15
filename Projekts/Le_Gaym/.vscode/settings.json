@@ -1,0 +1,10 @@
+{
+	"files.associations": {
+		"cmath": "cpp",
+		"chrono": "cpp",
+		"future": "cpp",
+		"system_error": "cpp",
+		"xlocale": "cpp",
+		"iosfwd": "cpp"
+	}
+}

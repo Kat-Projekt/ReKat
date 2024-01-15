@@ -70,7 +70,7 @@ std::complex<double> * Get_Tone ( std::complex<double>* _base, size_t _base_size
             fileTagliato.push_back ( el );
 		
 			if ( paus == 10 ) {
-				std::cout << "\t sample size: " << fileTagliato.size();
+				//std::cout << "\t sample size: " << fileTagliato.size();
 				sizzze += fileTagliato.size();
 				fileTagliati.push_back ( fileTagliato );
                 fileTagliato.clear();
@@ -81,7 +81,7 @@ std::complex<double> * Get_Tone ( std::complex<double>* _base, size_t _base_size
             fileTagliato.push_back ( el );
 		}
 	}
-	std::cout << "\nto size: " << sizzze + fileTagliato.size();
+	//std::cout << "\nto size: " << sizzze + fileTagliato.size();
 	std::cout << "\n#DIVIDED\n";
 	fileTagliati.push_back ( fileTagliato );
 	std::vector < std::complex<double> > r;
@@ -89,7 +89,7 @@ std::complex<double> * Get_Tone ( std::complex<double>* _base, size_t _base_size
 	// per ogni intervallo prendi il massimo
 	int porceseded = 0;
 	for ( auto el : fileTagliati ) {
-		auto max = el[0];
+		std::complex<double> max = 0;
 		for ( auto e : el ) { if ( abs ( e ) > abs ( max ) ) { max = e; } }
 		for ( auto e : el ) {
 			if ( e != max ) { r.push_back ( 0 ); }
@@ -104,7 +104,7 @@ std::complex<double> * Get_Tone ( std::complex<double>* _base, size_t _base_size
 	std::cout << "base :: " << _base_size << '\n'; 
 	std::complex<double> * _buf = ( std::complex<double> * ) calloc ( _base_size, sizeof(std::complex<double>) );
 	for ( size_t i = 0; i < _base_size; i++ ) 
-	{ _buf [i] = r[i]; std::cout << " " << i; }
+	{ _buf [i] = r[i]; }
 	
 	return _buf;	
 }

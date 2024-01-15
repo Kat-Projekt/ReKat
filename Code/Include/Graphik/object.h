@@ -23,6 +23,7 @@ protected:
 	glm::vec2 old_pos;
     float altitude = 0;
     glm::vec2 size;
+	float scale = 1;
     float rot = 0;
 	float old_rot = 0;
 	glm::vec2 rot_vector = {0,0};
@@ -86,7 +87,7 @@ public:
 		{ rot_vector = glm::vec2{ size.x * ( p.x*cos(rot) - p.y*sin(rot) ), size.y * ( p.x*sin(rot) + p.y * cos(rot) ) }; }
 		old_rot = rot;
 		_pos -= rot_vector;
-		std::cout << name << " : " << _pos.x << " x " << _pos.y << '\n';
+		// std::cout << name << " : " << _pos.x << " x " << _pos.y << '\n';
 	}
     glm::vec2 Get_pos ( ) {
 		Update_pos();
@@ -104,7 +105,7 @@ public:
         for ( auto o : Sub_Objects ) 
         { o.second->Draw( ); }
 
-        if ( sprite != nullptr ) { sprite->Draw_frame ( frame, glm::vec3{ pos+parent_pos-size*0.5f, altitude }, size, rot, color, pivot ); }
+        if ( sprite != nullptr ) { sprite->Draw_frame ( frame, glm::vec3{ pos+parent_pos - glm::vec2{ size.x, 0}, altitude }, size * scale, rot, color, pivot ); }
     }
     
     template < class C > 
@@ -138,7 +139,6 @@ public:
 	}
 
     virtual void Update ( ) {
-        if ( !Active ) { return; }
         for ( auto o : Sub_Objects ) 
         { o.second->Update ( ); }
         for ( auto c : components ) 
@@ -146,14 +146,13 @@ public:
     }
     
     virtual void Start ( ) {
-        if ( !Active ) { return; }
         for ( auto o : Sub_Objects ) 
         { o.second->Start ( ); }
         for ( auto c : components ) 
         { c->Start(); } 
     }
 
-    Object * Set_Active ( bool active ) { Active = active; Start(); return this; }
+    Object * Set_Active ( bool active ) { Active = active; return this; }
     bool Get_Active ( ) { return Active; }
     std::string Get_Name ( ) { return name; }
 
@@ -178,6 +177,9 @@ public:
         { o.second->Set_Altitude(a); }
 		return this;
     }
+
+	Object * Set_Scale ( float s ) 
+	{ scale = ( s >= 0 ? s : 0 ); return this; }
 };
 
 
