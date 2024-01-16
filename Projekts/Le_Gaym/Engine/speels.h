@@ -101,6 +101,9 @@ public:
 				Lasur->Add_component < Lasurs > ()->target_pos = Lasur_target;
 				Lasur->Start();
 				Manager::Active_Scene->Add_Object ( Lasur );
+				Collider * c = Lasur->Add_component<Collider> ( );//->Set_size ( {50,50} )->Set_trigger(true);
+				c->Set_Obj(Manager::Object_Get(name));
+				c->Start();
 				break; }
 			
 			case 1: { // spawn a can of beans

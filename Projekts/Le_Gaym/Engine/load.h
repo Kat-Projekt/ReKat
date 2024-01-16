@@ -153,7 +153,7 @@ void Create_Scenes ( ) {
 	Manager::Scene_Load ( "main" );
 	Manager::Scene_Get ( "main" )->Add_Shader ( Manager::Shader_Get("sprite_1x1") );
 	Manager::Scene_Get ( "main" )->Add_Shader ( Manager::Shader_Get("sprite_2x1") );
-	Manager::Scene_Get ( "main" )->Add_UI_Shader ( Manager::Shader_Get("sprite_2x2") );
+	Manager::Scene_Get ( "main" )->Add_Shader ( Manager::Shader_Get("sprite_2x2") );
 	Manager::Scene_Get ( "main" )->Add_Shader ( Manager::Shader_Get("empty_sprite") );
 	Manager::Scene_Get ( "main" )->Add_UI_Shader ( Manager::Shader_Get("UI") );
 	Manager::Scene_Get ( "main" )->Add_UI_Shader ( Manager::Shader_Get("text") );

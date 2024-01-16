@@ -1,5 +1,5 @@
 #pragma once
-#include "../global.h"
+#include "../../global.h"
 #include "exact_folower.h"
 #include "gobelino.h"
 using namespace ReKat::grapik::Input;
@@ -13,7 +13,7 @@ public:
     void Start ( ) { time = 0; }
 
     void Update ( ) {
-		time = Timer::delta_time;
+		time += Timer::delta_time;
 		if ( time > between ) { 
 			time = 0; count++;
 			//std::cout << "spawn gobelino " << count << '\n';

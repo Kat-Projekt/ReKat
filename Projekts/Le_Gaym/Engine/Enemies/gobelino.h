@@ -1,5 +1,5 @@
 #pragma once
-#include "../global.h"
+#include "../../global.h"
 using namespace ReKat::grapik::Input;
 
 class Gobelino : public Behaviour {
@@ -30,6 +30,7 @@ public:
 	void Collision ( std::string obj ) { }
 	void CollisionTrigger ( std::string obj ) { 
 		if ( obj == "Spada") {  life--; }
+        life--;
 		if ( life <= 0 ) { 
 			Manager::Object_Get ( name )->Set_Active(false); 
 			// Manager::Object_Get ( "Player")->Get_component < Player > ()->Kill ();

@@ -29,19 +29,24 @@ int main(int argc, char const *argv[]) {
 
     int Fps = 0;
 	int t = time (0);
-
+    float i_time = Timer::current_time;
     while ( ReKat::grapik::IsEnd ( ) ) {
 		Fps ++;
 		if ( t + 1 == time(0) ) { 
 			t = time (0); 
-			std::cout << "\n-------------- Fps: " << Fps << '\n'; 
+			std::cout << "\n-------------- Fps: " << Fps << '\n';
+
 			Fps = 0; 
 		}
         Send_positon ( );
-
+        
         Manager::Update ( );
 
-        ReKat::grapik::Pool ( );	
+        ReKat::grapik::Pool ( );
+        while ( Timer::current_time < i_time + 0.1 ) { }
+        i_time = Timer::current_time;
+        std::cout << Timer::current_time << '\n';
+        std::cout << Timer::delta_time << '\n';
     }
     std::cout << "End\n";
     End_Online ( );

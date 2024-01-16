@@ -1,5 +1,5 @@
 #pragma once
-#include "../global.h"
+#include "../../global.h"
 using namespace ReKat::grapik::Input;
 
 class Exact : public Behaviour {
