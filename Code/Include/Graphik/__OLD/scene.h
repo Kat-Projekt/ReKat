@@ -9,12 +9,16 @@
 #include "graphik.hpp"
 
 template < typename T >
-_NODISCARD _CONSTEXPR20 void remove_element ( std::vector<T>&vec, T element ) {
+void remove_element ( std::vector<T>&vec, T &element ) {
 	// find
-	auto it = std::find ( vec.begin(), vec.end(), element );
-	if ( it == vec.end() ) { return; }
+    int it = -1;
+    for (size_t i = 0; i < vec.size(); i++) { 
+        if ( vec[i] == element ) 
+        { it = i; } 
+    }
+    if ( it < 0 ) { return; }
 	// remove
-	vec.erase ( it );
+	vec.erase ( vec.begin() + it );
 }
 
 class Scene {

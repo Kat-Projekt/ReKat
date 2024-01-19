@@ -64,6 +64,32 @@ objects: {
 
 scenes: {
 
+<<<<<<< HEAD
+=======
+	Manager::Scene_Load ( "loading" );
+	Manager::Scene_Get ( "loading" )->Add_UI_Shader ( Manager::Shader_Get("text") );
+	Manager::Scene_Get ( "loading" )->Add_UI_Object ( Manager::UI_Object_Get( "Connecting" ) );
+
+	Manager::Scene_Load ( "main" );
+	Manager::Scene_Get ( "main" )->Add_Shader ( Manager::Shader_Get("sprite_1x1") );
+	Manager::Scene_Get ( "main" )->Add_Shader ( Manager::Shader_Get("sprite_2x1") );
+	Manager::Scene_Get ( "main" )->Add_Shader ( Manager::Shader_Get("sprite_2x2") );
+	Manager::Scene_Get ( "main" )->Add_Shader ( Manager::Shader_Get("empty_sprite") );
+	Manager::Scene_Get ( "main" )->Add_UI_Shader ( Manager::Shader_Get("UI") );
+	Manager::Scene_Get ( "main" )->Add_UI_Shader ( Manager::Shader_Get("text") );
+	Manager::Scene_Get ( "main" )->Add_UI_Shader ( Manager::Shader_Get("empty_sprite_UI") );
+	//Manager::Scene_Get ( "main" )->Add_Object ( Manager::Object_Get("Map") );
+	Manager::Scene_Get ( "main" )->Add_Object ( Manager::Object_Get("Player") );
+	Manager::Scene_Get ( "main" )->Add_Object ( Manager::Object_Get("G") );
+	Manager::Scene_Get ( "main" )->Add_Object ( Manager::Object_Get("S") );
+	Manager::Scene_Get ( "main" )->Add_Object ( Manager::Object_Get("Enemy") );
+	Manager::Scene_Get ( "main" )->Add_UI_Object ( Manager::UI_Object_Get("Spells") );
+	Manager::Scene_Get ( "main" )->Add_UI_Object ( Manager::UI_Object_Get( "start" ) );
+	Manager::Scene_Get ( "main" )->Add_UI_Object ( Manager::UI_Object_Get( "Dialog" ) );
+	Manager::Scene_Get ( "main" )->Add_UI_Object ( Manager::UI_Object_Get( "Mouse" ) );
+
+	std::cout << "Scenes  created\n";
+>>>>>>> 117c6854edaf575b641c008987a8db1cbd3a2275
 }
 
 	return result;

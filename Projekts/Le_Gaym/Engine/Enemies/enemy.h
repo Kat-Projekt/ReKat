@@ -1,5 +1,5 @@
 #pragma once
-#include "../global.h"
+#include "../../global.h"
 #include "exact_folower.h"
 #include "gobelino.h"
 using namespace ReKat::grapik::Input;
