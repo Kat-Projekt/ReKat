@@ -51,12 +51,12 @@ public:
 		std::cout << "stating scene: ";
 		Objects.reserve(100);
         for ( auto o : Objects ) 
-        { std::cout << o->Get_Name() << ", "; o->Start(); }
+        { o->Start(); }
         for ( auto o : UI_Objects ) 
-        { std::cout << o->Get_Name() << ", "; o->Start(); }
+        { o->Start(); }
     }
 
-    void Update ( ) {
+    void Update ( ) {		
 		world_mouse_pos = cam.Get_Pos() + ReKat::grapik::Input::mouse_pos;
 
         glClearColor(0.6, 0.4, 0.5, 1.0f);

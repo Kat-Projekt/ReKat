@@ -33,7 +33,7 @@ protected:
     int frame;
 
     std::unordered_map < std::string, Object* > Sub_Objects;
-    std::vector < Behaviour* > components;
+    std::vector < _behaviour < Object >* > components;
 
 public:
     Object ( ) { }
@@ -114,6 +114,7 @@ public:
         c->name = name;
         if ( std::is_base_of<Behaviour, C>::value ) 
         { components.push_back( ( Behaviour * ) ( c ) ); }
+		c->Start();
         return c;
     }
     template < class C > 
@@ -121,6 +122,7 @@ public:
         c->name = name;
         if ( std::is_base_of<Behaviour, C>::value ) 
         { components.push_back( ( Behaviour * ) ( c ) ); }
+		c->Start();
         return c;
     }
 	
@@ -156,7 +158,7 @@ public:
     bool Get_Active ( ) { return Active; }
     std::string Get_Name ( ) { return name; }
 
-    void Andle_Collsions ( std::string obj, bool is_trigger ) {
+    void Andle_Collsions ( Object* obj, bool is_trigger ) {
 		if ( is_trigger ) {
 			for ( auto c : components ) 
 			{ c->CollisionTrigger( obj ); } 

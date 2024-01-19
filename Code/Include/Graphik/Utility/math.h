@@ -1,4 +1,7 @@
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <iostream>
+#include "list.h"
 
 using namespace glm;
 
@@ -14,19 +17,19 @@ bool Near ( vec2 p1, vec2 p2, float d ) {
 	return false;
 }
 
-glm::vec2 lerp ( glm::vec2 a, glm::vec2 b, float t ) { return a + (b - a) * t; }
+vec2 lerp ( vec2 a, vec2 b, float t ) { return a + (b - a) * t; }
 
-glm::vec2 Qerp ( glm::vec2 a, glm::vec2 b, float t ) {
+vec2 Qerp ( vec2 a, vec2 b, float t ) {
 	return a + (b - a) * t * t;
 }
 
-glm::vec2 Normalize ( glm::vec2 a ) {
+vec2 Normalize ( vec2 a ) {
     float m = sqrt(a.x*a.x + a.y*a.y);
     if ( m == 0 ) { return {0,0}; }
     return a / m;
 }
 
-float angle ( glm::vec2 v ) {
+float angle ( vec2 v ) {
 	float angle = 0;
 	float X = v.x / sqrt( v.x * v.x + v.y *v.y );
 	if ( v.y > 0 ) { angle = 3.1415+std::asin ( X ); } 

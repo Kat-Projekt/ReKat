@@ -23,7 +23,8 @@ int main ( int argc, char const *argv[] ) {
 #include <ReKat.hpp>\n\
 \n\
 int Load ( ) {\n\
-	\n\
+	int result = 0;\n\
+	return result;\n\
 }";
 
 	std::string mainn = "\
@@ -32,7 +33,7 @@ int Load ( ) {\n\
 int main ( int argc, char const *argv[] ) {\n\
     ReKat::grapik::Start ( \"" + Pname + "\", 800, 600, false, false, true );\n\
 	ReKat::synth::Start ( );\n\
-	Load ();\n\
+	if ( Load () != 0 ) { return 1; }\n\
 	Manager::Start ( );\n\
 	while ( ReKat::grapik::IsEnd ( ) ) {\n\
 		Manager::Update ( );\n\

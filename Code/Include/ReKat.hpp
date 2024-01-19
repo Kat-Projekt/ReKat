@@ -22,22 +22,9 @@
 #ifdef OPENGL
 	#include <Graphik/graphik.hpp>
 	#ifdef ALL_MODULES
-		#include <Graphik/shader.h>
-		#include <Graphik/text.h>
-		//#include <Graphik/texture.h>
-		#include <Graphik/framebuffer.h>
-		#include <Graphik/camera.h>
-		#include <Graphik/sprite.h>
-		#include <Graphik/button.h>
-		#include <Graphik/tilemap.h>
-		#include <Graphik/manager.h>
-		#include <Graphik/object.h>
-		#include <Graphik/colors.h>
-		#include <Graphik/animator.h>
-		#include <Graphik/behaviour.h>
-		#include <Graphik/scene.h>
-		#include <Graphik/collision.h>
-		#include <Graphik/math.h>
+		#include <Graphik/Resources/manager.hpp>
+		#include <Graphik/objekt.h>
+		#include <Graphik/Components/catalog.hpp>
 	#endif
 #endif
 
