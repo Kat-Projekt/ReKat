@@ -177,7 +177,7 @@ namespace ReKat::synth {
 		return 0;
 	}
 
-	static int Create_Source ( std::string name, glm::vec3 _pos, bool internal = false ) {
+	static int Create_Source ( std::string name, glm::vec3 _pos = {0,0,0}, bool internal = false ) {
 		ALuint source;
 		alGenSources((ALuint)1, &source);
 		CHECK_ERROR(FAILED_SOURCE_CRETION);
@@ -201,6 +201,9 @@ namespace ReKat::synth {
 	}
 
 	static int Play ( std::string where, std::string what, bool wait ) {
+		ALint source_state;
+		alGetSourcei ( Sources[where], AL_SOURCE_STATE, &source_state );
+		if ( source_state == AL_PLAYING ) { return FAILED_PLAYING; }
 		//std::cout << "playing: " << where << " " << what << '\n';
 		alSourcei( Sources[where], AL_BUFFER, Buffers[what] );
 		CHECK_ERROR(FAILED_BINDING);
@@ -209,7 +212,7 @@ namespace ReKat::synth {
 		CHECK_ERROR(FAILED_PLAYING);
 
 		if ( wait ) {
-			ALint source_state;
+			source_state;
 			alGetSourcei ( Sources[where], AL_SOURCE_STATE, &source_state );
 			CHECK_ERROR(FAILED_STATUS_GET);
 			while ( source_state == AL_PLAYING ) {
