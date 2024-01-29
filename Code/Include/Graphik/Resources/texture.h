@@ -13,7 +13,7 @@ public:
     enum Status {
         SUCCESS,
         FAILED_LOAD_IMAGE,
-        EMPTY_BUFFER
+        EMPTY_BUFFER = -1
     };
 
     unsigned int ID;
@@ -34,7 +34,7 @@ public:
     int Make ( const char * file );
     // creates the texture
 	// -------------------
-    int Make ( unsigned char* data, unsigned int width, unsigned int height, int nrChannels );
+    static int Make ( unsigned char* data, unsigned int width, unsigned int height, int nrChannels );
     // activate the texture
 	// --------------------
     void Use ( ) const { glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, this->ID); }

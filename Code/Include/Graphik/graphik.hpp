@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <string>
+#include <chrono>
 #include <map>
 #include <glm/glm.hpp>
 
@@ -13,6 +14,26 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #endif
+
+namespace Timer {
+    auto start = std::chrono::system_clock::now();
+    float delta_time = 0;
+    float fixed_delta_time = 0;
+    float current_time = 0;
+    float current_fixed_time = 0;
+    float Get_Time () 
+    { return (float)( std::chrono::system_clock::now ( ) - start ).count( ) / 10000000.0; }
+    void Update ( ) {
+		auto t = Get_Time ( );
+        delta_time = t - current_time;
+        current_time = t;
+    }
+	void Fixed_Update ( ) {
+		auto t = Get_Time ( );
+        fixed_delta_time = t - current_fixed_time;
+        current_fixed_time = t;
+    }
+}
 
 namespace ReKat {
 namespace grapik {
@@ -180,7 +201,7 @@ namespace ReKat::grapik {
 		Internal::SCR_HEIGTH = SCR_HEIGTH; Internal::SCR_WIDTH = SCR_WIDTH;
 		Input::screen_ration = (float)ReKat::grapik::Internal::SCR_WIDTH / (float)ReKat::grapik::Internal::SCR_HEIGTH;
 
-		//Input::Configure();
+		Input::Configure ( );
 
 		glfwInit ( );
 		glfwWindowHint ( GLFW_CONTEXT_VERSION_MAJOR, 3 );
@@ -217,7 +238,7 @@ namespace ReKat::grapik {
 		glfwSetFramebufferSizeCallback ( Internal::window, Input::FreamBufferResize );
 		glfwSetCharCallback( Internal::window, Input::Caracters );
 
-		glfwSetInputMode ( Internal::window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN );
+		// glfwSetInputMode ( Internal::window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN );
 
 		// glad: load all OpenGL function pointers
 		// ---------------------------------------
@@ -253,8 +274,14 @@ namespace ReKat::grapik {
 		return SUCCESS;
 	}
 
-	static void Pool ( ) 
+	static void Pool ( )
 	{ glfwSwapBuffers ( Internal::window ); glfwPollEvents ( ); }
+	
+	static void Update ( ) {
+		ReKat::grapik::Input::Update ( );
+		ReKat::grapik::Pool ( );
+		Timer::Update ( );
+	}
 }
 
 #endif

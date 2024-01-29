@@ -24,7 +24,7 @@
 	#ifdef ALL_MODULES
 		#include <Graphik/Resources/manager.hpp>
 		#include <Graphik/objekt.h>
-		#include <Graphik/Components/catalog.hpp>
+		#include <Graphik/Components/_catalog.hpp>
 	#endif
 #endif
 

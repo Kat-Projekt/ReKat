@@ -1,15 +1,28 @@
-#define OPENGL
-#define OPENAL
-#define ALL_MODULES
-#include <ReKat.hpp>
-
-class Hello : public Behaviour {
-	public:
-	void Start ( ) { std::cout << "Obj: " << obj->Get_Name() << " says: hello world\n"; }
-	void Update ( ) { }
-};
-
+#include "com.h"
 using namespace ReKat::grapik::Input;
+
+class Gobelino : public Behaviour {
+private:
+	float life = 20;
+    float speed = 100.0f;
+public:
+	Objekt *pointer;
+    void Start ( ) { }
+
+    void Update ( ) {
+        glm::vec3 vector = pointer->Get_Pos() - obj->Get_Pos();
+        
+        //Manager::Object_Get ( name )->Change_frame( Manager::Animator_Get( "walk" )->Get_Animation_Frame("walk",Timer::Get_Time()));
+        
+        if ( vector == glm::vec3{0,0,0} ) { return; }
+        // normalize
+		vector = glm::normalize ( vector );
+        obj->Inc_Pos( vector * speed * Timer::delta_time );
+		// std::cout << "pos" << Manager::Object_Get ( name )->Get_pos().x << " x " << Manager::Object_Get ( name )->Get_pos().y << '\n';
+	}
+
+	void Collision_Trigger ( Objekt * e ) { obj->Set_Active(false); }
+};
 
 class Player : public Behaviour {
 private:
@@ -19,9 +32,9 @@ private:
     int gobleino = 1;
     glm::vec2 m_ = {0,0};
 	float progression = 10;
-	float attack_duration = 0.15;
+	float attack_duration = 0.15f;
 	float attack_angle;
-	float attack_spread = 1.5;
+	float attack_spread = 1.5f;
 	int Killed_gobelins = 0;
 public:
 
@@ -36,8 +49,17 @@ public:
         if ( Key_Pressed( "S" ) ) { dpos += glm::vec2{0,-1}; }
         obj->Inc_Pos ( vec3(Normalize(dpos) * speed * Timer::delta_time, 0) );
 		
-		if ( Key_Pressed( "A" ) && Key_Pressed( "W" ) && Key_Pressed( "D" ) && Key_Pressed( "S" ) ) {
-			obj->Set_Active(false);
+		if ( Key_Down( "A" ) && Key_Down( "W" ) && Key_Down( "D" ) && Key_Down( "S" ) ) {
+			Objekt *K = new Objekt("Kat");
+			// K->Add_component < Sfere_Collider > ( );
+			K->Add_component < Sprite > ( )->Set ( Manager::Texture_Get( "sprite" ), Manager::Shader_Get( "sprite" ), camera.Get_component < Camera > ( ), {2,1} );
+			K->Add_component < Gobelino > ( )->pointer = obj;
+			K->Add_component < Sfere_Collider > ( )->Set_Size (50);
+			K->Add_component < Rigidbody >();
+			std::cout << "Created obj\n";
+			K->Start ( );
+			Scene_Manager::_current_scene->Add_Child( K );
+			std::cout << "Added obj\n";
 		}
 
         /*if ( Key_Down ( "Mouse1" ) && progression >= attack_duration ) {
@@ -64,43 +86,3 @@ public:
         // if ( Key_Down ( "P" ) ) { Manager::Object_Load("gobelino_" + std::to_string(gobleino++), "gobelino", {100,100},{100,100} )->Add_component<gobelino>()->name = "gobelino_"+ std::to_string(gobleino);  }
     }
 };
-
-static void __FreamBufferResize ( GLFWwindow* window, int width, int height ) {
-    glViewport ( 0, 0, ReKat::grapik::Internal::SCR_WIDTH = width, ReKat::grapik::Internal::SCR_HEIGTH = height );
-}
-
-int Load ( ) {
-	_FreamBufferResize = __FreamBufferResize;
-
-	int result = 0;
-	result += Manager::Shader_Load  ( "sprite", "sprite.vs", "sprite.fs");
-	result += Manager::Texture_Load ( "sprite", "sprite.png" );
-
-	Objekt main ( "main" );
-	Objekt pier ( "pier" );
-	Objekt gio  ( "gio" );
-	
-	main.Add_Child ( &gio );
-	main.Add_Child ( &pier );
-
-	auto cam = pier.Add_component < Camera > ( );
-	auto sprite = gio.Add_component < Sprite > ( );
-	gio.Add_component < Player > ( );
-	main.Add_component < Fps > ( );
-
-	sprite->Set ( Manager::Texture_Get( "sprite" ), Manager::Shader_Get( "sprite" ), cam, {2,2} );
-
-	Scene_Manager::Set_Active_Scene ( &main );
-
-	while ( ReKat::grapik::IsEnd ( ) ) {
-		glClearColor(0.6, 0.4, 0.5, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glEnable(GL_DEPTH_TEST);
-
-		Scene_Manager::Update ( );
-		ReKat::grapik::Update ( );
-    }
-
-	std::cout << "\nresources loaded\n";
-	return result;
-}

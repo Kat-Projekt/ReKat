@@ -1,15 +1,24 @@
 #ifndef OBJEKT_H
 #define OBJEKT_H
 
+#define DIAGNOSTIC
+#ifndef DIAGNOSTIC 
+#define DEBUG(msg) std::cout << msg
+#else
+#define DEBUG(msg)
+#endif
+
 template < typename T >
 class _behaviour {
 public:
     T* obj;
     virtual void Start ( ) { }
     virtual void Update ( ) { }
+	virtual void Fixed_Update ( ) { }
+	virtual void UI_Update ( ) { }
 
-    virtual void Collision ( T* obj ) { }
-    virtual void CollisionTrigger ( T* obj ) { }
+    virtual void Collision ( T* _obj ) { _obj; }
+    virtual void Collision_Trigger ( T* _obj ) { _obj; }
 };
 
 #include "Utility/math.h"
@@ -24,7 +33,7 @@ protected:
     vec3 _pos  = {0,0,0};
     vec3 _size = {100,100,100};
     vec3 _rot  = {0,0,0};
-		vec3 _rot_pivot = {0,0,0};
+	vec3 _rot_pivot = {0,0,0};
 
     // Render Matrix
     mat4 _model = mat4(1.0f);
@@ -38,7 +47,7 @@ public:
 
     Objekt ( ) { }
     Objekt ( std::string name, vec3 pos = {0,0,0}, vec3 size = {100,100,100}, vec3 rot = {0,0,0}, vec3 rot_pivot = {0,0,0} ) 
-	: _name(name), _size(size), _rot(rot), _rot_pivot(rot_pivot) { }
+	: _name(name), _pos(pos), _size(size), _rot(rot), _rot_pivot(rot_pivot) { }
 
 	void Set_father ( Objekt * father ) { _father = father; }
     void Add_Child ( Objekt * child ) {
@@ -47,10 +56,18 @@ public:
 	}
 	void Rem_Child ( std::string name ) {
 		auto O = Get_Children ( name );
-		std::cout << "finding gio: " << O << '\n';
 		_childrens.Print ( );
 		_childrens.remove ( O );
 		_childrens.Print ( );
+	}
+	void Rem_Child ( Objekt* O ) {
+		_childrens.Print ( );
+		_childrens.remove ( O );
+		_childrens.Print ( );
+	}
+	void Delete ( ) {
+		if ( _father != nullptr ) { _father->Rem_Child ( this ); }
+		_active = false;
 	}
     Objekt* Get_Children ( std::string name ) {
 		auto C = _childrens.Get_Begin ( );
@@ -61,11 +78,14 @@ public:
 		}
 		return nullptr;
 	}
+	List < Objekt* > Get_Childrens ( ) { return _childrens; }
 
 	void Set_Pos ( vec3 pos = {0,0,0} ) { _pos = pos; }
-	vec3 Get_Pos ( ) { return _pos; }
+	void Inc_Pos ( vec3 pos = {0,0,0} ) { _pos += pos; }
+	vec3 Get_Pos ( ) { return _pos + ( _father != nullptr ? _father->Get_Pos() : vec3{0,0,0}); }
 
 	void Set_Rot ( vec3 rot = {0,0,0} ) { _rot = rot; }
+	void Set_2D_Rot ( float rot ) { _rot.z = rot; }
 	vec3 Get_Rot ( ) { return _rot; }
 
 	void Set_Size ( vec3 size = {0,0,0} ) { _size = size; }
@@ -89,7 +109,6 @@ public:
         	return c;
 		}
 		Error("Wrong component decraration");
-		return nullptr;
     }
     template < class C > 
     C* Add_component ( C* c ) {
@@ -99,29 +118,53 @@ public:
         	return c;
 		}
 		Error("Wrong component Behaviour");
-		return nullptr;
     }
 	
     template < class C > 
 	C* Get_component ( ) {
-		auto C = _components.Get_Begin ( );
-		while ( C != nullptr ) {
-			if ( typeid(*(C->data)) == typeid (C) ) { return (C*)c; }
-			C = C->next;
+		auto c = _components.Get_Begin ( );
+		while ( c != nullptr ) {
+			if ( typeid(*(c->data)) == typeid (C) ) { return (C*)c->data; }
+			c = c->next;
 		}
 		return nullptr;
+	}
+	template < class C > 
+	List < C* > Get_component_recursive ( ) {
+		List < C* > L;
+		auto c = _components.Get_Begin ( );
+		while ( c != nullptr ) {
+			if ( typeid(*(c->data)) == typeid (C) ) { L.append ( (C*)c->data ); }
+			c = c->next;
+		}
+        auto O = _childrens.Get_Begin ( );
+		while ( O != nullptr ) {
+			L.append ( &O->data->Get_component_recursive < C > ( ) );
+			O = O->next;
+		}
+		return L;
+	}
+
+	template < typename C >
+	bool Has_component ( ) {
+		auto c = _components.Get_Begin ( );
+		while ( c != nullptr ) {
+			if ( typeid(*(c->data)) == typeid (C) ) { return true; }
+			c = c->next;
+		}
+		return false;
 	}
 
     virtual void Start ( ) {
 		if ( !_active ) { return; }
         auto C = _components.Get_Begin ( );
 		while ( C != nullptr ) {
-			C->data->Start();
+			C->data->Start ( );
 			C = C->next;
 		}
         auto O = _childrens.Get_Begin ( );
 		while ( O != nullptr ) {
-			O->data->Start();
+			O->data->Start ( );
 			O = O->next;
 		}
     }
@@ -130,28 +173,111 @@ public:
 		if ( !_active ) { return; }
         auto C = _components.Get_Begin ( );
 		while ( C != nullptr ) {
-			C->data->Update();
+			DEBUG ( "Updating comp: " + std::string(typeid(*C->data).name()) + "\n" );
+			C->data->Update ( );
 			C = C->next;
 		}
 		auto O = _childrens.Get_Begin ( );
 		while ( O != nullptr ) {
-			O->data->Update();
+			DEBUG ( "Updating obj: " + O->data->Get_Name() + "\n" );
+			O->data->Update ( );
+			DEBUG ( "Updated obj: " + O->data->Get_Name() + "\n" );
 			O = O->next;
 		}
     }
 
+    virtual void Fixed_Update ( ) {
+		if ( !_active ) { return; }
+        auto C = _components.Get_Begin ( );
+		while ( C != nullptr ) {
+			C->data->Fixed_Update ( );
+			C = C->next;
+		}
+		auto O = _childrens.Get_Begin ( );
+		while ( O != nullptr ) {
+			O->data->Fixed_Update ( );
+			O = O->next;
+		}
+    }
+
+	virtual void Andle_Collsions ( Objekt * collider, float trigger = false ) {
+		if ( trigger ) { // the collision is of thigger type
+			auto C = _components.Get_Begin ( );
+			while ( C != nullptr ) {
+				C->data->Collision_Trigger ( collider );
+				C = C->next;
+			}
+			auto O = _childrens.Get_Begin ( );
+			while ( O != nullptr ) {
+				O->data->Andle_Collsions ( collider, trigger );
+				O = O->next;
+			}
+		}
+		auto C = _components.Get_Begin ( );
+		while ( C != nullptr ) {
+			C->data->Collision ( collider );
+			C = C->next;
+		}
+		auto O = _childrens.Get_Begin ( );
+		while ( O != nullptr ) {
+			O->data->Andle_Collsions ( collider, trigger );
+			O = O->next;
+		}
+	} 
+
 	mat4 Get_Model_Mat ( ) {
-		// modify pos based on pivot (alwais on center)
-        vec3 position = _pos + _father->Get_Pos() + vec3{ _rot_pivot.x * _size.x, _rot_pivot.y * _size.y, _rot_pivot.z * _size.z };
+		vec3 Pivot = { (_rot_pivot.x + 0.5) * _size.x, (_rot_pivot.y + 0.5) * _size.y, (_rot_pivot.z) * _size.z };
+		vec3 position = _pos;
+		if ( _father != nullptr ) { position+= _father->Get_Pos(); }
 
-		mat4 rot_x = glm::rotate(glm::mat4(1.0f), glm::radians(_rot.x), glm::vec3(1.0f, 0.0f, 0.0f));
-    	mat4 rot_y = glm::rotate(glm::mat4(1.0f), glm::radians(_rot.y), glm::vec3(0.0f, 1.0f, 0.0f));
-    	mat4 rot_z = glm::rotate(glm::mat4(1.0f), glm::radians(_rot.z), glm::vec3(0.0f, 0.0f, 1.0f));
+		mat4 model = glm::mat4(1.0f);
+        model = glm::translate(model, position);
+        if ( _rot.x != 0 ) { model = glm::rotate(model, glm::radians(_rot.x), glm::vec3(1.0f, 0.0f, 0.0f)); }
+    	if ( _rot.y != 0 ) { model = glm::rotate(model, glm::radians(_rot.y), glm::vec3(0.0f, 1.0f, 0.0f)); }
+    	if ( _rot.z != 0 ) { model = glm::rotate(model, _rot.z, glm::vec3(0.0f, 0.0f, 1.0f)); }
+        model = glm::translate(model, -Pivot);
 
-		_model = glm::translate(glm::mat4(1.0f), position) * ( rot_x * rot_y * rot_z ) * glm::scale(glm::mat4(1.0f), _size);
+        model = glm::scale(model, _size);
+
+		return model;
+	}
+
+	std::string Print_Tree ( ) {
+		std::string out = _name;
+		auto O = _childrens.Get_Begin ( );
+		while ( O != nullptr ) {
+			out += " : {" + O->data->Print_Tree () + '}';
+			O = O->next;
+		}
 		
-		return _model;
+		return out;
 	}
 };
+
+namespace Scene_Manager {
+	static List < Objekt* > _scenes;
+	static Objekt* _current_scene = nullptr;
+
+	static void Start ( ) 
+	{ if ( _current_scene != nullptr ) { _current_scene->Start(); } };
+	static void Update ( )
+	{ if ( _current_scene != nullptr ) { _current_scene->Update(); } };
+
+	static void Add_Scene ( Objekt * o ) 
+	{ _scenes.append( o ); }
+	static void Set_Active_Scene ( Objekt * o ) {
+		if ( !_scenes.contains( o ) ) { _scenes.append ( o ); }
+		_current_scene = o;
+		Start ( );
+	}
+	static void Set_Active_Scene ( std::string s ) {
+		auto S = _scenes.Get_Begin ( );
+		while ( S != nullptr ) {
+			if ( S->data->Get_Name () == s ) 
+			{ _current_scene = S->data; Start ( ); break; }
+			S = S->next;
+		}
+	}
+}
 
 #endif

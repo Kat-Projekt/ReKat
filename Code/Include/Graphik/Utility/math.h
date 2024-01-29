@@ -5,19 +5,22 @@
 
 using namespace glm;
 
-inline float Dist ( vec2 p1, vec2 p2 ) {
-	vec2 D = p1 - p2;
+template < typename T >
+inline float Dist ( T p1, T p2 ) {
+	T D = p1 - p2;
 	float DD = abs (D.x) + abs(D.y);
 	return DD;
 }
 
+template < typename T >
 bool Near ( vec2 p1, vec2 p2, float d ) {
 	float DD = Dist (p1,p2);
 	if ( DD < d ) { return true; }
 	return false;
 }
 
-vec2 lerp ( vec2 a, vec2 b, float t ) { return a + (b - a) * t; }
+template < typename T >
+T lerp ( T a, T b, float t ) { return a + (b - a) * t; }
 
 vec2 Qerp ( vec2 a, vec2 b, float t ) {
 	return a + (b - a) * t * t;
@@ -38,6 +41,21 @@ float angle ( vec2 v ) {
 }
 
 std::ostream& operator << ( std::ostream& os, const vec2& vec ) {
-	os << vec.x << " : " << vec.y;
+	os << vec.x << " :\t" << vec.y;
+	return os;
+}
+
+std::ostream& operator << ( std::ostream& os, const vec3& vec ) {
+	os << vec.x << " :\t" << vec.y<< " :\t" << vec.z;
+	return os;
+}
+
+template < typename T > 
+std::ostream& operator << ( std::ostream& os, const std::vector<T>& vec ) {
+	os << vec.size ( );
+	if ( vec.size ( ) == 0 ) { return os; }
+	os << " : ";
+	for ( auto e : vec ) 
+	{ std::cout << "{" << e << "} "; }
 	return os;
 }

@@ -1,194 +1,124 @@
 #ifndef COLLISION_H
 #define COLLISION_H
 
-#include "object.h"
-#include "behaviour.h"
-#include "object.h"
-#include "map"
-
-#define CLAMP(n,a,b) ( ( n > b ) ? b : ( ( n < a ) ? a : n ) )
-#define OUT(n,a,b) ( ( n > b ) ? true : ( ( n < a ) ? true : false ) )
+#include "../objekt.h"
 
 class Collider : public Behaviour {
 private:
-	Object *obj = nullptr;
-    glm::vec2 size;
-	bool is_trigger = false;
-	bool is_movable = true;
+	bool _trigger = false;
+	bool _static = false;
 public:
-    void Start ( );
-	void Update ( ) { }
-	Collider *Set_size ( glm::vec2 _size ) { size = _size; return this; }
-	glm::vec2 Get_pos ( ) { return obj->Get_pos( ); }
-	glm::vec2 Get_size ( ) { return size; }
-	bool Is_trigger ( ) { return is_trigger; }
-	bool Is_movable ( ) { return is_movable; }
-	Collider *Set_trigger ( bool _trigger ) { is_trigger = _trigger; return this; }
-	Collider *Set_movable ( bool _movable ) { is_movable = _movable; return this; }
-	Collider *Set_Obj ( Object * _obj ) { obj = _obj; return this; }
-	Object* Get_Obj ( ) { return obj; }
+	void Start ( ) { _static = ! obj->Has_component < Rigidbody > ( ); }
+
+	bool Is_Trigger ( ) { return _trigger; }
+	Collider *Set_Trigger ( bool trigger ) { _trigger = trigger; return this; }
+
+	bool Is_Static ( ) { return _static; } 
 };
 
-namespace Collision {
-	static std::vector < Collider* > Colliders;
-	enum Status {
-		COLLIDING,
-		ENTER,
-		EXIT,
-		NONE
-	};
-	static std::vector < Status > collision_Status;
-	// this map contains every collider grouped by position
-	// /// 100 200 300 400
-	// 100 co1 co2 /// co4
-	// 200 /// co3 /// ///
-	// 300 /// /// /// ///
-	// 400 co5 co6 /// co7
-	// when checking collisions only check the ones in neibouns cells;
-	// if we nead to verify co1 collisons we only verifiy: co2 and co3
-    static std::map < std::pair <int,int>, std::vector < int > > Collision_Map;
-	// Max number of colliders per Box if another collider tryes to enter it is verboten
-	int Max_Colliders = 10;
-	// Dimension of the collion cell
-	static int Box_Size = 100;
-	// verify if the collider moved the move it
-	static void Update_Collision_Map ( ) { }
-	inline static std::vector < int > Get_Colliders ( glm::vec2 pos ) { 
-		// quantiza la posizione
-		int X = pos.x / Box_Size;
-		int Y = pos.y / Box_Size;
-		// get all neibourn colliders
-		std::vector < int > Colliders;
-		// (x-1,y+1) (x+0,y+1) (x+1,y+1)
-		// (x-1,y+0) (x+0,y+0) (x+1,y)
-		// (x-1,y-1) (x+0,y-1) (x+1,y-1)
-		for ( int Dx = -1; Dx <= 1; Dx++) {
-			for (int Dy = -1; Dy <= 1; Dy++) 
-			{ true; }
-		}
-		return Colliders;
-	}
-	static int Get_collider_Position ( ) { } 
-    static void Add_Collider ( Collider* o ) {
-		Colliders.push_back( o );
-		// std::cout << "added collider: " << o->name << '\n';
-	}
-	// checks if o is in collision with another collider if it is:
-	// case is_trigger : send a collision trigger call to both colliders
-	// case is_block : send a collison call to both colliders and moves the o collider to a non colliding position
-	// the is_block collision call is called also on contact
-	
-	static glm::vec2 Check_collision ( Collider* O1, Collider* O2 ) { 
-		// check collision between obj1 e obj2 
-		// collision x-axis?
-		float Dx = abs(O1->Get_pos().x - O2->Get_pos().x) - ( O1->Get_size ().x + O2->Get_size().x ) / 2;
-		float Dy = abs(O1->Get_pos().y - O2->Get_pos().y) - ( O1->Get_size ().y + O2->Get_size().y ) / 2;
-		if ( Dy > 0 || Dx > 0 ) { return {0,0}; }
+// ------------------------------- Collider Types -----------------------------------
+// ----------------------------------------------------------------------------------
+class Box_Collider : public Collider {
+private:
+	vec3 _size = {0,0,0};
+public:
+	Collider *Set_Size ( glm::vec3 size ) { _size = size; return this; }
+	vec3 Get_Size ( ) { return _size; }
+};
+
+class Sfere_Collider : public Collider {
+private:
+	float _size = 0;
+public:
+	Collider *Set_Size ( float size ) { _size = size; return this; }
+	float Get_Size ( ) { return _size; }
+};
+
+// ---------------------------- Collsion Detection ----------------------------
+// ----------------------------------------------------------------------------------
+struct Collision_Result {
+	// specifies if the collision appened
+	bool triggered = false;
+	// specifies the direction for the shortes exit
+	vec3 exit_direction = {0,0,0};
+};
+
+std::ostream& operator << ( std::ostream& os, const Collision_Result& C ) {
+	os << ( C.triggered ? "collision { " :  "--------- { " ) << C.exit_direction << " } ";
+	return os;
+}
+
+Collision_Result Check_Collision ( Box_Collider   *B1, Box_Collider   *B2 ) {
+	vec3 P_Delta = B1->obj->Get_Pos ( ) - B2->obj->Get_Pos ( );
+	vec3 Delta = abs ( P_Delta ) - ( B1->Get_Size () + B2->Get_Size() ) * 0.5f;
+
+	// collision not appeing
+	if ( Delta.x > 0 || Delta.y > 0 || Delta.z > 0 ) { return {false,{0,0,0}}; }
+
+	// trigger collision ( no nead for fastest exit point )
+	if ( B1->Is_Trigger( ) || B2->Is_Trigger ( ) ) { return {true,{0,0,0}}; }
 		
-		glm::vec2 move_vector;
-		if ( abs(Dx) < abs(Dy) ) {
-			int Sing = ( O2->Get_pos().x - O1->Get_pos().x >= 0 ? 1 : -1 );
-			move_vector = { Dx * Sing, 0 };
-		} else {
-			int Sing = ( O2->Get_pos().y - O1->Get_pos().y >= 0 ? 1 : -1 );
-			move_vector = { 0, Dy * Sing };
-		}
+	glm::vec3 move_vector;
 
-		if ( ! ( O1->Is_trigger( ) || O2->Is_trigger( ) ) ) {
-			if ( O1->Is_movable( ) && O2->Is_movable( ) ) {
-				O1->Get_Obj()->DMove( move_vector * 0.5f );
-				O2->Get_Obj()->DMove( - move_vector * 0.5f );
-				return move_vector;
-			}
-			if ( O1->name == "Player" || O2->name == "Player" ) { 
-				if ( O1->Is_movable( ) ) { O1->Get_Obj()->DMove( move_vector );}
-				if ( O2->Is_movable( ) ) { O2->Get_Obj()->DMove( move_vector );}
-			} else {
-				if ( O1->Is_movable( ) ) { O1->Get_Obj()->DMove( - move_vector );}
-				if ( O2->Is_movable( ) ) { O2->Get_Obj()->DMove( - move_vector );}
-			}
+	// determine exit point
+	if ( abs ( Delta.x ) > abs ( Delta.y ) ) {
+		if ( abs ( Delta.y ) > abs ( Delta.z ) ) { // Delta.z is Low
+			float Sing = ( P_Delta.z >= 0 ? -1 : 1 );
+			move_vector = { 0, 0, Delta.z * Sing };
+		} else { // Delta.y is Low
+			float Sing = ( P_Delta.y >= 0 ? -1 : 1 );
+			move_vector = { 0, Delta.y * Sing, 0 };
 		}
-		return move_vector;
+	} else {
+		if ( abs ( Delta.x ) > abs ( Delta.z ) ) { // Delta.z is Low
+			float Sing = ( P_Delta.z >= 0 ? -1 : 1 );
+			move_vector = { 0, 0, Delta.z * Sing };
+		} else { // Delta.x is Max
+			float Sing = ( P_Delta.x >= 0 ? -1 : 1 );
+			move_vector = { Delta.x * Sing, 0, 0 };
+		}
 	}
 
-	static void Check_collisions ( ) {
-		if ( Colliders.size () < 2 ) { return; }
-		// ciclo dal primo al penultimo
-        for ( size_t primo = 0; primo < Colliders.size() - 1; primo ++ ) {
-			Collider * _cp = Colliders[primo];
-			if ( ! _cp->Get_Obj()->Get_Active() ) { continue; }
-            // ciclo per le coppie non viste e diverse dall'identità
-            for ( size_t secondo = 1 + primo; secondo < Colliders.size(); secondo ++ ) {
-				Collider * _cs = Colliders[secondo];
-				if ( ! _cs->Get_Obj()->Get_Active() ) { continue; }
-				if ( !_cp->Is_movable() && !_cs->Is_movable() ) { continue; };
-				glm::vec2 C = Check_collision ( _cp,  _cs );
-                // std::cout << "check " << _cp->name << " & " << _cs->name << " = " << ( C==glm::vec2{0,0} ? "si" : "no" ) << '\n';
+	return {true,move_vector};
+}
+Collision_Result Check_Collision ( Box_Collider   *B1, Sfere_Collider *S2 ) {
+	// get center point circle first 
+    glm::vec3 center = S2->obj->Get_Pos ( );
+    // calculate AABB info (center, half-extents)
+    glm::vec3 aabb_half_extents = B1->Get_Size ( ) * 0.5f;
+    glm::vec3 aabb_center = B1->obj->Get_Pos ( );
+    // get difference vector between both centers
+    glm::vec3 difference = center - aabb_center;
+    glm::vec3 clamped = glm::clamp(difference, -aabb_half_extents, aabb_half_extents);
+    // add clamped value to AABB_center and we get the value of box closest to circle
+    glm::vec3 closest = aabb_center + clamped;
+    // retrieve vector between center circle and closest point AABB and check if length <= radius
+    difference = closest - center;
 
-				// inside collision
-				if ( C != glm::vec2 (0,0) ) {
-					if ( ! _cp->Is_trigger( ) && ! _cs->Is_trigger( ) ) {
-						//std::cout << "both solid";
-						// mantain collider out of other collider;
-						_cp->Get_Obj()->Andle_Collsions( _cs->name, false );
-						_cs->Get_Obj()->Andle_Collsions( _cp->name, false );
-					} else {
-						//std::cout << "both trigger";
-						_cp->Get_Obj()->Andle_Collsions( _cs->name, true );
-						_cs->Get_Obj()->Andle_Collsions( _cp->name, true );
-					}
-				}
-            }
-        }
-        //std::cout <<'\n'; 
-	}
+	float D = glm::length(difference);
+	// collision not appened
+	if ( D > S2->Get_Size ( ) ) { return {false,{0,0,0}}; }
 
-    /*static void Check_collisons ( ) {
-        // ciclo dal primo al penultimo
-        for ( size_t primo = 0; primo < Objs.size() - 1; primo ++ ) {
-            // ciclo per le coppie non viste e diverse dall'identità
-            for ( size_t secondo = 1 + primo; secondo < Objs.size() - 1; secondo ++ ) {
-                //std::cout << "check " << Objs[primo]->Get_Name() << " & " << Objs[secondo]->Get_Name() << '\n';
-                // collision x-axis?
-                bool collisionX = Objs[primo]->Get_pos().x + Objs[primo]->Get_size().x >= Objs[secondo]->Get_pos().x &&
-                    Objs[secondo]->Get_pos().x + Objs[secondo]->Get_size().x >= Objs[primo]->Get_pos().x;
-                // collision y-axis?
-                bool collisionY = Objs[primo]->Get_pos().y + Objs[primo]->Get_size().y >= Objs[secondo]->Get_pos().y &&
-                    Objs[secondo]->Get_pos().y + Objs[secondo]->Get_size().y >= Objs[primo]->Get_pos().y;
-                
-                // send collision call
-                if ( collisionX && collisionY ) {
-                    Objs[primo]->Andle_Collsions( Objs[secondo]->name, true );
-                    Objs[secondo]->Andle_Collsions( Objs[primo]->name, true );
-                }
-            }
-        }
-        //std::cout <<'\n';        
-    }
-    // check for collisions in a direction return position
-    static void Move ( Object *o, glm::vec2 _new_pos ) {
-        // create a new_position that can't collide with the objs
-        for ( auto _o : Objs ) {
-            if ( o == _o ) { continue; }
-            // collision x-axis?
-            bool collisionX = o->Get_pos().x +  o->Get_size().x >= _o->Get_pos().x &&
-                             _o->Get_pos().x + _o->Get_size().x >=  o->Get_pos().x;
-            // collision y-axis?
-            bool collisionY = o->Get_pos().y +  o->Get_size().y >= _o->Get_pos().y &&
-                             _o->Get_pos().y + _o->Get_size().y >=  o->Get_pos().y;
-                
-                // send collision call
-                if ( collisionX && collisionY ) {
-                    o->Andle_Collsions( _o->name, true );
-                    _o->Andle_Collsions( o->name, true );
-                }
-        }
-        
-    }*/
-};
+	// trigger collision ( no nead for fastest exit point )
+	if ( B1->Is_Trigger( ) || S2->Is_Trigger ( ) ) { return {true,{0,0,0}}; }
 
-void Collider::Start ( ) { // add this collider to Collision manager
-	Collision::Add_Collider ( this );
+	// determine exit point
+	return {true, difference*(D-S2->Get_Size ( ))/(D == 0 ? 1 : D)};
+}
+Collision_Result Check_Collision ( Sfere_Collider *S1, Sfere_Collider *S2 ) {
+	vec3 P = S1->obj->Get_Pos ( ) - S2->obj->Get_Pos ( );
+
+	float D = glm::length ( P );
+	float S = S1->Get_Size ( ) + S2->Get_Size ( );
+
+	// collision not appened
+	if ( D > S ) { return {false,{0,0,0}}; }
+
+	// trigger collision ( no nead for fastest exit point )
+	if ( S1->Is_Trigger( ) || S2->Is_Trigger ( ) ) { return {true,{0,0,0}}; }
+
+	// determine exit point
+	return {true, P*(S-D)/D};
 }
 
 #endif

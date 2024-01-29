@@ -25,7 +25,7 @@ public:
 	
 	// gets element by index
 	// nullptr if not found
-	T* operator[] ( integer index ) {
+	T operator[] ( integer index ) {
 		if ( index > _size ) { Error("out of bounds"); }
 		auto C = _first;
 		for ( size_t i = 0; i < index; i++ ) 
@@ -35,15 +35,24 @@ public:
 	}
 	// gets the index of the first occurence og element
 	// -1 if not found
-	integer operator[] ( T elemment ) {
+	integer operator[] ( T element ) {
 		integer r = 0;
 		auto C = _first;
-		while ( C->next != nullptr ) {
-			if ( C->data == elemment ) { return r; }
+		while ( C != nullptr ) {
+			if ( C->data == element ) { return r; }
 			C = C->next;
 			r++;
 		}
 		return -1;
+	}
+
+	bool contains ( T element ) {
+		auto C = _first;
+		while ( C != nullptr ) {
+			if ( C->data == element ) { return true; }
+			C = C->next;
+		}
+		return false;
 	}
 	
 	// adds data to list
@@ -71,6 +80,25 @@ public:
 		_size++;
 		return this;
 	}
+
+	List* append ( List<T> * data ) {
+		if ( data == nullptr || data->size() == 0 ) { return this; }
+		// first item
+		if ( _first == nullptr ) {
+			_first = data->Get_Begin ( );
+			_last = data->Get_Endin ( );
+			_size = data->size ( );
+			return this;
+		}
+
+		_last->next = data->Get_Begin ( );
+		data->Get_Begin ( )->prev = _last;
+		_last = data->Get_Endin ( );
+
+		_size += data->size ( );
+		return this;
+	}
+
 	// removes every istance of and element equal to data from list
 	List* remove ( T data ) {
 		auto C = _first;
@@ -98,13 +126,28 @@ public:
 	}
 
 	Element* Get_Begin ( ) { return _first; }
+	Element* Get_Endin ( ) { return _last; }
 
 	void Print ( ) {
 		auto C = _first;
 		int i = 0;
 		while (C != nullptr) { std::cout << i << ':' << C->data << '\n'; C = C->next; i++; }
 	}
+	
+	friend std::ostream& operator << ( std::ostream& os, List<T>& list ) {
+		os << list.size( );
+		if ( list.size ( ) == 0 ) { return os; }
+		os << " : ";
+		auto C = list.Get_Begin( );
+		auto E = list.Get_Endin( );
+		while ( C != nullptr ) {
+			std::cout << "{" << C->data << ( C != E ? "} : " : "}");
+			C = C->next;
+		}
+		return os;
+	}
 };
+
 
 
 #endif
