@@ -25,7 +25,7 @@ public:
 
 		if ( _t + 1 < Timer::Get_Time ( ) ) {
 			std::cout << "\n---- Fps: " << _fps << '\n';
-			std::cout << "\n---- Rendered: " << obj->Get_Childrens ().size();
+			std::cout << "---- Rendered: " << obj->Get_Childrens ().size() << '\n';
 			_t = Timer::Get_Time(); 
 			_fps = 0;
 		}

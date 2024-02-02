@@ -41,12 +41,12 @@ float angle ( vec2 v ) {
 }
 
 std::ostream& operator << ( std::ostream& os, const vec2& vec ) {
-	os << vec.x << " :\t" << vec.y;
+	os << "{ " << vec.x << " : " << vec.y << " }";
 	return os;
 }
 
 std::ostream& operator << ( std::ostream& os, const vec3& vec ) {
-	os << vec.x << " :\t" << vec.y<< " :\t" << vec.z;
+	os << "{ " << vec.x << " : " << vec.y<< " : " << vec.z << " }";
 	return os;
 }
 

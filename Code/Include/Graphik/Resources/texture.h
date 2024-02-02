@@ -25,7 +25,8 @@ public:
     unsigned int Filter_Max;
 
     Texture ( ) : Width(0), Height(0), Format(GL_RGB), Wrap_S(GL_REPEAT), Wrap_T(GL_REPEAT), Filter_Min(GL_NEAREST), Filter_Max(GL_NEAREST) { }
-    Texture ( const char * file ) : Width(0), Height(0), Format(GL_RGB), Wrap_S(GL_REPEAT), Wrap_T(GL_REPEAT), Filter_Min(GL_NEAREST), Filter_Max(GL_NEAREST) 
+    Texture ( int ID ) : Width(0), Height(0), Format(GL_RGB), Wrap_S(GL_REPEAT), Wrap_T(GL_REPEAT), Filter_Min(GL_NEAREST), Filter_Max(GL_NEAREST) { this->ID = ID; }
+	Texture ( const char * file ) : Width(0), Height(0), Format(GL_RGB), Wrap_S(GL_REPEAT), Wrap_T(GL_REPEAT), Filter_Min(GL_NEAREST), Filter_Max(GL_NEAREST) 
 	{ Make ( file ); }
     ~Texture ( ) { End ( ); }
 

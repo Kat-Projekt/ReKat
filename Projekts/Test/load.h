@@ -85,7 +85,7 @@ int Load ( ) {
 
 	auto cam = pier.Add_component < Camera > ( );
 	auto sprite = gio.Add_component < Sprite > ( );
-	gio.Add_component < Player > ( );
+	// gio.Add_component < Player > ( );
 	main.Add_component < Fps > ( );
 
 	sprite->Set ( Manager::Texture_Get( "sprite" ), Manager::Shader_Get( "sprite" ), cam, {2,2} );
@@ -98,6 +98,8 @@ int Load ( ) {
 		glEnable(GL_DEPTH_TEST);
 
 		Scene_Manager::Update ( );
+
+		std::cout << '\n';
 		ReKat::grapik::Update ( );
     }
 

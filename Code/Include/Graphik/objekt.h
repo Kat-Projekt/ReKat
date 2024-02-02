@@ -2,7 +2,7 @@
 #define OBJEKT_H
 
 #define DIAGNOSTIC
-#ifndef DIAGNOSTIC 
+#ifdef DIAGNOSTIC 
 #define DEBUG(msg) std::cout << msg
 #else
 #define DEBUG(msg)
@@ -28,6 +28,7 @@ class Objekt {
 protected:
     std::string _name;
 	bool _active = true;
+	bool _started = false;
 
     // Transform
     vec3 _pos  = {0,0,0};
@@ -53,6 +54,7 @@ public:
     void Add_Child ( Objekt * child ) {
 		child->Set_father ( this );
 		_childrens.append ( child );
+		if ( _started ) { child->Start( ); }
 	}
 	void Rem_Child ( std::string name ) {
 		auto O = Get_Children ( name );
@@ -106,6 +108,7 @@ public:
 			C* c = new C ( );
 			c->obj = this;
 			_components.append ( ( Behaviour * ) ( c ) );
+			if ( _started ) { c->Start( ); }
         	return c;
 		}
 		Error("Wrong component decraration");
@@ -113,8 +116,9 @@ public:
     template < class C > 
     C* Add_component ( C* c ) {
 		if ( std::is_base_of<Behaviour, C>::value ) {
-			c.obj = this;
+			c->obj = this;
 			_components.append ( ( Behaviour * ) ( c ) );
+			if ( _started ) { c->Start( ); }
         	return c;
 		}
 		Error("Wrong component Behaviour");
@@ -156,6 +160,7 @@ public:
 	}
 
     virtual void Start ( ) {
+		if ( _started ) { return; }
 		if ( !_active ) { return; }
         auto C = _components.Get_Begin ( );
 		while ( C != nullptr ) {
@@ -167,23 +172,24 @@ public:
 			O->data->Start ( );
 			O = O->next;
 		}
+		_started = true;
     }
 
     virtual void Update ( ) {
 		if ( !_active ) { return; }
+		auto O = _childrens.Get_Begin ( );
+		while ( O != nullptr ) {
+			O->data->Update ( );
+			O = O->next;
+		}
         auto C = _components.Get_Begin ( );
+		DEBUG ( "Updating obj: " + Get_Name() + "\n" );
 		while ( C != nullptr ) {
 			DEBUG ( "Updating comp: " + std::string(typeid(*C->data).name()) + "\n" );
 			C->data->Update ( );
 			C = C->next;
 		}
-		auto O = _childrens.Get_Begin ( );
-		while ( O != nullptr ) {
-			DEBUG ( "Updating obj: " + O->data->Get_Name() + "\n" );
-			O->data->Update ( );
-			DEBUG ( "Updated obj: " + O->data->Get_Name() + "\n" );
-			O = O->next;
-		}
+		DEBUG ( "Updated obj: " + Get_Name() + "\n" );
     }
 
     virtual void Fixed_Update ( ) {

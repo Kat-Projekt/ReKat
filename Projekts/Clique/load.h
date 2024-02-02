@@ -40,29 +40,32 @@ int Load ( ) {
 
 	std::cout << "Objects Linked\n";
 
-	main.Add_component < Fps > ( )->MAX_FPS = 60;
+	main.Add_component < Fps > ( )->MAX_FPS = 30;
 	main.Add_component < Phisiks > ( );
 	camera.Add_component < Camera > ( );
 	pier.Add_component < Sprite > ( );
 	pier.Add_component < Rigidbody > ( );
 	pier.Add_component < Player > ( );
-	pier.Add_component < Sfere_Collider > ( )->Set_Size(50);
+	pier.Add_component < Box_Collider > ( )->Set_Size(100);
 	gio.Add_component < Sprite > ( );
-	gio.Add_component < Sfere_Collider > ( )->Set_Size(50);
+	gio.Add_component < Sfere_Collider > ( )->Set_Size(100);
 	speel.Add_component < Spells > ( )->Player = &pier;
 
 	Map.Add_component < Tilemap > ( );
+	Map.Add_component < Tilemap_Collider > ( );
 
 	std::cout << "Components Added\n";
 
 	pier.Get_component < Sprite > ( ) ->
-	Set ( Manager::Texture_Get( "sprite" ), Manager::Shader_Get( "sprite" ), camera.Get_component < Camera > ( ), {2,1} );
+	Set ( Manager::Texture_Get( "sprite" ), Manager::Shader_Get( "sprite" ), camera.Get_component < Camera > ( ), {2,1} )->frame = 1;
 	
 	gio.Get_component < Sprite > ( ) ->
-	Set ( Manager::Texture_Get( "sprite" ), Manager::Shader_Get( "sprite" ), camera.Get_component < Camera > ( ), {2,1} );
+	Set ( Manager::Texture_Get( "sprite" ), Manager::Shader_Get( "sprite" ), camera.Get_component < Camera > ( ), {2,1} )->frame = 0;
 
 	Map.Get_component < Tilemap > ( ) ->
 	Set ( "tilemap.csv", Manager::Texture_Get( "tilemap" ), Manager::Shader_Get( "tilemap" ), camera.Get_component < Camera > ( ), {32,32} );
+	Map.Get_component < Tilemap_Collider > ( ) ->
+	Set ( "tilemap.c.csv" );
 
 	std::cout << "Components Configured\n";
 
