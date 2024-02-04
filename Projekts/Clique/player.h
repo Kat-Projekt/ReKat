@@ -47,7 +47,7 @@ public:
         if ( Key_Pressed( "W" ) ) { dpos += glm::vec2{0,1};  }
         if ( Key_Pressed( "D" ) ) { dpos += glm::vec2{1,0};  }
         if ( Key_Pressed( "S" ) ) { dpos += glm::vec2{0,-1}; }
-        obj->Inc_Pos ( vec3(Normalize(dpos) * speed * Timer::delta_time, 0) );
+        obj->Get_component < Rigidbody > ()->velocity = ( vec3(Normalize(dpos) * speed, 0) );
 		
 		if ( Key_Down( "A" ) && Key_Down( "W" ) && Key_Down( "D" ) && Key_Down( "S" ) ) {
 			Objekt *K = new Objekt("Kat");

@@ -38,7 +38,7 @@ public:
             sData_stream << s;
             // Tokenizing 
             W = 0;
-            while ( getline ( sData_stream, intermediate, ',' ) ) { W++; D.push_back( std::stoi(intermediate) >= 0 ); }
+            while ( getline ( sData_stream, intermediate, ',' ) ) { W++; D.push_back( std::stoi(intermediate) > 0 ); }
         }
 
 		HH = H * obj->Get_Size().y;
@@ -47,67 +47,67 @@ public:
 	}
 
 	void Set ( std::string path ) { _path = path; }
-	vec3 Get_Space ( vec3 p ) {
-		p -= obj->Get_Pos();
-		vec3 s = obj->Get_Size();
-		return {int(p.x / s.x), int(p.y / s.y), int(p.z / s.z)};
-	}
-	vec3 Ret_Space ( vec3 p ) {
-		vec3 s = obj->Get_Size();
-		p += obj->Get_Pos ( );
-		p += vec3 { p.x * s.x, p.y * s.y, p.z * s.z };
-		return p;
-	}
-	bool In_Space ( vec3 p ) {
-		if ( ( p.x >= 0 && p.y >= 0 ) && ( p.x < WW && p.y < HH ) ) { return true; }
-		return false;
-	}
-	/*List < Box_Collider > Get_Colliders ( vec3 Top_corner, vec3 Bot_corner ) {
-		if ( ! ( In_Space ( Top_corner ) && In_Space ( Bot_corner ) ) ) { return List < Box_Collider > ( ); }
-		// get clamped space Top_corner
-		Top_corner = Get_Space ( Top_corner );
-		// get clamped space Bot_corner
-		Bot_corner = Get_Space ( Bot_corner );
-		if ( Top_corner == Bot_corner ) {
-			Box_Collider B;
-		}
-	}*/
 
 	Collision_Result Check_Collision ( Box_Collider * B ) {
-		std::cout << "- check collision " << obj->Get_Name ( ) << " & " << B->obj->Get_Name ( ) << '\n';
-		// gets the position of B on the grid ( if on bound prosed )
-    	vec3 Half_Size = B->Get_Size ( ) * 0.5f;
-    	vec3 Center = B->obj->Get_Pos ( );
+		vec2 rec_scale;
+		vec2 half_size = B->Get_Size ( ) * 0.5f;
+		vec2 pos = B->obj->Get_Pos ( );
+		vec2 X_limit = { pos.x - half_size.x, pos.x + half_size.x };
+		vec2 Y_limit = { pos.y - half_size.y, pos.y + half_size.y };
 
-		vec3 Su_Destra = Center + Half_Size;
-		vec3 Giu_Sinistra = Center - Half_Size;
+		// rasterize the collider
+		vec2 _pos = obj->Get_Pos();
+		vec2 _size = obj->Get_Size();
+		float _Min_X = ( (X_limit.x - _pos.x) / _size.x + 0.5f ), _Max_X = ( (X_limit.y - _pos.x) / _size.x + 0.5f );
+		float _Min_Y = ( (_pos.y - Y_limit.y) / _size.y + 0.5f ), _Max_Y = ( (_pos.y - Y_limit.x) / _size.y + 0.5f );
 
-		std::cout << "- - " << Center << '\n';
+		// Min_ < Max_
+		int Min_X = ( _Min_X >= 0 ? (int)_Min_X : (int) (_Min_X-1.0f));
+		int Max_X = ( _Max_X >= 0 ? (int)_Max_X : (int) (_Max_X-1.0f));
+		int Min_Y = ( _Min_Y >= 0 ? (int)_Min_Y : (int) (_Min_Y-1.0f));
+		int Max_Y = ( _Max_Y >= 0 ? (int)_Max_Y : (int) (_Max_Y-1.0f));
 
-		if ( ! ( In_Space ( Su_Destra ) && In_Space ( Giu_Sinistra ) ) ) { return {false, {0,0,0}}; }
-		std::cout << "- Obj in space\n";
+		// work on rasterized collider
+		// // everyting out
+		if ( ( Max_X < 0 && Min_X < 0 ) || ( Max_Y < 0 && Min_Y < 0 ) ) { return { false, {0,0,0} }; }
+		if ( ( Max_X >= W && Min_X >= W ) || ( Max_Y >= H && Min_Y >= H ) ) { return { false, {0,0,0} }; }
 
-		// check for Giu_Sinistra
-		vec3 Giu_Sinistra_C = Get_Space ( Giu_Sinistra );
-		std::cout << Giu_Sinistra_C << '\n';
-		if ( D [ Giu_Sinistra_C.x + Giu_Sinistra_C.y * W ] ) {
-			vec3 move_vector;
-			vec3 Delta = Ret_Space ( Giu_Sinistra );
+		// clamp
+		Min_X < 0 ? Min_X = 0 : 0;
+		Min_Y < 0 ? Min_Y = 0 : 0;
+		Max_X >= W ? Max_X = W - 1 : 0;
+		Max_Y >= H ? Max_Y = H - 1 : 0;
 
-			// determine exit point
-			if ( abs ( Delta.x ) > abs ( Delta.y ) ) {
-				move_vector = { 0, Delta.y, 0 };
-			} else {
-				move_vector = { Delta.x, 0, 0 };
+		// tile to check
+		vec3 out_vector = {0,0,0};
+		for (size_t x = Min_X; x <= Max_X; x++) {
+			for (size_t y = Min_Y; y <= Max_Y; y++) {
+				if ( D[x + y * W] != 1 ) { continue; }
+				vec2 tile_pos = obj->Get_Pos() + vec3{ obj->Get_Size().x * x, -obj->Get_Size().y * y, 0 };
+				vec2 P_Delta = tile_pos - (vec2)B->obj->Get_Pos();
+				vec2 Delta = abs(P_Delta) - (vec2)(obj->Get_Size() + B->Get_Size()) * 0.5f;
+
+				// collision not appeing
+				if ( Delta.x > 0 || Delta.y > 0 ) { continue; }
+
+				// trigger collision ( no nead for fastest exit point )
+				if ( B->Is_Trigger() ) { return { true,{0,0,0} }; }
+
+				// determine exit point
+				if (abs(Delta.x) > abs(Delta.y)) {// Delta.y is Low
+					float Sing = (P_Delta.y >= 0 ? -1 : 1);
+					float move_vector = Delta.y * Sing;
+					if ( abs ( out_vector.y ) < abs ( move_vector ) ) { out_vector.y = move_vector; }
+				}
+				else { // Delta.x is Max
+					float Sing = (P_Delta.x >= 0 ? -1 : 1);
+					float move_vector = Delta.x * Sing;
+					if ( abs ( out_vector.x ) < abs ( move_vector ) ) { out_vector.x = move_vector; }
+				}
 			}
-
-			return {true,move_vector};
 		}
-		
-		// check for Su_Destra
-		vec3 Su_Destra_C = Get_Space ( Su_Destra );
-		std::cout << Su_Destra_C << '\n';
-		if ( D [ Su_Destra_C.x + Su_Destra_C.y * W ] ) { return { true, ( Giu_Sinistra - Ret_Space ( Giu_Sinistra_C) ) }; }
+
+		return { out_vector != vec3{0,0,0}, out_vector };
 	}
 	Collision_Result Check_Collision ( Sfere_Collider * S ) {
 		return { false, {0,0,0} };

@@ -2,6 +2,8 @@
 
 #include "player.h"
 #include "speels.h"
+#include "camera_controll.h"
+#include "gobleino.h"
 
 static void __FreamBufferResize ( GLFWwindow* window, int width, int height ) {
     glViewport ( 0, 0, ReKat::grapik::Internal::SCR_WIDTH = width, ReKat::grapik::Internal::SCR_HEIGTH = height );
@@ -25,11 +27,11 @@ int Load ( ) {
 	std::cout << "Resources Loaded\n";
 
 	Objekt main ( "main" );
-	Objekt pier ( "pier" );
-	Objekt gio ( "gio",{300,0,0} );
+	Objekt pier ( "pier", {300,-100,0.4}, {100,100,100});
+	Objekt gio ( "gio",{300,0,0.5}, {50,50,50} );
 	Objekt speel ( "spell" );
 	Objekt WALL ( "spell", {0,200,0} );
-	Objekt Map ( "map", {0,100,0},{20,20,10} );
+	Objekt Map ( "map", {0,100,0},{100,100,10} );
 	
 	main.Add_Child ( &camera );
 	main.Add_Child ( &pier );
@@ -43,12 +45,15 @@ int Load ( ) {
 	main.Add_component < Fps > ( )->MAX_FPS = 30;
 	main.Add_component < Phisiks > ( );
 	camera.Add_component < Camera > ( );
+	camera.Add_component < Camera_Controll > ( )->_target = &pier;
 	pier.Add_component < Sprite > ( );
 	pier.Add_component < Rigidbody > ( );
 	pier.Add_component < Player > ( );
 	pier.Add_component < Box_Collider > ( )->Set_Size(100);
 	gio.Add_component < Sprite > ( );
-	gio.Add_component < Sfere_Collider > ( )->Set_Size(100);
+	gio.Add_component < Rigidbody > ( );
+	gio.Add_component < Box_Collider > ( )->Set_Size(50);
+	gio.Add_component < Gobleino > ( )->target = &pier;
 	speel.Add_component < Spells > ( )->Player = &pier;
 
 	Map.Add_component < Tilemap > ( );
@@ -63,9 +68,8 @@ int Load ( ) {
 	Set ( Manager::Texture_Get( "sprite" ), Manager::Shader_Get( "sprite" ), camera.Get_component < Camera > ( ), {2,1} )->frame = 0;
 
 	Map.Get_component < Tilemap > ( ) ->
-	Set ( "tilemap.csv", Manager::Texture_Get( "tilemap" ), Manager::Shader_Get( "tilemap" ), camera.Get_component < Camera > ( ), {32,32} );
-	Map.Get_component < Tilemap_Collider > ( ) ->
-	Set ( "tilemap.c.csv" );
+	Set ( "Maps/Dungeon.csv", Manager::Texture_Get( "tilemap" ), Manager::Shader_Get( "tilemap" ), camera.Get_component < Camera > ( ), {32,32} );
+	Map.Get_component < Tilemap_Collider > ( ) -> Set ( "Maps/Dungeon.c.csv" );
 
 	std::cout << "Components Configured\n";
 
@@ -75,7 +79,7 @@ int Load ( ) {
 
 	std::cout << "-------------- Start Main Loop -----------------\n";
 	while ( ReKat::grapik::IsEnd ( ) ) {
-		glClearColor(0.6, 0.4, 0.5, 1.0f);
+		glClearColor(0.0, 0.0, 0.0, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 		Scene_Manager::Update();

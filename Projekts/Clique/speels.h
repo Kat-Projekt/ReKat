@@ -20,35 +20,27 @@ class Beans : public Behaviour {
 		if ( D < 10 ) { obj->Get_component<Sprite>()->frame = 2; }
 		if ( D < 3 ) { obj->Get_component<Sprite>()->frame = 3; }
 	}
+    void Collision_Trigger ( Objekt* _obj ) { 
+		if ( _obj->Get_Name() != "pier" ) { obj->Set_Active(false); }
+	}
 };
 
 class Lasurs : public Behaviour {
 	public:
 	vec3 target_pos;
-	vec3 dir = {0,0,0};
-	vec3 start_pos = {0,0,0};
-	float progress = 0;
-	float speed = 3;
-	float fase = 3 * 3.1415;
-	float amplitude = 20;
+	float speed = 500.0f;
 
 	void Start ( ) {
-		start_pos = obj->Get_Pos();
-		dir = normalize ( target_pos - start_pos );
+		vec3 start_pos = obj->Get_Pos();
+		vec3 dir = normalize ( target_pos - start_pos );
 		float a = angle ( {dir.x, dir.y} );
 		std::cout << "angle: " << a << '\n';
 		obj->Set_2D_Rot ( a );
+		obj->Get_component < Rigidbody > ( )->velocity = dir * speed;
 	}
 
-	void Update ( ) {
-		progress += Timer::delta_time * speed;
-
-		obj->Set_Pos ( lerp ( start_pos, target_pos, progress ) + 
-		vec3 { cos ( fase * progress ) * dir.y, sin ( fase * progress ) * dir.x, 0 } * amplitude);
-
-		if ( progress > 0.8 ) { obj->Get_component<Sprite>()->frame = 1; }
-		else { obj->Get_component<Sprite>()->frame = 0; }
-		if ( progress > 1 ) { obj->Set_Active( false ); }
+    void Collision_Trigger ( Objekt* _obj ) { 
+		if ( _obj->Get_Name() != "pier" ) { obj->Set_Active(false); }
 	}
 };
 
@@ -118,8 +110,8 @@ public:
 	int spell_count = spell_list.size();
 	float spell_angle = 2 * 3.1415 / spell_count ;
     void Start ( ) {
-		P = new Objekt ( "spells" );
-		obj->Add_Child ( P );
+		P = new Objekt ( "spells", {0,0,0.6} );
+		Player->Add_Child ( P );
 		for ( size_t i = 0; i < spell_count; i++ ) {
 			auto S = new Objekt ( spell_list[i], vec3 { sin( spell_angle * (i + 0.5) ), cos( spell_angle * (i + 0.5) ), 0 } * 100.0f, {100,100,100} );
 			S->Add_component < Sprite > ( )->frame = i*2 + 1;
@@ -162,19 +154,20 @@ public:
 				// std::cout << Lasur_target.x << " : " << Lasur_target.y;
 				Objekt* Lasur = new Objekt ( "Lasur_" + std::to_string (Lasurss++), Player->Get_Pos(), {60,60,0}) ;
 				Lasur->Add_component < Lasurs > ( )->target_pos = Lasur_target;
-				Lasur->Add_component < Sfere_Collider > ( )->Set_Trigger(true);
+				Lasur->Add_component < Box_Collider > ( )->Set_Trigger(true);
+				Lasur->Add_component < Rigidbody > ( );
 				Lasur->Add_component < Sprite > ( )->
 				Set ( Manager::Texture_Get( "Lasur" ), Manager::Shader_Get( "sprite" ), camera.Get_component < Camera > ( ), {2,1} );
-				Scene_Manager::_current_scene->Add_Child ( Lasur );
-				Lasur->Start();
+				obj->Add_Child ( Lasur );
 				break; }
 			
 			case 1: { // spawn a can of beans
 				std::cout << "oooooooooooooooooooooooooooo Beans\n";
 				vec3 bean_pos = camera.Get_Pos ( ) + vec3{mouse_pos * camera.Get_component< Camera > ()->Scale, 0};
 				std::cout << bean_pos.x << " : " << bean_pos.y;
-				Objekt* Bean = new Objekt ( "Bean_" + std::to_string (Beanss++), Player->Get_Pos(), {100,100,100});
+				Objekt* Bean = new Objekt ( "Bean", Player->Get_Pos(), {100,100,100});
 				Bean->Add_component < Beans > ( )->target_pos = bean_pos;
+				Bean->Add_component < Box_Collider > ( )->Set_Size ( 50 )->Set_Trigger ( true );
 				Bean->Add_component < Sprite > ( )->
 				Set ( Manager::Texture_Get( "Bean" ), Manager::Shader_Get( "sprite" ), camera.Get_component < Camera > ( ), {2,2} );
 				Bean->Start();

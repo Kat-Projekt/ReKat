@@ -47,7 +47,7 @@ source_group("Libs" FILES ${LIBS_SOURCES})
 add_definitions(-DGLFW_INCLUDE_NONE
 				-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
 
-set(PROJEKTS simulation)
+set(PROJEKTS Clique)
 
 foreach(PROJEKT ${PROJEKTS})
 	file(GLOB PROJECT_SOURCES Projekts/${PROJEKT}/main.cpp )

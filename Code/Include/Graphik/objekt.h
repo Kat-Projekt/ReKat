@@ -1,7 +1,7 @@
 #ifndef OBJEKT_H
 #define OBJEKT_H
 
-#define DIAGNOSTIC
+// #define DIAGNOSTIC
 #ifdef DIAGNOSTIC 
 #define DEBUG(msg) std::cout << msg
 #else
@@ -55,6 +55,8 @@ public:
 		child->Set_father ( this );
 		_childrens.append ( child );
 		if ( _started ) { child->Start( ); }
+		std::cout << " - added obj: " << child << '\n';
+		std::cout << " - objekts: " << _childrens << '\n';
 	}
 	void Rem_Child ( std::string name ) {
 		auto O = Get_Children ( name );

@@ -141,9 +141,10 @@ public:
 		auto C = list.Get_Begin( );
 		auto E = list.Get_Endin( );
 		while ( C != nullptr ) {
-			std::cout << "{" << C->data << ( C != E ? "} : " : "}");
+			std::cout << "{" << C->data << " p: " << C->prev << " n: " << C->next << ( C != E ? "} : " : "}");
 			C = C->next;
 		}
+		std::cout << " B: " << list.Get_Begin ( ) << " E: " << E;
 		return os;
 	}
 };

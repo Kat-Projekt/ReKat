@@ -20,10 +20,10 @@ public:
 	}
 
 	void Vincolar_Reaction ( vec3 plane_normal ) {
-		// std::cout << " normal: " << plane_normal << " vel: " << velocity << " acc: " << acceleration << '\n';
+		//std::cout << " normal: " << plane_normal << " vel: " << velocity << " acc: " << acceleration << '\n';
 		acceleration -= plane_normal * ( dot ( plane_normal, acceleration ) ) * ( 1 + bouncy );
 		velocity -= plane_normal * ( dot ( plane_normal, velocity ) ) * ( 1 + bouncy );
-		// std::cout << " normal: " << plane_normal << " vel: " << velocity << " acc: " << acceleration << '\n';
+		//std::cout << " normal: " << plane_normal << " vel: " << velocity << " acc: " << acceleration << '\n';
 	}
 };
 

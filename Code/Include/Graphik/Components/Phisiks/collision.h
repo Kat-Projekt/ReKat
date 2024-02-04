@@ -9,11 +9,6 @@ void Resolve_Collision ( C1 c1, C2 c2 ) {
 	if ( c1->Is_Static ( ) && c2->Is_Static ( ) ) { return; };
 	auto C = Check_Collision ( c1, c2 );
 	
-	if ( typeid (C1) == typeid (Tilemap_Collider*) ) {
-		std::cout << "- indirizing: " << typeid(C1).name() << " & " << typeid(C2).name() << '\n';
-		std::cout << "- " << C << '\n';
-	}
-
 	// inside collision
 	if ( C.triggered ) {
 		if ( ! c1->Is_Trigger( ) && ! c2->Is_Trigger( ) ) { // reaction
@@ -25,12 +20,11 @@ void Resolve_Collision ( C1 c1, C2 c2 ) {
 					M1 = M1 / M;
 					M2 = M2 / M;
 
-					std::cout << "M: " << M << " M1: " << M1 << " M2: " << M2 << '\n';
-
 					c1->obj->Inc_Pos ( C.exit_direction * ( 1 - M1 ) );
 					c2->obj->Inc_Pos ( - C.exit_direction * ( 1 - M2 ) );
 
 					// vincolar reaction
+					if ( C.exit_direction == vec3{0,0,0} ) { return; }
 					vec3 normalize_exit = normalize(C.exit_direction);
 
 					c1->obj->Get_component < Rigidbody >()->Vincolar_Reaction( normalize_exit );
@@ -38,11 +32,13 @@ void Resolve_Collision ( C1 c1, C2 c2 ) {
 					return;
 				}
 				c1->obj->Inc_Pos ( C.exit_direction );
+				if ( C.exit_direction == vec3{0,0,0} ) { return; }
 				vec3 normalize_exit = normalize(C.exit_direction);
 				c1->obj->Get_component < Rigidbody >()->Vincolar_Reaction(normalize_exit);
 			}
 			if ( ! c2->Is_Static ( ) ){ // second dinamic 
 				c2->obj->Inc_Pos ( -C.exit_direction );
+				if ( C.exit_direction == vec3{0,0,0} ) { return; }
 				vec3 normalize_exit = normalize(C.exit_direction);
 				c2->obj->Get_component < Rigidbody >()->Vincolar_Reaction(-normalize_exit);
 			}
@@ -129,11 +125,11 @@ void Resolve_Collisions ( Objekt * obj ) {
 		// ciclo per le coppie non viste e diverse dall'identità
 		for ( size_t secondo = 0; secondo < BCs.size(); secondo ++ ) {
 			Box_Collider * _cs = BCs[secondo];
-			std::cout << "collision: " << _cp->obj->Get_Name ( ) << " & " << _cs->obj->Get_Name ( ) << '\n';
+			//std::cout << "collision: " << _cp->obj->Get_Name ( ) << " & " << _cs->obj->Get_Name ( ) << '\n';
 			if ( ! _cs->obj->Get_Active ( ) ) { continue; }
 			
 			Resolve_Collision ( _cp, _cs );
-			std::cout << "- resolved " << _cp->obj->Get_Name ( ) << " & " << _cs->obj->Get_Name ( ) << "\n\n";
+			//std::cout << "- resolved " << _cp->obj->Get_Name ( ) << " & " << _cs->obj->Get_Name ( ) << "\n\n";
 		}
 	}
 

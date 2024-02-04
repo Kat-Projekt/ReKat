@@ -7,8 +7,8 @@
 class Sprite : public Behaviour {
 private:
     unsigned int _quad;
-    Shader  *_shader = nullptr; 
     Texture *_texture = nullptr;
+    Shader  *_shader = nullptr; 
 	Camera  *_camera = nullptr;
 	vec2 _frames = {1,1};
 	vec4 _color = {1,1,1,1};

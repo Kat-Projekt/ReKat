@@ -8,14 +8,18 @@ int main ( int argc, char const *argv[] ) {
 	std::string component = "#ifndef _" + Cname + "\n#define _" + Cname + "\n\
 \n\
 #include <Graphik/objekt.h>\n\
+#include <Graphik/graphik.hpp>\n\
+using namespace ReKat::grapik::Input;\n\
+\n\
 class " + Cname + " : public Behaviour {\n\
-	void Start ( ) { }\n\
-    void Update ( ) { }\n\
+public:\n\
+    virtual void Start ( ) { }\n\
+    virtual void Update ( ) { }\n\
+	virtual void Fixed_Update ( ) { }\n\
+	virtual void UI_Update ( ) { }\n\
 \n\
-    void Collision ( T* obj ) { }\n\
-    void CollisionTrigger ( T* obj ) { }\n\
-\n\
-	public:\n\
+    virtual void Collision ( Objekt* _obj ) { _obj; }\n\
+    virtual void Collision_Trigger ( Objekt* _obj ) { _obj; }\n\
 };\n\
 \n\
 #endif";
@@ -28,16 +32,23 @@ class " + Cname + " : public Behaviour {\n\
 }
 
 /*
-#ifndef _NAME
-#define _NAME
+#ifndef AUDIO_LISTENER_H
+#define AUDIO_LISTENER_H
 
-#include <Graphik/manager.h>
-class NAME : public Behaviour {
-	void Start ( ) { }
-	void Update ( ) { }
+#include <Graphik/objekt.h>
+#include <Graphik/graphik.hpp>
+using namespace ReKat::grapik::Input;
 
-	void Collision ( Objekt* obj ) { }
-	void CollisionTrigger ( Objekt* obj ) { }
+class Audio_Listener : public Behaviour {
+public:
+    virtual void Start ( ) { }
+    virtual void Update ( ) { }
+	virtual void Fixed_Update ( ) { }
+	virtual void UI_Update ( ) { }
+
+    virtual void Collision ( Objekt* _obj ) { _obj; }
+    virtual void Collision_Trigger ( Objekt* _obj ) { _obj; }
 };
+
 #endif
 */
