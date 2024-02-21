@@ -1,7 +1,7 @@
 #ifndef OBJEKT_H
 #define OBJEKT_H
 
-// #define DIAGNOSTIC
+//#define DIAGNOSTIC
 #ifdef DIAGNOSTIC 
 #define DEBUG(msg) std::cout << msg
 #else
@@ -10,8 +10,19 @@
 
 template < typename T >
 class _behaviour {
+	bool _active = true;
+	bool _started = false;
 public:
     T* obj;
+
+	void _Start ( ) { if ( _active ) { Start ( ); } _started = true; }
+	void _Update ( ) { if ( _active ) { Update ( ); } }
+	void _Fixed_Update ( ) { if ( _active ) { Fixed_Update ( ); } }
+	void _UI_Update ( ) { if ( _active ) { UI_Update ( ); } }
+
+	void _Collision ( T* _obj ) { if ( _active ) { Collision ( _obj ); } }
+	void _Collision_Trigger ( T* _obj ) { if ( _active ) { Collision_Trigger ( _obj ); } }
+
     virtual void Start ( ) { }
     virtual void Update ( ) { }
 	virtual void Fixed_Update ( ) { }
@@ -19,6 +30,10 @@ public:
 
     virtual void Collision ( T* _obj ) { _obj; }
     virtual void Collision_Trigger ( T* _obj ) { _obj; }
+
+	void Set_Active ( bool active ) 
+	{ _active = active; if ( !_started ) { Start( ); } }
+	bool Get_Active ( ) { return _active; }
 };
 
 #include "Utility/math.h"
@@ -50,13 +65,13 @@ public:
     Objekt ( std::string name, vec3 pos = {0,0,0}, vec3 size = {100,100,100}, vec3 rot = {0,0,0}, vec3 rot_pivot = {0,0,0} ) 
 	: _name(name), _pos(pos), _size(size), _rot(rot), _rot_pivot(rot_pivot) { }
 
-	void Set_father ( Objekt * father ) { _father = father; }
-    void Add_Child ( Objekt * child ) {
-		child->Set_father ( this );
+	void Set_Father ( Objekt * father ) { _father = father; }
+	Objekt * Get_Father ( ) { return _father; }
+    Objekt * Add_Child ( Objekt * child ) {
+		child->Set_Father ( this );
 		_childrens.append ( child );
 		if ( _started ) { child->Start( ); }
-		std::cout << " - added obj: " << child << '\n';
-		std::cout << " - objekts: " << _childrens << '\n';
+		return this;
 	}
 	void Rem_Child ( std::string name ) {
 		auto O = Get_Children ( name );
@@ -83,8 +98,19 @@ public:
 		return nullptr;
 	}
 	List < Objekt* > Get_Childrens ( ) { return _childrens; }
+	int Count_Childrens ( ) {
+		int count = 0;
+		auto C = _childrens.Get_Begin ( );
+		while ( C != nullptr ) {
+			count ++;
+			count += C->data->Count_Childrens ( );
+			C = C->next;
+		}
+		return count;
+	}
 
 	void Set_Pos ( vec3 pos = {0,0,0} ) { _pos = pos; }
+	void Set_Pos ( float z = 0 ) { _pos.z = z; }
 	void Inc_Pos ( vec3 pos = {0,0,0} ) { _pos += pos; }
 	vec3 Get_Pos ( ) { return _pos + ( _father != nullptr ? _father->Get_Pos() : vec3{0,0,0}); }
 
@@ -98,36 +124,37 @@ public:
 	void Set_Rot_Pivot ( vec3 rot_pivot = {0,0,0} ) { _rot_pivot = rot_pivot; }
 	vec3 Get_Rot_Pivot ( ) { return _rot_pivot; }
 
-    void Set_Active ( bool active ) { _active = active; }
+    void Set_Active ( bool active ) 
+	{ _active = active; if ( !_started ) { Start( ); } }
     bool Get_Active ( ) { return _active; }
 
     void Set_Name ( std::string name ) { _name = name; }
     std::string Get_Name ( ) { return _name; }
 
     template < class C >
-    C* Add_component ( ) {
+    C* Add_Component ( ) {
         if ( std::is_base_of<Behaviour, C>::value ) { 
 			C* c = new C ( );
 			c->obj = this;
 			_components.append ( ( Behaviour * ) ( c ) );
-			if ( _started ) { c->Start( ); }
+			if ( _started ) { c->_Start( ); }
         	return c;
 		}
 		Error("Wrong component decraration");
     }
     template < class C > 
-    C* Add_component ( C* c ) {
+    C* Add_Component ( C* c ) {
 		if ( std::is_base_of<Behaviour, C>::value ) {
 			c->obj = this;
 			_components.append ( ( Behaviour * ) ( c ) );
-			if ( _started ) { c->Start( ); }
+			if ( _started ) { c->_Start( ); }
         	return c;
 		}
 		Error("Wrong component Behaviour");
     }
 	
     template < class C > 
-	C* Get_component ( ) {
+	C* Get_Component ( ) {
 		auto c = _components.Get_Begin ( );
 		while ( c != nullptr ) {
 			if ( typeid(*(c->data)) == typeid (C) ) { return (C*)c->data; }
@@ -136,7 +163,7 @@ public:
 		return nullptr;
 	}
 	template < class C > 
-	List < C* > Get_component_recursive ( ) {
+	List < C* > Get_Component_Recursive ( ) {
 		List < C* > L;
 		auto c = _components.Get_Begin ( );
 		while ( c != nullptr ) {
@@ -145,14 +172,14 @@ public:
 		}
         auto O = _childrens.Get_Begin ( );
 		while ( O != nullptr ) {
-			L.append ( &O->data->Get_component_recursive < C > ( ) );
+			L.append ( &O->data->Get_Component_Recursive < C > ( ) );
 			O = O->next;
 		}
 		return L;
 	}
 
 	template < typename C >
-	bool Has_component ( ) {
+	bool Has_Component ( ) {
 		auto c = _components.Get_Begin ( );
 		while ( c != nullptr ) {
 			if ( typeid(*(c->data)) == typeid (C) ) { return true; }
@@ -162,13 +189,17 @@ public:
 	}
 
     virtual void Start ( ) {
+		DEBUG ( "Starting obj: " + Get_Name() + "\n" );
 		if ( _started ) { return; }
 		if ( !_active ) { return; }
         auto C = _components.Get_Begin ( );
 		while ( C != nullptr ) {
-			C->data->Start ( );
+			DEBUG ( " - Starting comp: " + std::string(typeid(*(C->data)).name()) + "\n" );
+			C->data->_Start ( );
 			C = C->next;
+			DEBUG ( " - Started\n" );
 		}
+		DEBUG ( " - Updating Subobjs\n" );
         auto O = _childrens.Get_Begin ( );
 		while ( O != nullptr ) {
 			O->data->Start ( );
@@ -188,7 +219,7 @@ public:
 		DEBUG ( "Updating obj: " + Get_Name() + "\n" );
 		while ( C != nullptr ) {
 			DEBUG ( "Updating comp: " + std::string(typeid(*C->data).name()) + "\n" );
-			C->data->Update ( );
+			C->data->_Update ( );
 			C = C->next;
 		}
 		DEBUG ( "Updated obj: " + Get_Name() + "\n" );
@@ -198,7 +229,7 @@ public:
 		if ( !_active ) { return; }
         auto C = _components.Get_Begin ( );
 		while ( C != nullptr ) {
-			C->data->Fixed_Update ( );
+			C->data->_Fixed_Update ( );
 			C = C->next;
 		}
 		auto O = _childrens.Get_Begin ( );
@@ -212,20 +243,17 @@ public:
 		if ( trigger ) { // the collision is of thigger type
 			auto C = _components.Get_Begin ( );
 			while ( C != nullptr ) {
-				C->data->Collision_Trigger ( collider );
+				C->data->_Collision_Trigger ( collider );
 				C = C->next;
 			}
-			auto O = _childrens.Get_Begin ( );
-			while ( O != nullptr ) {
-				O->data->Andle_Collsions ( collider, trigger );
-				O = O->next;
+		} else {
+			auto C = _components.Get_Begin ( );
+			while ( C != nullptr ) {
+				C->data->_Collision ( collider );
+				C = C->next;
 			}
 		}
-		auto C = _components.Get_Begin ( );
-		while ( C != nullptr ) {
-			C->data->Collision ( collider );
-			C = C->next;
-		}
+		
 		auto O = _childrens.Get_Begin ( );
 		while ( O != nullptr ) {
 			O->data->Andle_Collsions ( collider, trigger );
@@ -260,6 +288,20 @@ public:
 		
 		return out;
 	}
+	void Print_Tree ( std::string level ) {
+		std::cout << level << _name << ( _active ? " v" : " x") << '\n';
+		auto _C = _components.Get_Begin ( );
+		while ( _C != nullptr ) {
+			std::cout << level << "+ " << typeid(*_C->data).name() << ( _C->data->Get_Active () ? " v" : " x") << '\n';
+			_C = _C->next;
+		}
+		level += "- ";
+		auto C = _childrens.Get_Begin ( );
+		while ( C != nullptr ) {
+			C->data->Print_Tree ( level );
+			C = C->next;
+		}
+	}
 };
 
 namespace Scene_Manager {
@@ -279,12 +321,19 @@ namespace Scene_Manager {
 		Start ( );
 	}
 	static void Set_Active_Scene ( std::string s ) {
+		std::cout << "changing scene\n";
+		std::cout << s << '\n';
+		std::cout << _current_scene << '\n';
+		std::cout << "scenes" << _scenes << '\n';
+
 		auto S = _scenes.Get_Begin ( );
 		while ( S != nullptr ) {
+			std::cout << S->data->Get_Name () << '\n';
 			if ( S->data->Get_Name () == s ) 
 			{ _current_scene = S->data; Start ( ); break; }
 			S = S->next;
 		}
+		std::cout << _current_scene << '\n';
 	}
 }
 

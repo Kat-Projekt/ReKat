@@ -6,8 +6,8 @@
 
 class Rigidbody : public Behaviour {
 public:
-	vec3 acceleration;
-	vec3 velocity;
+	vec3 acceleration = {0,0,0};
+	vec3 velocity = {0,0,0};
 	float mass = 1;
 	float time_scale = 1;
 	float bouncy = 0.7;
@@ -15,7 +15,7 @@ public:
 
 	void Fixed_Update ( ) {
 		if ( block_z ) { velocity.z = 0; acceleration.z = 0;}
- 		velocity += acceleration * Timer::fixed_delta_time * time_scale;
+		if ( acceleration != vec3{0,0,0} ) { velocity += acceleration * Timer::fixed_delta_time * time_scale; }
 		obj->Inc_Pos ( velocity * Timer::fixed_delta_time * time_scale );
 	}
 

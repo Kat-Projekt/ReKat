@@ -67,14 +67,16 @@ public:
 
 	void Update ( ) {
 		glBindFramebuffer(GL_FRAMEBUFFER, FBO);
+        glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
 		_to_render->Update ( );
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glDisable(GL_DEPTH_TEST);
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+        glClearColor(1.0f, 0.0f, 1.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
 		_shader->Use ( );
-		_shader->setMat4  ( "projection", _camera->Projkection ( ) );
+		_shader->setMat4 ( "projection", _camera->Projkection ( ) );
 		_shader->setMat4 ( "model", obj->Get_Model_Mat ( ) );
         glBindVertexArray(VAO);
         glBindTexture(GL_TEXTURE_2D, TEX);

@@ -51,7 +51,7 @@ public:
 	Collision_Result Check_Collision ( Box_Collider * B ) {
 		vec2 rec_scale;
 		vec2 half_size = B->Get_Size ( ) * 0.5f;
-		vec2 pos = B->obj->Get_Pos ( );
+		vec2 pos = B->Get_Pos ( );
 		vec2 X_limit = { pos.x - half_size.x, pos.x + half_size.x };
 		vec2 Y_limit = { pos.y - half_size.y, pos.y + half_size.y };
 
@@ -84,7 +84,7 @@ public:
 			for (size_t y = Min_Y; y <= Max_Y; y++) {
 				if ( D[x + y * W] != 1 ) { continue; }
 				vec2 tile_pos = obj->Get_Pos() + vec3{ obj->Get_Size().x * x, -obj->Get_Size().y * y, 0 };
-				vec2 P_Delta = tile_pos - (vec2)B->obj->Get_Pos();
+				vec2 P_Delta = tile_pos - (vec2)B->Get_Pos();
 				vec2 Delta = abs(P_Delta) - (vec2)(obj->Get_Size() + B->Get_Size()) * 0.5f;
 
 				// collision not appeing
@@ -110,7 +110,70 @@ public:
 		return { out_vector != vec3{0,0,0}, out_vector };
 	}
 	Collision_Result Check_Collision ( Sfere_Collider * S ) {
-		return { false, {0,0,0} };
+		vec2 rec_scale;
+		vec2 half_size = vec2(S->Get_Size ( )) * 0.5f;
+		vec2 pos = S->Get_Pos ( );
+		vec2 X_limit = { pos.x - half_size.x, pos.x + half_size.x };
+		vec2 Y_limit = { pos.y - half_size.y, pos.y + half_size.y };
+
+		// rasterize the collider
+		vec2 _pos = obj->Get_Pos();
+		vec2 _size = obj->Get_Size();
+		float _Min_X = ( (X_limit.x - _pos.x) / _size.x + 0.5f ), _Max_X = ( (X_limit.y - _pos.x) / _size.x + 0.5f );
+		float _Min_Y = ( (_pos.y - Y_limit.y) / _size.y + 0.5f ), _Max_Y = ( (_pos.y - Y_limit.x) / _size.y + 0.5f );
+
+		// Min_ < Max_
+		int Min_X = ( _Min_X >= 0 ? (int)_Min_X : (int) (_Min_X-1.0f));
+		int Max_X = ( _Max_X >= 0 ? (int)_Max_X : (int) (_Max_X-1.0f));
+		int Min_Y = ( _Min_Y >= 0 ? (int)_Min_Y : (int) (_Min_Y-1.0f));
+		int Max_Y = ( _Max_Y >= 0 ? (int)_Max_Y : (int) (_Max_Y-1.0f));
+
+		// work on rasterized collider
+		// // everyting out
+		if ( ( Max_X < 0 && Min_X < 0 ) || ( Max_Y < 0 && Min_Y < 0 ) ) { return { false, {0,0,0} }; }
+		if ( ( Max_X >= W && Min_X >= W ) || ( Max_Y >= H && Min_Y >= H ) ) { return { false, {0,0,0} }; }
+
+		// clamp
+		Min_X < 0 ? Min_X = 0 : 0;
+		Min_Y < 0 ? Min_Y = 0 : 0;
+		Max_X >= W ? Max_X = W - 1 : 0;
+		Max_Y >= H ? Max_Y = H - 1 : 0;
+
+		// tile to check
+		vec3 out_vector = {0,0,0};
+		for (size_t x = Min_X; x <= Max_X; x++) {
+			for (size_t y = Min_Y; y <= Max_Y; y++) {
+				if ( D[x + y * W] != 1 ) { continue; }
+
+				vec3 tile_pos = obj->Get_Pos() + vec3{ obj->Get_Size().x * x, -obj->Get_Size().y * y, 0 };
+
+				// get center point circle first 
+				glm::vec3 center = S->Get_Pos ( );
+				// calculate AABB info (center, half-extents)
+				glm::vec3 aabb_half_extents = obj->Get_Size( ) * 0.5f;
+				glm::vec3 aabb_center = tile_pos;
+				// get difference vector between both centers
+				glm::vec3 difference = center - aabb_center;
+				glm::vec3 clamped = glm::clamp(difference, -aabb_half_extents, aabb_half_extents);
+				// add clamped value to AABB_center and we get the value of box closest to circle
+				glm::vec3 closest = aabb_center + clamped;
+				// retrieve vector between center circle and closest point AABB and check if length <= radius
+				difference = closest - center;
+
+				float D = glm::length(difference);
+				// collision not appened
+				if ( D > S->Get_Size ( ) ) { continue; }
+
+				// trigger collision ( no nead for fastest exit point )
+				if ( S->Is_Trigger ( ) ) { return {true,{0,0,0}}; }
+
+				// determine exit point
+				vec3 move_vector = -difference*(D-S->Get_Size ( ))/(D == 0 ? 1 : D);
+				if ( length ( out_vector ) < length ( move_vector ) ) { out_vector = move_vector; }
+			}
+		}
+
+		return { out_vector != vec3{0,0,0}, out_vector };
 	}
 };
 

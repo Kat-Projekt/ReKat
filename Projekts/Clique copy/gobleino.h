@@ -22,8 +22,9 @@ public:
 	virtual void UI_Update ( ) { }
 
     virtual void Collision ( Objekt* _obj ) { _obj; }
-    virtual void Collision_Trigger ( Objekt* _obj ) { 
-		if ( obj->Get_Name () == "Bean" ) { speed *= 0.5f; return; }
+    virtual void Collision_Trigger ( Objekt* _obj ) {
+		std::cout << obj->Get_Name () << '\n';
+		if ( obj->Get_Name () == "Bean" ) { speed = 50; return; }
 		obj->Set_Active ( false );
 	}
 };

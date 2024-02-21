@@ -10,7 +10,7 @@ private:
 	int _fps;
 	float _delta;
 public:
-	int MAX_FPS = 60;
+	int MAX_FPS = -1;
 
     void Start ( ) {
 		_t = Timer::Get_Time ( );
@@ -25,7 +25,8 @@ public:
 
 		if ( _t + 1 < Timer::Get_Time ( ) ) {
 			std::cout << "\n---- Fps: " << _fps << '\n';
-			std::cout << "---- Rendered: " << obj->Get_Childrens ().size() << '\n';
+			std::cout << "---- Rendered: " << obj->Count_Childrens () << '\n';
+			obj->Print_Tree ( " - " );
 			_t = Timer::Get_Time(); 
 			_fps = 0;
 		}

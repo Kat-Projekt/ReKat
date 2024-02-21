@@ -9,13 +9,25 @@ private:
 	bool _trigger = false;
 	bool _static = true;
 public:
-	virtual void Start ( ) { _static = ! obj->Has_component < Rigidbody > ( ); }
+	virtual void _Start ( ) { }
+	virtual void Start ( ) { _static = ! obj->Has_Component < Rigidbody > ( ); _Start( ); }
 
 	bool Is_Trigger ( ) { return _trigger; }
 	Collider *Set_Trigger ( bool trigger ) { _trigger = trigger; return this; }
 
 	bool Is_Static ( ) { return _static; }
 	Collider * Set_Static ( bool S ) { _static = S; return this; }
+
+	vec3 Get_Pos ( ) {
+		vec3 pos = obj->Get_Pos ( );
+		vec3 size = obj->Get_Size ( );
+		float rot = obj->Get_Rot ( ).z;
+		// center to sprite
+		glm::vec3 p = obj->Get_Rot_Pivot ( );
+		vec3 rot_vector = vec3{ size.x * ( p.x*cos(rot) - p.y*sin(rot) ), size.y * ( p.x*sin(rot) + p.y * cos(rot) ), 0 };
+		pos -= rot_vector;
+		return pos;	
+	}
 };
 
 // ------------------------------- Collider Types -----------------------------------
@@ -24,6 +36,7 @@ class Box_Collider : public Collider {
 private:
 	vec3 _size = {0,0,0};
 public:
+	void _Start ( ) { if ( _size == vec3{0,0,0} ) { _size = obj->Get_Size (); }}
 	Collider* Set_Size ( float size ) { _size = vec3(size); return this; }
 	Collider *Set_Size ( glm::vec3 size ) { _size = size; return this; }
 	vec3 Get_Size ( ) { return _size; }
@@ -50,7 +63,7 @@ std::ostream& operator << ( std::ostream& os, const Collision_Result& C ) {
 }
 
 Collision_Result Check_Collision ( Box_Collider   *B1, Box_Collider   *B2 ) {
-	vec3 P_Delta = B1->obj->Get_Pos ( ) - B2->obj->Get_Pos ( );
+	vec3 P_Delta = B1->Get_Pos ( ) - B2->Get_Pos ( );
 	vec3 Delta = abs ( P_Delta ) - ( B1->Get_Size () + B2->Get_Size() ) * 0.5f;
 
 	// collision not appeing
@@ -84,10 +97,10 @@ Collision_Result Check_Collision ( Box_Collider   *B1, Box_Collider   *B2 ) {
 }
 Collision_Result Check_Collision ( Box_Collider   *B1, Sfere_Collider *S2 ) {
 	// get center point circle first 
-    glm::vec3 center = S2->obj->Get_Pos ( );
+    glm::vec3 center = S2->Get_Pos ( );
     // calculate AABB info (center, half-extents)
     glm::vec3 aabb_half_extents = B1->Get_Size ( ) * 0.5f;
-    glm::vec3 aabb_center = B1->obj->Get_Pos ( );
+    glm::vec3 aabb_center = B1->Get_Pos ( );
     // get difference vector between both centers
     glm::vec3 difference = center - aabb_center;
     glm::vec3 clamped = glm::clamp(difference, -aabb_half_extents, aabb_half_extents);
@@ -107,7 +120,7 @@ Collision_Result Check_Collision ( Box_Collider   *B1, Sfere_Collider *S2 ) {
 	return {true, -difference*(D-S2->Get_Size ( ))/(D == 0 ? 1 : D)};
 }
 Collision_Result Check_Collision ( Sfere_Collider *S1, Sfere_Collider *S2 ) {
-	vec3 P = S1->obj->Get_Pos ( ) - S2->obj->Get_Pos ( );
+	vec3 P = S1->Get_Pos ( ) - S2->Get_Pos ( );
 
 	float D = glm::length ( P );
 	float S = S1->Get_Size ( ) + S2->Get_Size ( );

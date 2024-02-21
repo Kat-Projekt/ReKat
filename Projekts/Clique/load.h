@@ -1,93 +1,125 @@
-#include "com.h"
+#define OPENGL
+#define OPENAL
+#define ONLINE_PEER
+#define ALL_MODULES
+#include <ReKat.hpp>
 
-#include "player.h"
-#include "speels.h"
-#include "camera_controll.h"
-#include "gobleino.h"
+#include "Scripts/Player.h"
+#include "Scripts/Camera_Controll.h"
+#include "Scripts/Enemies/Master_Mind.h"
+#include "Scripts/Life_display.h"
 
-static void __FreamBufferResize ( GLFWwindow* window, int width, int height ) {
-    glViewport ( 0, 0, ReKat::grapik::Internal::SCR_WIDTH = width, ReKat::grapik::Internal::SCR_HEIGTH = height );
-}
+using namespace Manager;
 
 int Load ( ) {
-	ReKat::grapik::Input::_FreamBufferResize = __FreamBufferResize;
-
 	int result = 0;
-	result += Manager::Shader_Load  ( "sprite", "Shaders/sprite.vs", "Shaders/sprite.fs");
-	result += Manager::Shader_Load  ( "tilemap", "Shaders/tilemap.vs", "Shaders/tilemap.fs");
+	// loading Shaders 
+	result += Manager::Shader_Load ( "sprite", "Shaders/sprite.vs", "Shaders/sprite.fs" );
+	result += Manager::Shader_Load ( "font", "Shaders/font.vs", "Shaders/font.fs" );
+	result += Manager::Shader_Load ( "tilemap", "Shaders/tilemap.vs", "Shaders/tilemap.fs" );
+	// loading Textures
+	result += Manager::Texture_Load ( "icon", "Sprites/icon.png" );
+	result += Manager::Texture_Load ( "attack_mode", "Sprites/UI/attack_mode.png" );
+	result += Manager::Texture_Load ( "heart", "Sprites/UI/heart.png" );
+	result += Manager::Texture_Load ( "soldato", "Sprites/Player/soldato.png" );
+	result += Manager::Texture_Load ( "bean", "Sprites/Spells/bean.png" );
+	result += Manager::Texture_Load ( "dart", "Sprites/Spells/dart.png" );
+	result += Manager::Texture_Load ( "wall", "Sprites/Spells/wall.png" );
+	result += Manager::Texture_Load ( "weel", "Sprites/Spells/weel.png" );
+	result += Manager::Texture_Load ( "bastone", "Sprites/Weapons/bastone.png" );
+	result += Manager::Texture_Load ( "spada", "Sprites/Weapons/spada.png" );
+	result += Manager::Texture_Load ( "gobelini", "Sprites/Enemies/gobelini.png" );
+	result += Manager::Texture_Load ( "gobelini_dark", "Sprites/Enemies/gobelini_dark.png" );
+	result += Manager::Texture_Load ( "gobeloni", "Sprites/Enemies/gobeloni.png" );
+	result += Manager::Texture_Load ( "gobeloni_dark", "Sprites/Enemies/gobeloni_dark.png" );
+	result += Manager::Texture_Load ( "gobelino", "Sprites/Enemies/gobelino.png" );
+	result += Manager::Texture_Load ( "yoda", "Sprites/Enemies/yoda.png" );
+	result += Manager::Texture_Load ( "tilemap", "Sprites/Tilemaps/tilemap.png" );
+	// loading Fonts
+	result += Manager::Font_Load ( "death_record", "Fonts/death_record.ttf", 100 );
 
-	result += Manager::Texture_Load ( "sprite", "Collider_Shape.png" );
-	result += Manager::Texture_Load ( "tilemap", "tile1.png" );
-	result += Manager::Texture_Load ( "Bean", "Spells/Beans.png" );
-	result += Manager::Texture_Load ( "Lasur", "Spells/Lasur.png" );
-	result += Manager::Texture_Load ( "Wall", "Spells/LE wall.png" );
-	result += Manager::Texture_Load ( "Spells", "Spells/spells.png" );
-	if ( result != 0 ) { return 1; }
+	if ( result != 0 ) { return result; }
+	std::cout << "loaded\n";
 
-	std::cout << "Resources Loaded\n";
+	// creating Scenes
+	auto dungeon = new Objekt ( "Dungeon" );
+	auto death = new Objekt ( "Death" );
 
-	Objekt main ( "main" );
-	Objekt pier ( "pier", {300,-100,0.4}, {100,100,100});
-	Objekt gio ( "gio",{300,0,0.5}, {50,50,50} );
-	Objekt speel ( "spell" );
-	Objekt WALL ( "spell", {0,200,0} );
-	Objekt Map ( "map", {0,100,0},{100,100,10} );
+	// creating Objekts
+	auto UI_Container = new Objekt ( "UI" );
+	auto camera = new Objekt ( "Camera" );
+	auto map = new Objekt ( "map" );
+	auto mode_indicator = new Objekt ( "mode indicator", {-500,-450,0} );
+	auto life_indicator = new Objekt ( "life indicator", {-500,480,0} );
+	auto name_indicator = new Objekt ( "name indicator", {500,450,0} );
+	auto player = new Objekt ( "Player" );
+	auto sword = new Objekt ( "weapon" );
+	auto enemy = new Objekt ( "enemy", {100,100,0} );
 	
-	main.Add_Child ( &camera );
-	main.Add_Child ( &pier );
-	main.Add_Child ( &gio );
-	main.Add_Child ( &speel );
-	main.Add_Child ( &WALL );
-	main.Add_Child ( &Map );
+	auto death_text = new Objekt ( "death massage" );
 
-	std::cout << "Objects Linked\n";
+	// creating Objekts Hierarchy
+	dungeon->Add_Child ( UI_Container );
+	dungeon->Add_Child ( camera );
+	dungeon->Add_Child ( player );
+	dungeon->Add_Child ( enemy );
+	dungeon->Add_Child ( map );
+	UI_Container->Add_Child ( mode_indicator );
+	UI_Container->Add_Child ( name_indicator );
+	UI_Container->Add_Child ( life_indicator );
+	player->Add_Child ( sword );
 
-	main.Add_component < Fps > ( )->MAX_FPS = 30;
-	main.Add_component < Phisiks > ( );
-	camera.Add_component < Camera > ( );
-	camera.Add_component < Camera_Controll > ( )->_target = &pier;
-	pier.Add_component < Sprite > ( );
-	pier.Add_component < Rigidbody > ( );
-	pier.Add_component < Player > ( );
-	pier.Add_component < Box_Collider > ( )->Set_Size(100);
-	gio.Add_component < Sprite > ( );
-	gio.Add_component < Rigidbody > ( );
-	gio.Add_component < Box_Collider > ( )->Set_Size(50);
-	gio.Add_component < Gobleino > ( )->target = &pier;
-	speel.Add_component < Spells > ( )->Player = &pier;
+	death->Add_Child ( death_text );
 
-	Map.Add_component < Tilemap > ( );
-	Map.Add_component < Tilemap_Collider > ( );
+	// adding Components
+	dungeon->Add_Component < Phisiks > ( );
+	dungeon->Add_Component < Fps > ( );
+	camera->Add_Component < Camera > ( );
+	camera->Add_Component < Camera_Controll > ( );
+	map->Add_Component < Tilemap > ( );
+	map->Add_Component < Tilemap_Collider > ( );
+	mode_indicator->Add_Component < Sprite > ( );
+	name_indicator->Add_Component < Text > ( );
+	life_indicator->Add_Component < Life_Indicator > ( );
+	player->Add_Component < Player > ( );
+	player->Add_Component < Sprite > ( );
+	player->Add_Component < Rigidbody > ( );
+	player->Add_Component < Sfere_Collider > ( ) -> Set_Size ( 60 );
+	sword->Add_Component < Sprite > ( );
+	sword->Add_Component < Weapon > ( );
+	sword->Add_Component < Sfere_Collider > ( )->Set_Trigger ( true );
+	auto mm = enemy->Add_Component < Master_Mind > ( );
 
-	std::cout << "Components Added\n";
+	death_text->Add_Component < Text > ( );
 
-	pier.Get_component < Sprite > ( ) ->
-	Set ( Manager::Texture_Get( "sprite" ), Manager::Shader_Get( "sprite" ), camera.Get_component < Camera > ( ), {2,1} )->frame = 1;
-	
-	gio.Get_component < Sprite > ( ) ->
-	Set ( Manager::Texture_Get( "sprite" ), Manager::Shader_Get( "sprite" ), camera.Get_component < Camera > ( ), {2,1} )->frame = 0;
+	// configuring Components
+	auto cam = camera->Get_Component < Camera > ( );
+	camera->Get_Component < Camera_Controll > ( ) -> target = player;
+	map->Get_Component < Tilemap > ( ) -> Set
+	( "Maps/Dungeon.csv", Manager::Texture_Get( "tilemap" ), Manager::Shader_Get ( "tilemap" ), cam, {32,32} );
+	map->Get_Component < Tilemap_Collider > ( ) -> Set
+	( "Maps/Dungeon.c.csv" );
+	mode_indicator->Get_Component < Sprite > ( ) -> Set 
+	( Texture_Get ( "attack_mode" ), Shader_Get ( "sprite" ), cam, {2,1} )->Set ( true );
+	name_indicator->Get_Component < Text > ( )->Set ( Font_Get ( "death_record" ), Shader_Get ( "font" ), cam, {0.5,0.6,0.1,1} );
+	name_indicator->Get_Component < Text > ( )->Set ( "pier" );
+	life_indicator->Get_Component < Life_Indicator > ( )->cam = cam;
+	life_indicator->Get_Component < Life_Indicator > ( )->life = &player->Get_Component < Player > ( )->life;
+	player->Get_Component < Sprite > ( ) -> Set 
+	( Texture_Get ( "soldato" ), Shader_Get ( "sprite" ), cam );
+	sword->Set_Rot_Pivot ( {0,-1,0} );
+	sword->Get_Component < Sprite > ( ) -> Set 
+	( Texture_Get ( "spada" ), Shader_Get ( "sprite" ), cam );
+	mm->cam = cam;
+	mm->player = player;
 
-	Map.Get_component < Tilemap > ( ) ->
-	Set ( "Maps/Dungeon.csv", Manager::Texture_Get( "tilemap" ), Manager::Shader_Get( "tilemap" ), camera.Get_component < Camera > ( ), {32,32} );
-	Map.Get_component < Tilemap_Collider > ( ) -> Set ( "Maps/Dungeon.c.csv" );
+	death_text->Get_Component < Text > ( )->Set ( Font_Get ( "death_record" ), Shader_Get ( "font" ), cam, {0.5,0.6,0.1,1} );
+	death_text->Get_Component < Text > ( )->Set ( "yo mama stupid" );
 
-	std::cout << "Components Configured\n";
+	Scene_Manager::Add_Scene ( death );
+	std::cout << "ready to start\n";
+	Scene_Manager::Set_Active_Scene ( dungeon );
+	std::cout << "started\n";
 
-	Scene_Manager::Set_Active_Scene ( &main );
-
-	std::cout << "Scene Configured\n";
-
-	std::cout << "-------------- Start Main Loop -----------------\n";
-	while ( ReKat::grapik::IsEnd ( ) ) {
-		glClearColor(0.0, 0.0, 0.0, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glEnable(GL_DEPTH_TEST);
-		Scene_Manager::Update();
-		ReKat::grapik::Update();
-		// std::cout << "\n--- Rendered: " << main.Get_Childrens ().size();
-		// std::cout << "\n------------ End Frame\n";
-	}
-	std::cout << "\n-------------- Ended Main Loop -----------------\n";
-
-	return result;
+	return 0;
 }

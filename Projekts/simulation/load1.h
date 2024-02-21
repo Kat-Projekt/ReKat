@@ -48,7 +48,7 @@ int Load ( ) {
 	Set ( Manager::Texture_Get( "sprite" ), Manager::Shader_Get( "sprite" ), camera.Get_component < Camera > ( ), {2,1}, {0,0,1,1} )->frame = 0;
 	
 	gio.Get_component < Sprite > ( ) ->
-	Set ( Manager::Texture_Get( "sprite" ), Manager::Shader_Get( "sprite" ), camera.Get_component < Camera > ( ), {2,1} )->frame = 0;
+	Set ( Manager::Texture_Get( "sprite" ), Manager::Shader_Get( "sprite" ), camera.Get_component < Camera > ( ), {2,1}, {0,0,1,1} )->frame = 0;
 
 	main.Start ( );
 	Scene_Manager::Set_Active_Scene ( &Frame );

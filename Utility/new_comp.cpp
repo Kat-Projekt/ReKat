@@ -9,6 +9,7 @@ int main ( int argc, char const *argv[] ) {
 \n\
 #include <Graphik/objekt.h>\n\
 #include <Graphik/graphik.hpp>\n\
+#include <Graphik/Components/_catalog.hpp>\n\
 using namespace ReKat::grapik::Input;\n\
 \n\
 class " + Cname + " : public Behaviour {\n\

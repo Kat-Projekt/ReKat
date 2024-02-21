@@ -6,11 +6,12 @@
 
 class Sprite : public Behaviour {
 private:
+	bool _UI_render = false;
     unsigned int _quad;
     Texture *_texture = nullptr;
     Shader  *_shader = nullptr; 
 	Camera  *_camera = nullptr;
-	vec2 _frames = {1,1};
+	ivec2 _frames = {1,1};
 	vec4 _color = {1,1,1,1};
 public:
 	int frame = 0;
@@ -43,11 +44,11 @@ public:
 		_shader->setInt ( "image", 0 );
     }
 
-	void Fixed_Update ( ) {
+	void Update ( ) {
 		// prepare transformations
 		if ( _shader == nullptr || _texture == nullptr || _camera == nullptr ) { return; }
 
-		_shader->setMat4  ( "projection", _camera->Projkection ( ) );
+		_shader->setMat4  ( "projection", ( _UI_render ? _camera->UI_Projkection ( ) : _camera->Projkection ( )) );
         _shader->setFloat ( "SPRITE_COLUMNS", _frames.x );
         _shader->setFloat ( "SPRITE_ROWS", _frames.y );
         _shader->setFloat ( "NUM_OF_SPRITES", (int)(_frames.x * _frames.y) );
@@ -65,10 +66,11 @@ public:
         glBindVertexArray(0);
 	}
 
-	Sprite* Set ( Texture* texture, Shader* shader, Camera* camera, vec2 frames = {1,1}, vec4 color = {1,1,1,1} ) 
+	Sprite* Set ( Texture* texture, Shader* shader, Camera* camera, ivec2 frames = {1,1}, int frame = 0, vec4 color = {1,1,1,1} ) 
 	{ _texture = texture; _shader = shader; _camera = camera;
-	_frames = frames; _color = color; return this; }
+	_frames = frames; this->frame = frame; _color = color; return this; }
 
+	Sprite* Set ( bool UI_sprite ) { _UI_render = UI_sprite; return this; }
 };
 
 #endif

@@ -47,15 +47,15 @@ public:
         if ( Key_Pressed( "W" ) ) { dpos += glm::vec2{0,1};  }
         if ( Key_Pressed( "D" ) ) { dpos += glm::vec2{1,0};  }
         if ( Key_Pressed( "S" ) ) { dpos += glm::vec2{0,-1}; }
-        obj->Get_component < Rigidbody > ()->velocity = ( vec3(Normalize(dpos) * speed, 0) );
+        obj->Get_Component < Rigidbody > ()->velocity = ( vec3(Normalize(dpos) * speed, 0) );
 		
 		if ( Key_Down( "A" ) && Key_Down( "W" ) && Key_Down( "D" ) && Key_Down( "S" ) ) {
 			Objekt *K = new Objekt("Kat");
-			// K->Add_component < Sfere_Collider > ( );
-			K->Add_component < Sprite > ( )->Set ( Manager::Texture_Get( "sprite" ), Manager::Shader_Get( "sprite" ), camera.Get_component < Camera > ( ), {2,1} );
-			K->Add_component < Gobelino > ( )->pointer = obj;
-			K->Add_component < Sfere_Collider > ( )->Set_Size (50);
-			K->Add_component < Rigidbody >();
+			// K->Add_Component < Sfere_Collider > ( );
+			K->Add_Component < Sprite > ( )->Set ( Manager::Texture_Get( "sprite" ), Manager::Shader_Get( "sprite" ), camera.Get_Component < Camera > ( ), {2,1} );
+			K->Add_Component < Gobelino > ( )->pointer = obj;
+			K->Add_Component < Sfere_Collider > ( )->Set_Size (50);
+			K->Add_Component < Rigidbody >();
 			std::cout << "Created obj\n";
 			K->Start ( );
 			Scene_Manager::_current_scene->Add_Child( K );

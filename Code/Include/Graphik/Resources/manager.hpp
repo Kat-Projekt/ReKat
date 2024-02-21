@@ -3,13 +3,30 @@
 
 #include "shader.h"
 #include "texture.h"
+#include "font.h"
 
 #include <unordered_map>
 #include <iostream>
 
 namespace Manager {
+    static std::unordered_map < std::string, Font* > _fonts;
     static std::unordered_map < std::string, Shader* >  _shaders;
     static std::unordered_map < std::string, Texture* > _textures;
+
+	// Gets a Font
+	// -------------
+    static Font* Font_Get  ( std::string name ) {
+		if ( name == "" ) { return nullptr; }
+		auto findit = _fonts.find(name);
+		if ( findit != _fonts.end() ) {
+			return findit->second;
+		} else { return nullptr; }
+	}
+    static int Font_Load ( std::string name, const char* fontPath, int heigth = 48 ) {
+        Font *s = new Font ( heigth );
+        _fonts.insert( { name, s } );
+        return (*s).Make( fontPath );
+    }
 
 	// Gets a Shader
 	// -------------
@@ -47,6 +64,7 @@ namespace Manager {
 	// Makes the resources disapear
 	// ----------------------------
 	static void Free ( ) {
+		for ( auto F : _fonts    ) { F.second->End(); }
 		for ( auto S : _shaders  ) { S.second->End(); }
 		for ( auto T : _textures ) { T.second->End(); }
 	}

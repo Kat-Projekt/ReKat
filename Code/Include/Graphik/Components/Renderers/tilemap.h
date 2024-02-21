@@ -125,7 +125,7 @@ public:
 		_texture->Use();
 
 		glBindVertexArray(_quad);
-        glDrawArraysInstanced(GL_TRIANGLES, 0, 6, _instances); // 100 triangles of 6 vertices each
+        glDrawArraysInstanced(GL_TRIANGLES, 0, 6, _instances);
         glBindVertexArray(0);
 	}
 

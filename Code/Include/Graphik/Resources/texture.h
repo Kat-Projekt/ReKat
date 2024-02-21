@@ -69,7 +69,7 @@ int Texture::Make ( const char * file ) {
 
         glGenerateMipmap(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, 0);
-    } else { stbi_image_free(data); return FAILED_LOAD_IMAGE; }
+    } else { stbi_image_free(data); std::cout << "error loading: " << file << '\n'; return FAILED_LOAD_IMAGE; }
 
     stbi_image_free(data);
     return SUCCESS; 
@@ -92,8 +92,8 @@ int Texture::Make ( unsigned char* data, unsigned int width, unsigned int height
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
         glGenerateMipmap(GL_TEXTURE_2D);
         glBindTexture(GL_TEXTURE_2D, 0);

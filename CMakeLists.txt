@@ -47,7 +47,7 @@ source_group("Libs" FILES ${LIBS_SOURCES})
 add_definitions(-DGLFW_INCLUDE_NONE
 				-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
 
-set(PROJEKTS Clique)
+set(PROJEKTS Clique Test)
 
 foreach(PROJEKT ${PROJEKTS})
 	file(GLOB PROJECT_SOURCES Projekts/${PROJEKT}/main.cpp )
@@ -64,6 +64,3 @@ foreach(PROJEKT ${PROJEKTS})
 		TARGET ${PROJEKT} POST_BUILD
 		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Projekts/${PROJEKT}/Resources $<TARGET_FILE_DIR:${PROJEKT}>)
 endforeach(PROJEKT)
-
-
-

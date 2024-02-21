@@ -145,6 +145,7 @@ namespace Input {
 		ReKat::grapik::Internal::SCR_HEIGTH = height;
 		ReKat::grapik::Internal::SCR_WIDTH = width;
 		screen_ration = (float)ReKat::grapik::Internal::SCR_WIDTH / (float)ReKat::grapik::Internal::SCR_HEIGTH;
+		glViewport ( 0, 0, ReKat::grapik::Internal::SCR_WIDTH = width, ReKat::grapik::Internal::SCR_HEIGTH = height );
 		if ( _FreamBufferResize != nullptr ) 
 		{ _FreamBufferResize ( window, width, height ); }
 	}

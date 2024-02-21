@@ -24,6 +24,11 @@ int main ( int argc, char const *argv[] ) {
 \n\
 int Load ( ) {\n\
 	int result = 0;\n\
+	Objekt * scene = new Objekt ( \"Scene\" );\n\
+	scene->Add_Component < Phisiks > ( );\n\
+	scene->Add_Component < Fps > ( );\n\
+\n\
+	Scene_Manager::Set_Active_Scene ( &scene );\n\
 	return result;\n\
 }";
 
@@ -36,7 +41,10 @@ int main ( int argc, char const *argv[] ) {\n\
 	if ( Load () != 0 ) { return 1; }\n\
 	Manager::Start ( );\n\
 	while ( ReKat::grapik::IsEnd ( ) ) {\n\
-		Manager::Update ( );\n\
+		glClearColor(0.0, 0.0, 0.0, 1.0f);\n\
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);\n\
+		glEnable(GL_DEPTH_TEST);\n\
+		Scene_Manager::Update()\n\
 		ReKat::grapik::Pool ( );\n\
     }\n\
 	ReKat::synth::End();\n\
