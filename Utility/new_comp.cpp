@@ -7,20 +7,20 @@ int main ( int argc, char const *argv[] ) {
 	if ( argc != 2 ) { std::cout << "Insert Componenent name: "; std::cin >> Cname; }
 	std::string component = "#ifndef _" + Cname + "\n#define _" + Cname + "\n\
 \n\
-#include <Graphik/objekt.h>\n\
-#include <Graphik/graphik.hpp>\n\
-#include <Graphik/Components/_catalog.hpp>\n\
+#include <engine.hpp>\n\
 using namespace ReKat::grapik::Input;\n\
 \n\
 class " + Cname + " : public Behaviour {\n\
 public:\n\
-    virtual void Start ( ) { }\n\
-    virtual void Update ( ) { }\n\
+	virtual void Start ( ) { }\n\
+	virtual void Update ( ) { }\n\
 	virtual void Fixed_Update ( ) { }\n\
 	virtual void UI_Update ( ) { }\n\
-\n\
-    virtual void Collision ( Objekt* _obj ) { _obj; }\n\
-    virtual void Collision_Trigger ( Objekt* _obj ) { _obj; }\n\
+\
+	virtual void Collision ( T* _obj ) { _obj; }\n\
+	virtual void Collision_Trigger ( T* _obj ) { _obj; }\n\
+\
+	virtual void Delete ( ) { }\n\
 };\n\
 \n\
 #endif";

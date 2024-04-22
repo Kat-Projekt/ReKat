@@ -96,16 +96,7 @@ public:
     void Start ( ) {
         mappa = Mappa ( 12345, {50,50} );
         std::cout << mappa;
-		for (size_t i = 0; i < 50; i++) {
-			for (size_t y = 0; y < 50; y++) {
-				glm::vec4 color = {mappa.rooms[i*mappa.size.y+y]/4,0,0,1};
-				if ( mappa.rooms[i*mappa.size.y+y] == 0 ) { continue; }
-				std::string n = "Tile:" + std::to_string(i) + ":" + std::to_string(y);
-				Manager::Object_Load( n, "empty_sprite",{100*y,100*i},{100,100})->Set_Color(color);
-				if ( mappa.rooms[i*mappa.size.y+y] == 4 )
-				{ Manager::Add_Collider ( n )->Set_size({100,100})->Set_movable(false); std::cout << "col"; }
-				Manager::Object_Get(name)->Add_Sub_Object(n ,Manager::Object_Get(n));
-			}
-		}
+		Tilemap *com = new Tilemap;
+
     }
 };

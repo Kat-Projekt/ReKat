@@ -49,9 +49,9 @@ public:
 		if ( _shader == nullptr || _texture == nullptr || _camera == nullptr ) { return; }
 
 		_shader->setMat4  ( "projection", ( _UI_render ? _camera->UI_Projkection ( ) : _camera->Projkection ( )) );
-        _shader->setFloat ( "SPRITE_COLUMNS", _frames.x );
-        _shader->setFloat ( "SPRITE_ROWS", _frames.y );
-        _shader->setFloat ( "NUM_OF_SPRITES", (int)(_frames.x * _frames.y) );
+        _shader->setInt ( "SPRITE_COLUMNS", _frames.x );
+        _shader->setInt ( "SPRITE_ROWS", _frames.y );
+        _shader->setInt ( "NUM_OF_SPRITES", (int)(_frames.x * _frames.y) );
 
 		mat4 model = obj->Get_Model_Mat ( );
 
@@ -66,9 +66,9 @@ public:
         glBindVertexArray(0);
 	}
 
-	Sprite* Set ( Texture* texture, Shader* shader, Camera* camera, ivec2 frames = {1,1}, int frame = 0, vec4 color = {1,1,1,1} ) 
+	Sprite* Set ( Texture* texture, Shader* shader, Camera* camera, ivec2 frames = {1,1}, int _frame = 0, vec4 color = {1,1,1,1} ) 
 	{ _texture = texture; _shader = shader; _camera = camera;
-	_frames = frames; this->frame = frame; _color = color; return this; }
+	_frames = frames; this->frame = _frame; _color = color; return this; }
 
 	Sprite* Set ( bool UI_sprite ) { _UI_render = UI_sprite; return this; }
 };

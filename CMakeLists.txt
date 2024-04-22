@@ -1,7 +1,6 @@
 cmake_minimum_required(VERSION 3.13)
 
-project(ReKat)
-
+project(ReKat) 
 ## remove examples
 option(OPENAL_BUILD_EXAMPLES OFF)
 add_subdirectory(Code/Lib/openal-soft)
@@ -25,6 +24,7 @@ else()
 endif()
 
 include_directories(Code/Include/
+					Code/Include/Engine_Rework/
 					Code/Lib/glad/include/
 					Code/Lib/freetype/include/
 					Code/Lib/glfw/include/
@@ -47,7 +47,7 @@ source_group("Libs" FILES ${LIBS_SOURCES})
 add_definitions(-DGLFW_INCLUDE_NONE
 				-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
 
-set(PROJEKTS Clique Test)
+set(PROJEKTS Kat)
 
 foreach(PROJEKT ${PROJEKTS})
 	file(GLOB PROJECT_SOURCES Projekts/${PROJEKT}/main.cpp )

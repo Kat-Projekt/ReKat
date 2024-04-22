@@ -9,10 +9,11 @@ void clear_signal ( complex <double> *t, int size, double base ) {
 	}
 }
 
-void clamp_freq ( complex <double> *t, int size, int Min, int Max ) {
+void clamp_freq ( complex <double> *t, int size, int Min = 0, int Max = -1 ) {
 	for ( int i = 0; i < size; i++ ) { 
 		if ( i < Min ) { t[i] = 0; }
-		if ( i > Max ) { t[i] = 0; }		
+		if ( Max == -1 ) { continue; }
+		if ( i > Max ) { t[i] = 0; }
 	}
 }
 

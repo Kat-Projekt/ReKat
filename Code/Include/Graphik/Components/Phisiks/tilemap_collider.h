@@ -95,13 +95,11 @@ public:
 
 				// determine exit point
 				if (abs(Delta.x) > abs(Delta.y)) {// Delta.y is Low
-					float Sing = (P_Delta.y >= 0 ? -1 : 1);
-					float move_vector = Delta.y * Sing;
+					float move_vector = Delta.y * (P_Delta.y >= 0 ? -1 : 1);
 					if ( abs ( out_vector.y ) < abs ( move_vector ) ) { out_vector.y = move_vector; }
 				}
 				else { // Delta.x is Max
-					float Sing = (P_Delta.x >= 0 ? -1 : 1);
-					float move_vector = Delta.x * Sing;
+					float move_vector = Delta.x * (P_Delta.x >= 0 ? -1 : 1);
 					if ( abs ( out_vector.x ) < abs ( move_vector ) ) { out_vector.x = move_vector; }
 				}
 			}

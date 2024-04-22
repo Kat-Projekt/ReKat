@@ -10,7 +10,7 @@ public:
 	vec3 velocity = {0,0,0};
 	float mass = 1;
 	float time_scale = 1;
-	float bouncy = 0.7;
+	float bouncy = 0.7f;
 	bool block_z = true;
 
 	void Fixed_Update ( ) {

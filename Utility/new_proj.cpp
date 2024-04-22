@@ -16,19 +16,18 @@ int main ( int argc, char const *argv[] ) {
 	std::filesystem::create_directory ( Pname + "/Resources" );
 	
 	std::string loadn = "\
-#define OPENGL\n\
-#define OPENAL\n\
-#define ONLINE_PEER\n\
-#define ALL_MODULES\n\
-#include <ReKat.hpp>\n\
+#include <engine.hpp>\n\
 \n\
 int Load ( ) {\n\
+    ReKat::grapik::Start ( \"" + Pname + "\", 800, 600, false, false, true );\n\
+	Synth *Audio_Drivers = new Synth;\n\
+	Audio_Drivers->_Start ( );\n\
 	int result = 0;\n\
 	Objekt * scene = new Objekt ( \"Scene\" );\n\
-	scene->Add_Component < Phisiks > ( );\n\
+	scene->Add_Component ( Audio_Drivers );\n\
 	scene->Add_Component < Fps > ( );\n\
 \n\
-	Scene_Manager::Set_Active_Scene ( &scene );\n\
+	Scene_Manager::Set_Active_Scene ( scene );\n\
 	return result;\n\
 }";
 
@@ -36,18 +35,15 @@ int Load ( ) {\n\
 #include \"load.h\"\n\
 \n\
 int main ( int argc, char const *argv[] ) {\n\
-    ReKat::grapik::Start ( \"" + Pname + "\", 800, 600, false, false, true );\n\
-	ReKat::synth::Start ( );\n\
 	if ( Load () != 0 ) { return 1; }\n\
 	Manager::Start ( );\n\
 	while ( ReKat::grapik::IsEnd ( ) ) {\n\
-		glClearColor(0.0, 0.0, 0.0, 1.0f);\n\
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);\n\
-		glEnable(GL_DEPTH_TEST);\n\
-		Scene_Manager::Update()\n\
-		ReKat::grapik::Pool ( );\n\
+		Scene_Manager::Update ( );\n\
+		ReKat::grapik::Update ( );\n\
     }\n\
-	ReKat::synth::End();\n\
+\
+	Manager::Free_Audio ( );\n\
+	Manager::Free ( );\n\
 	ReKat::grapik::Terminate();\n\
 	return 0;\n\
 }\n\

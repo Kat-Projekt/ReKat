@@ -15,7 +15,7 @@ class _behaviour {
 public:
     T* obj;
 
-	void _Start ( ) { if ( _active ) { Start ( ); } _started = true; }
+	void _Start ( ) { if ( _active && !_started ) { Start ( ); } _started = true; }
 	void _Update ( ) { if ( _active ) { Update ( ); } }
 	void _Fixed_Update ( ) { if ( _active ) { Fixed_Update ( ); } }
 	void _UI_Update ( ) { if ( _active ) { UI_Update ( ); } }

@@ -8,6 +8,7 @@
 #include "Scripts/Camera_Controll.h"
 #include "Scripts/Enemies/Master_Mind.h"
 #include "Scripts/Life_display.h"
+#include "Scripts/Dungeon/Dungeon.h"
 
 using namespace Manager;
 
@@ -73,11 +74,10 @@ int Load ( ) {
 
 	// adding Components
 	dungeon->Add_Component < Phisiks > ( );
-	dungeon->Add_Component < Fps > ( );
+	// dungeon->Add_Component < Fps > ( );
 	camera->Add_Component < Camera > ( );
 	camera->Add_Component < Camera_Controll > ( );
-	map->Add_Component < Tilemap > ( );
-	map->Add_Component < Tilemap_Collider > ( );
+	map->Add_Component < Dungeon > ( )->_Start();
 	mode_indicator->Add_Component < Sprite > ( );
 	name_indicator->Add_Component < Text > ( );
 	life_indicator->Add_Component < Life_Indicator > ( );
@@ -97,8 +97,6 @@ int Load ( ) {
 	camera->Get_Component < Camera_Controll > ( ) -> target = player;
 	map->Get_Component < Tilemap > ( ) -> Set
 	( "Maps/Dungeon.csv", Manager::Texture_Get( "tilemap" ), Manager::Shader_Get ( "tilemap" ), cam, {32,32} );
-	map->Get_Component < Tilemap_Collider > ( ) -> Set
-	( "Maps/Dungeon.c.csv" );
 	mode_indicator->Get_Component < Sprite > ( ) -> Set 
 	( Texture_Get ( "attack_mode" ), Shader_Get ( "sprite" ), cam, {2,1} )->Set ( true );
 	name_indicator->Get_Component < Text > ( )->Set ( Font_Get ( "death_record" ), Shader_Get ( "font" ), cam, {0.5,0.6,0.1,1} );

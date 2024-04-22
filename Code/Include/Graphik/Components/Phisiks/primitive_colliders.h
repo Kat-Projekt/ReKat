@@ -46,7 +46,7 @@ class Sfere_Collider : public Collider {
 private:
 	float _size = 0;
 public:
-	Collider *Set_Size ( float size ) { _size = size * 0.5; return this; }
+	Collider *Set_Size ( float size ) { _size = size * 0.5f; return this; }
 	float Get_Size ( ) { return _size; }
 };
 
@@ -77,19 +77,15 @@ Collision_Result Check_Collision ( Box_Collider   *B1, Box_Collider   *B2 ) {
 	// determine exit point
 	if ( abs ( Delta.x ) > abs ( Delta.y ) ) {
 		if ( abs ( Delta.y ) > abs ( Delta.z ) ) { // Delta.z is Low
-			float Sing = ( P_Delta.z >= 0 ? -1 : 1 );
-			move_vector = { 0, 0, Delta.z * Sing };
+			move_vector = { 0, 0, Delta.z * ( P_Delta.z >= 0 ? -1 : 1 ) };
 		} else { // Delta.y is Low
-			float Sing = ( P_Delta.y >= 0 ? -1 : 1 );
-			move_vector = { 0, Delta.y * Sing, 0 };
+			move_vector = { 0, Delta.y * ( P_Delta.y >= 0 ? -1 : 1 ), 0 };
 		}
 	} else {
 		if ( abs ( Delta.x ) > abs ( Delta.z ) ) { // Delta.z is Low
-			float Sing = ( P_Delta.z >= 0 ? -1 : 1 );
-			move_vector = { 0, 0, Delta.z * Sing };
+			move_vector = { 0, 0, Delta.z * ( P_Delta.z >= 0 ? -1 : 1 ) };
 		} else { // Delta.x is Max
-			float Sing = ( P_Delta.x >= 0 ? -1 : 1 );
-			move_vector = { Delta.x * Sing, 0, 0 };
+			move_vector = { Delta.x * ( P_Delta.x >= 0 ? -1 : 1 ), 0, 0 };
 		}
 	}
 
