@@ -35,6 +35,7 @@ int main(int argc, char const *argv[]) {
 		nw.Update ( );
 		ReKat::grapik::Update ( );
 	}
+
 	
 	Manager::Free_Audio ( );
 	Manager::Free ( );

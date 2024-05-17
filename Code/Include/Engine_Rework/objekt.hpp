@@ -354,10 +354,13 @@ namespace Manager {
 	static void Update ( )
 	{ if ( _current_scene != nullptr ) { _current_scene->Update(); } };
 
-	static void Add_Objekt ( std::string name, vec3 pos = {0,0,0}, vec3 size = {100,100,100}, vec3 rot = {0,0,0}, vec3 rot_pivot = {0,0,0} ) 
-	{ objekts.append( new Objekt(name, pos, size, rot, rot_pivot) ); }
-	static void Add_Objekt ( Objekt * o ) 
-	{ objekts.append( o ); }
+	static Objekt* Objekt_Load ( std::string name, vec3 pos = {0,0,0}, vec3 size = {100,100,100}, vec3 rot = {0,0,0}, vec3 rot_pivot = {0,0,0} ) {
+		auto o = new Objekt(name, pos, size, rot, rot_pivot);
+		objekts.append ( o );
+		return o;
+	}
+	static Objekt* Objekt_Load ( Objekt * o ) 
+	{ objekts.append( o ); return o;}
 	static void Set_Active_Scene ( Objekt * o ) {
 		if ( !objekts.contains( o ) ) { objekts.append ( o ); }
 		_current_scene = o;

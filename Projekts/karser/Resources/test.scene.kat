@@ -1,0 +1,32 @@
+// projekt metadata
+projekt = Test;
+
+graphic = true;
+audio = true;
+
+// reasurces
+.resources {
+	textures: { 
+		"texture 1": [ "Path\to\texture" ],
+		"texture 2": [ "antorher\path\to\text" ] 
+	}
+
+	type_of_reaurce: {
+		"risorsa": [ "arg1", 3, 0.123 ] 
+	}
+}
+// custom components
+.components {
+	"Path \to\component.cpp",
+	"second\file"
+}
+
+// objekts
+.objekts {
+	"pippo franco": { //ciccio
+		components : {
+			Sprite,
+			Camera
+		}
+	} 
+}
