@@ -277,6 +277,24 @@ public:
 			/* code */
 		}
 	}
+
+	struct node {
+		std::string token;
+		std::vector < node > childrens;
+	};
+
+	node Find_node ( int begin ) {
+		node new_node;
+		lexer.set_pointer ( begin );
+		// find entry point
+		new_node.token = lexer.peek ( );
+		if ( lexer.next ( ) == "{" ) {
+			// it has certanly leafes
+			new_node.childrens.push_back ( Find_node ( begin + 2 ) );
+		}
+
+		return new_node;
+	}
 	
 	Parser ( Lexer _lexer ) {
 		lexer = _lexer;
@@ -288,69 +306,10 @@ public:
 		// if ( temp == -1 ) { Error ( "Projekt name not set\n\tAdd \"projekt = <name>\" in your file\n" );}
 
 		std::string current_token = lexer.peek ( );
+		std::vector < node > root;
 
-		while ( !lexer.Eof ( ) ) {
-
-			if ( current_token == ".resources" ) {
-				// check for begin
-				if ( lexer.next ( ) != "{" ) { Error ( "unexpected token after .resources" ); }
-				int open_brakets = 1;
-				int begining_of_section = lexer.get_pointer ( );
-				
-
-				// find end -> count "{" and return when equals to "}"
-				while ( !lexer.Eof ( ) ) {
-					current_token = lexer.next ();
-					if ( current_token == "{" ) { open_brakets ++; }
-					if ( current_token == "}" ) { open_brakets --; }
-					if ( open_brakets == 0 ) { break; }
-				}
-
-				if ( open_brakets == 0 ) { Parse_Resources ( begining_of_section, lexer.get_pointer ( ) -1 ); }
-				else { Error ( "missing closing token" ); }
-				current_token = lexer.next ( );
-			}
-			if ( current_token == ".components" ) {// check for begin
-				if ( lexer.next ( ) != "{" ) { Error ( "unexpected token after .components" ); }
-				int open_brakets = 1;
-				int begining_of_section = lexer.get_pointer ( );
-				
-
-				// find end -> count "{" and return when equals to "}"
-				while ( !lexer.Eof ( ) ) {
-					current_token = lexer.next ();
-					if ( current_token == "{" ) { open_brakets ++; }
-					if ( current_token == "}" ) { open_brakets --; }
-					if ( open_brakets == 0 ) { break; }
-				}
-
-				if ( open_brakets == 0 ) { Parse_Components ( begining_of_section, lexer.get_pointer ( ) -1 ); }
-				else { Error ( "missing closing token" ); }
-				current_token = lexer.next ( );
-			}
-			if ( current_token == ".objekts"    ) {
-				if ( lexer.next ( ) != "{" ) { Error ( "unexpected token after .objekts" ); }
-				int open_brakets = 1;
-				int begining_of_section = lexer.get_pointer ( );
-				
-
-				// find end -> count "{" and return when equals to "}"
-				while ( !lexer.Eof ( ) ) {
-					current_token = lexer.next ();
-					if ( current_token == "{" ) { open_brakets ++; }
-					if ( current_token == "}" ) { open_brakets --; }
-					if ( open_brakets == 0 ) { break; }
-				}
-
-				if ( open_brakets == 0 ) { Parse_Objekts ( begining_of_section, lexer.get_pointer ( ) -1 ); }
-				else { Error ( "missing closing token" ); }
-				current_token = lexer.next ( );
-			}
-			
-			std::cout << current_token << ' ';
-
-			current_token = lexer.next ();
-		}
+		while ( !lexer.Eof ( ) ) 
+		{ root.push_back ( Find_node ( lexer.get_pointer ( ) ) ); }
 		
 
 		std::cout << "\n\nDone  Parser\n";

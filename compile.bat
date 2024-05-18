@@ -4,7 +4,7 @@ cmake . -B ../Build -G "MinGW Makefiles"
 
 cd ../Build
 
-mingw32-make
+mingw32-make -j8
 
 cd ReKat
 
