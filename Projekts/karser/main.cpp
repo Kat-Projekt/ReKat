@@ -26,12 +26,15 @@
 #endif
 #endif
 
+void Error ( std::string error ) { color ( error.c_str ( ), FOREGROUND_RED | FOREGROUND_INTENSITY ); throw; }
+
 class Reader {
 private:
 	std::string caracters;
 	size_t position_pointer = 0;
 	size_t size;
 public:
+	// removes comments
 	Reader ( std::string file ) {
 		std::cout << "Start Reader\n";
 		// open files
@@ -81,94 +84,57 @@ public:
 	Lexer ( ) { }
 	Lexer ( Reader reader ) {
 		std::cout << "Start Lexer\n";
+		// remove every non in string space or new line
+		std::string reformatted_file = "";
+		bool Quotation_Mark = false; // chech for " or '
+		bool Apostrophe = false;
+		char current = reader.peek ( );
+		while ( !reader.Eof ( ) ) {
+			if ( current == '\"' && !Apostrophe ) // activate if not in an aphostrope string
+			{ Quotation_Mark = !Quotation_Mark; }
+			if ( current == '\'' && !Quotation_Mark ) // activate if not in an qutoation string
+			{ Apostrophe = !Apostrophe; }
+
+			if ( ( current == ' ' || current == '\t' || current == '\n' ) && ! ( Apostrophe || Quotation_Mark ) ) 
+			{ current = reader.next ( ); continue; }
+		
+			reformatted_file += current;
+			current = reader.next ( );
+		}
+
+		std::cout << reformatted_file;
 
 		std::string token = "";
-		char current = reader.peek ( );
-		bool Quotation_Mark_Apostrophe = false; // chech for " or ' 
-		while ( !reader.Eof ( ) ) {
-			// std::cout << "char: " << current << '\n';
-			if ( ( current == '\"' || current == '\'' ) && Quotation_Mark_Apostrophe ) {
-				token += current;
-				current = reader.next ( );
+
+		bool skip = false;
+		for ( size_t i = 0; i < reformatted_file.size(); i++ ) {
+			if ( skip ) {
 				tokens.push_back ( token );
 				token = "";
-				Quotation_Mark_Apostrophe = false;
-				continue; 
+				skip = false;
 			}
-			if ( current == '\"' || current == '\'' ) { Quotation_Mark_Apostrophe = true; }
-
-			if ( ! Quotation_Mark_Apostrophe && ( current == ' ' || current == '\t' || current == '\n' ) ) {
-				tokens.push_back ( token ); 
-				token = ""; 
-				current = reader.next ( );
-				continue;
+			char c = reformatted_file[i];
+			// if c is a divider
+			if ( c == '[' || c == '{' || c == '}' || c == ']' || c == ';' || c == ':' || c == ',' || c == '=' ) {
+				tokens.push_back ( token );
+				token = "";
+				skip = true;
 			}
-			
-			token += current;
-			current = reader.next ( );
+			token += reformatted_file[i];
 		}
 		tokens.push_back ( token );
 
-		// clear tokens
-		std::vector < std::string > tokenns;
-		std::string tokenn = "";
-		for ( auto token : tokens ) {
-			for ( auto c : token ) { 
-				if ( !( c == ' ' || c == '\t' || c == '\n' ) ) {
-					tokenn += c;
-				}
-			}
-			if ( tokenn == "" ) { continue; }
-			// check for : or ;
-			// std::cout << "token: " << tokenn << " size: " << tokenn.size( ) << '\n';
-			if ( tokenn == ":" || tokenn == ";" ) 
-			{ tokenns.push_back ( tokenn ); tokenn = ""; continue; }
-			if ( tokenn.back() == ':' || tokenn.back() == ';' || tokenn.back() == ',') {
-				std::string p = "";
-				p += tokenn.back( );
-				tokenn.pop_back ( );
-				tokenns.push_back ( tokenn );
-				tokenns.push_back ( p );
-				tokenn = "";
-				continue;
-			}
-
-			tokenns.push_back ( tokenn );
-			tokenn = "";
+		std::vector < std::string > tokens_whiout_blaks;
+		for ( auto token : tokens ) { 
+			if ( token == "" ) { continue; } 
+			tokens_whiout_blaks.push_back ( token );
 		}
 
-		std::vector < std::string > tokennns;
-		// meged tokens: .resource:texture -> .resource : texture
-		for ( auto token : tokenns ) {
-			if ( token == ";" || token == ":" || token == "," ) 
-			{ tokennns.push_back ( token ); continue; }
-			std::string temp_token = "";
-			for ( auto c : token ) {
-				if ( c == ';' || c == ':' || c == ',' ) { // split
-					tokennns.push_back ( temp_token );
-					std::string charc;
-					charc += c;
-					tokennns.push_back ( charc );
-					temp_token = "";
-					continue;
-				}
-				temp_token += c;
-			}
-			tokennns.push_back ( temp_token );
-		}
+		tokens = tokens_whiout_blaks;
+		size = tokens.size ( );
 
-		std::vector < std::string > toke4ns;
-		for ( auto token : tokennns ) {
-			if ( !( token == " " || token == "\t" || token == "\n" ) ) {
-				toke4ns.push_back ( token );
-			}
-		}
+		std::cout << "tokens:\n"; for ( auto token : tokens )  { std::cout << token << " ' "; } std::cout << tokens.size ( );
 
-		tokens = toke4ns;
-		size = toke4ns.size ( );
-
-		// std::cout << "tokens:\n"; for ( auto token : tokens )  { std::cout << token << ' '; } std::cout << tokens.size ( );
-		
 		std::cout << "Done  Lexer\n";
 	}
 
@@ -177,7 +143,7 @@ public:
 
 	std::string next ( ) {
 		current_token ++;
-		if ( current_token >= size ) { return 0; }
+		if ( current_token >= size ) { return ""; }
 		return tokens [ current_token ];
 	}
 
@@ -192,6 +158,105 @@ public:
 
 	bool Eof ( ) 
 	{ return ( current_token + 1 > size ); }
+};
+
+class Parser {
+private:
+	Projekt pj;
+	Lexer lexer;
+public:
+	struct node {
+		std::string token;
+		int child_type = 0; // 0 = '{' ; 1 = '['
+		std::vector < node > childrens;
+	};
+
+	void print_node ( node n, std::string indentation = "" ) {
+		std::cout << indentation << n.token;
+		if ( n.childrens.size ( ) == 0 ) { return; }
+		switch ( n.child_type ) {
+		case 0: std::cout << " : { n: " << n.childrens.size ( ); break;
+		case 1: std::cout << " : [ n: " << n.childrens.size ( ); break;
+		}
+
+		for ( auto nn : n.childrens ) {
+			std::cout << "\n";
+			print_node ( nn, indentation + "\t" ) ;
+		}
+
+		switch ( n.child_type ) {
+		case 0: std::cout << "\n" << indentation << "}\n"; break;
+		case 1: std::cout << "\n" << indentation << "]\n"; break;
+		}
+	}
+	// the token of a node is every thing it contains and it is broken when ',' ';' '}' is found
+	node Find_node ( ) {
+		node new_node;
+		std::string token = lexer.peek ( );
+		std::cout << "\nfinding pointer staring with: " << token;
+		std::string next_token = lexer.next ( );
+		std::cout << "\n\tnext: " << next_token << " ;";
+
+		bool is_aglomerate = false;
+		while ( ( next_token == "{" || next_token == "[" ) || ( is_aglomerate && next_token == ",") ) {
+			if ( !is_aglomerate ) {
+				if ( next_token == "[" ) { new_node.child_type = 1; }
+				else { new_node.child_type = 0; }
+			}
+			
+			std::cout << "\nadding child to " << token;
+			lexer.next ( );
+			new_node.childrens.push_back ( Find_node ( ) );
+
+			std::cout << "\nfind child of " << token;
+			next_token = lexer.peek ( );
+			std::cout << "\n out token " << next_token ;
+			is_aglomerate = true;
+		}
+		
+		new_node.token = token;
+		if ( is_aglomerate ) { lexer.next (); return new_node; }
+
+		if ( next_token == "}" || next_token == "]" ) { return new_node; }
+
+		
+		std::cout <<  "\n\ttoken " << token;
+		std::cout <<  "\n\tn_token " << next_token;
+		while ( !( next_token == "," || next_token == ";" || next_token == "" || next_token == "}" || next_token == "]"  ) ) {
+			std::cout << "\n\t adding token " << next_token;
+			token += " " + next_token;
+			next_token = lexer.next ( );
+		}
+		
+		new_node.token = token;
+
+		if ( next_token == ";" || next_token == "" ) { lexer.next ( ); }
+
+		return new_node;
+	}
+	
+	Parser ( Lexer _lexer ) {
+		lexer = _lexer;
+		std::cout << "Start Parser\n\n";
+		int temp = -1;
+
+		// find interface data // mandatory
+		// temp = lexer.find_token ( "projekt" );
+		// if ( temp == -1 ) { Error ( "Projekt name not set\n\tAdd \"projekt = <name>\" in your file\n" );}
+
+		std::string current_token = lexer.peek ( );
+		std::vector < node > root;
+
+		while ( !lexer.Eof ( ) ) 
+		{ root.push_back ( Find_node ( ) ); }
+		
+		for ( auto n : root ) {
+			std::cout << '\n';
+			print_node ( n );
+		}
+
+		std::cout << "\n\nDone  Parser\n";
+	}
 };
 
 class Projekt {
@@ -238,89 +303,14 @@ class Projekt {
 	_Objekt Projekt_Entry_Point;
 };
 
-void Error ( std::string error ) {
-	color ( error.c_str ( ), FOREGROUND_RED | FOREGROUND_INTENSITY );
-	throw;
-}
-
-class Parser {
-private:
-	Projekt pj;
-	Lexer lexer;
-public:
-	void Parse_Resources ( int inizio, int fine ) {
-		std::cout << "parsing Resources\tstarting at:" << inizio << "\t ending at: " << fine <<'\n';
-		// setup lexer
-		lexer.set_pointer ( inizio );
-		while ( lexer.get_pointer ( ) != fine )	{
-			std::cout << "PR: " << lexer.next ( ) << '\n';
-			/* code */
-		}
-	}
-
-	void Parse_Objekts ( int inizio, int fine )  {
-		std::cout << "parsing Objekts\tstarting at:" << inizio << "\t ending at: " << fine <<'\n';
-		// setup lexer
-		lexer.set_pointer ( inizio );
-		while ( lexer.get_pointer ( ) != fine )	{
-			std::cout << "PO: " << lexer.next ( ) << '\n';
-			/* code */
-		}
-	}
-
-	void Parse_Components ( int inizio, int fine ) {
-		std::cout << "parsing Components\tstarting at:" << inizio << "\t ending at: " << fine <<'\n';
-		// setup lexer
-		lexer.set_pointer ( inizio );
-		while ( lexer.get_pointer ( ) != fine )	{
-			std::cout << "PC: " << lexer.next ( ) << '\n';
-			/* code */
-		}
-	}
-
-	struct node {
-		std::string token;
-		std::vector < node > childrens;
-	};
-
-	node Find_node ( int begin ) {
-		node new_node;
-		lexer.set_pointer ( begin );
-		// find entry point
-		new_node.token = lexer.peek ( );
-		if ( lexer.next ( ) == "{" ) {
-			// it has certanly leafes
-			new_node.childrens.push_back ( Find_node ( begin + 2 ) );
-		}
-
-		return new_node;
-	}
-	
-	Parser ( Lexer _lexer ) {
-		lexer = _lexer;
-		std::cout << "Start Parser\n\n";
-		int temp = -1;
-
-		// find interface data // mandatory
-		// temp = lexer.find_token ( "projekt" );
-		// if ( temp == -1 ) { Error ( "Projekt name not set\n\tAdd \"projekt = <name>\" in your file\n" );}
-
-		std::string current_token = lexer.peek ( );
-		std::vector < node > root;
-
-		while ( !lexer.Eof ( ) ) 
-		{ root.push_back ( Find_node ( lexer.get_pointer ( ) ) ); }
-		
-
-		std::cout << "\n\nDone  Parser\n";
-	}
-};
-
 class Compiler {
 public:
-	Compiler ( Parser p ) {
+	/// @brief this creates the main.cpp and load.h files that nead to be compiled
+	/// @brief can also pack everything neaded to compile in a single folder 
+	/// @param p 
+	Compiler ( Parser p, bool pack = false ) {
 		std::cout << "Start Compiler\n";
-
+		
 
 		std::cout << "Done  Compiler\n";
 	}

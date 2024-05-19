@@ -7,12 +7,12 @@ audio = true;
 // reasurces
 .resources {
 	textures { 
-		"texture 1": [ "Path\to\texture" ],
-		"texture 2": [ "antorher\path\to\text" ] 
-	}
+		"texture 1" [ "Path\to\texture" ],
+		"texture 2" [ "antorher\path\to\text" ] 
+	},
 
 	type_of_reaurce {
-		"risorsa": [ "arg1", 3, 0.123 ] 
+		"risorsa" [ "arg1", 3, 0.123 ] 
 	}
 }
 // custom components
@@ -24,6 +24,6 @@ audio = true;
 // objekts
 .objekts {
 	"pippo franco" { //ciccio
-		components: [ Sprite, Camera ]
+		components [ Sprite, Camera ]
 	} 
 }
