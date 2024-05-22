@@ -15,6 +15,12 @@
 #include "stb_image.h"
 #endif
 
+#define GL_CHECK_ERROR				\
+	error = glGetError ( );			\
+	if ( error != GL_NO_ERROR) 		\
+	{ std::cout << "\tErrore: " << error << " at line: " << __LINE__ << " of file: " << __FILE__ << '\n'; throw; } \
+	else { std::cout << "no erro";}
+
 namespace Timer {
     auto start = std::chrono::system_clock::now();
     float delta_time = 0;

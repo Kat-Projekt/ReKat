@@ -367,10 +367,11 @@ namespace Manager {
 		Start ( );
 	}
 	static void Set_Active_Scene ( std::string s ) {
+		std::cout << "adding acrive scene\n";
 		auto S = objekts.Get_Begin ( );
 		while ( S != nullptr ) {
 			if ( S->data->Get_Name () == s ) 
-			{ _current_scene = S->data; Start ( ); break; }
+			{ _current_scene = S->data; Start ( ); std::cout << "added main scene"; break; }
 			S = S->next;
 		}
 	}

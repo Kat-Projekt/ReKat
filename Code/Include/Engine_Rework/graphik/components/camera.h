@@ -1,7 +1,7 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "../objekt.h"
+#include "../objekt.hpp"
 #include "../graphik.hpp"
 
 class Camera : public Behaviour {

@@ -134,7 +134,7 @@ public:
 				token = "";
 				skip = true;
 			}
-
+			
 			if ( into_square && c == '}' ) { graph_into_square = false; }
 			if ( c == ']' ) { into_square = false; }
 
@@ -327,7 +327,7 @@ class Projekt {
 	std::vector < _Resource > Resources;
 	std::vector < _Additional_scripts > Additional_scripts;
 	
-	std::string Projekt_Entry_Point;
+	_Objekt Projekt_Entry_Point;
 };
 
 class Compiler {
@@ -345,13 +345,8 @@ public:
 				pj.name = n.childrens[0].token;
 				std::cout << "projekt name: " << pj.name << '\n';
 			}
-			if ( n.token == "entry_point" ) {
-				pj.Projekt_Entry_Point = n.childrens[0].token;
-				std::cout << n.token << " set: " << pj.Projekt_Entry_Point;
-			}
 		}
 		if ( pj.name == "" ) { Error  ( "no name?"); }
-		if ( pj.Projekt_Entry_Point == "" ) { Error  ( "no entry point?"); }
 
 		// find modules node: graphik, synth, katwork,
 		for ( auto n : p.root ) {
@@ -476,6 +471,8 @@ public:
 			std::cout << '\n';			
 		}
 
+		// verify childs
+
 		// creating main file
 		auto main = std::ofstream ( "main.cpp" );
 		auto load = std::ofstream ( "load.h" );
@@ -490,55 +487,9 @@ public:
 		main << "#include \"load.h\"\n \nint main ( int argc, char const *argv [ ] ) {\n";
 		load << "\nint load ( ) {\n\tint result = 0;\n";
 
-		// start engines
 		if ( pj.Interface.graphik ) {
-			main << "\tReKat::grapik::Start ( \"" + pj.name + "\", 600, 400 );\n";
+			main << "\tReKat::g";
 		}
-		if ( pj.Interface.graphik ) {
-			// main << "\tReKat::synth::Start ( );\n";
-		}
-		if ( pj.Interface.graphik ) {
-			// main << "\tReKat::online::Start ( " + pj.name + " );\n";
-		}
-
-		// creating main loop
-		main << "\tload ( );\n";
-		main << "\tManager::Start ( );\n";
-
-		if ( pj.Interface.graphik ) {
-			main << "\twhile ( ReKat::grapik::IsEnd ( ) ) {\n";
-		} else {
-			main << "\tbool main_shutdown = false;\n";
-			main << "\twhile ( ! main_shutdown ) {\n";
-		}
-
-		main << "\t\tManager::Update ( );\n";
-
-		if ( pj.Interface.graphik ) 
-		{ main << "\t\tReKat::grapik::Update ( );\n"; }
-
-		main << "\t}\n";
-
-		// engine ending code
-		if ( pj.Interface.graphik ) {
-			main << "\tManager::Free ( );\n\tReKat::grapik::Terminate ( );\n";
-		}
-		if ( pj.Interface.graphik ) {
-			// main << "\tReKat::synth::Terminate ( );\n";
-		}
-		if ( pj.Interface.graphik ) {
-			// main << "\tReKat::online::Terminate;\n";
-		}
-
-		// load resources
-		for ( auto ris : pj.Resources ) {
-			load << "\tresult += Manager::" << ris.type << "_Load ( " << ris.name;
-			for ( auto arg : ris.Arguments ) {
-				load << ", " << arg.value;
-			}
-			load << " );\n";			
-		}
-		load << "\tif ( result != 0 ) { throw; }\n";
 
 		// create objects
 		load << "\t// creating objekts \n";
@@ -563,7 +514,7 @@ public:
 			for ( auto child : obj.Childs ) {
 				if ( ! in_map ( objekts_list, child.name ) ) 
 				{ Error ( "no such named child: " + child.name );}
-				load << '\t' << objekts_list[obj.name] << "->Add_Child ( " << objekts_list[child.name] << " );\n";
+				load << '\t' << objekts_list[obj.name] << ".Add_Child ( " << objekts_list[child.name] << " );\n";
 			}
 		}
 
@@ -573,8 +524,7 @@ public:
 		for ( auto obj : pj.Objekts ) {	
 			for ( auto comp : obj.Components ) {
 				if ( comp.Arguments.size ( ) != 0 ) { // there are arguments
-					load << "\tauto com_" << additional_components << " = new " << comp.name << " ( );\n";
-					load << "\tcom_" << additional_components << "->Set (";
+					load << "\tauto com_" << additional_components << " = new " << comp.name << " (";
 					for ( size_t i = 0; i < comp.Arguments.size( ) ; i++ ) {
 						if ( i != 0 ) { load << ", "; } else { load << ' ';}
 						load << comp.Arguments[i].value;
@@ -588,13 +538,9 @@ public:
 			}
 		}
 
-		// add code entry point
-		load << "\t// adding entry point\n";
-		load << "\tManager::Set_Active_Scene ( " + pj.Projekt_Entry_Point + " );\n";
-
 		main << "}";
 		main.close ( );
-		load << "\treturn 0;\n}";
+		load << "}";
 		load.close ( );
 
 		std::cout << "Done Compiler\n";

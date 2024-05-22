@@ -1,0 +1,34 @@
+// col
+projekt = Clique;
+
+graphik = true;
+audio = true;
+katwork = true;
+
+.resources {
+	Shader {
+		"base" [ "Shaders\\sprite.vs", "Shaders\\sprite.fs" ]
+	},
+
+	Texture {
+		"gobelino" [ "Sprites\\Enemies\\gobelino.png" ]
+	}
+}
+
+
+.components {
+	"Scripts/hello_world.h"
+}
+
+.objekts {
+	"franco" {
+		components [ Sprite [ Manager::Texture_Get("gobelino"), Manager::Shader_Get("base"), obj_0->Get_Component<Camera>() ] ]
+	},
+	
+	"lorenzo" {
+		components [ Fps, hello_world, Camera ],
+		childs [ "franco" ]
+	}
+}
+
+entry_point = "lorenzo";

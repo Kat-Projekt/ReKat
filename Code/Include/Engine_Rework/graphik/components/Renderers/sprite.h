@@ -1,8 +1,8 @@
 #ifndef SPRITE_H
 #define SPRITE_H
 
-#include "camera.h"
-#include "../Resources/manager.hpp"
+#include "../camera.h"
+#include "../../Resources/manager.hpp"
 
 class Sprite : public Behaviour {
 private:
@@ -46,7 +46,7 @@ public:
 
 	void Update ( ) {
 		// prepare transformations
-		if ( _shader == nullptr || _texture == nullptr || _camera == nullptr ) { return; }
+		if ( _shader == nullptr || _texture == nullptr || _camera == nullptr ) { std::cout << "compoente setting error\n\n"; return; }
 
 		_shader->setMat4  ( "projection", ( _UI_render ? _camera->UI_Projkection ( ) : _camera->Projkection ( )) );
         _shader->setFloat ( "SPRITE_COLUMNS", _frames.x );
