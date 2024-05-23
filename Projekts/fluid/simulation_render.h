@@ -52,9 +52,8 @@ public:
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-		for (size_t x = 0; x < sim->size_H; x++) {
-			for (size_t y = 0; y < sim->size_W; y++) 
-			{ ourShader->setFloat ("particles[" + std::to_string (x*sim->size_W+y) + "]", sim->current_matrix[x][y].parzial_pression); }
+		for ( size_t i = 0; i < sim->total; i++ ) {
+			ourShader->setFloat ("particles[" + std::to_string ( i ) + "]", sim->current_matrix[i].parzial_pression);
 		}
 
         // render container
