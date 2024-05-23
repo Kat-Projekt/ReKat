@@ -13,8 +13,8 @@ class simulation : public Behaviour {
 	
 public:
 	node ** current_matrix;
-	int size_W = 10;
-	int size_H = 10;
+	int size_W = 32;
+	int size_H = 32;
 
 	virtual void Start ( ) { // setup the matrix
 		std::cout << "setting starting matrix\n";
@@ -23,8 +23,8 @@ public:
 		{ current_matrix[i] = (node *) calloc ( size_W, sizeof(node) ); }
 
 		// inputing starting data
-		for ( size_t i = 0; i < size_H; i++ ) {
-			current_matrix[i][0].parzial_pression = 1;
+		for ( size_t i = 0; i < size_W; i++ ) {
+			current_matrix[1][i].parzial_pression = 10;
 			// sets the first row to high pressure
 		}
 
@@ -66,6 +66,10 @@ public:
 		
 	}
 	virtual void Update ( ) {
+		static int i;
+		i++;
+
+		if ( ! ReKat::grapik::Input::Key_Down ( "W" ) ) { return; }
 		node ** new_current_matrix = (node **) calloc ( size_H, sizeof(node*) );	
 		for ( size_t i = 0; i < size_H; i++ ) 
 		{ new_current_matrix[i] = (node *) calloc ( size_W, sizeof(node) ); }
@@ -100,13 +104,15 @@ public:
 			new_current_matrix[x][y].parzial_pression = new_parsial_pressure;				
 		} }
 
+		new_current_matrix[int(size_H/2 + sin (i*0.01)*10)][int(size_W/2 + cos (i*0.01)*10)].parzial_pression = 1;
+
 		current_matrix = new_current_matrix;
-		std::cout << "fluids\n";
+		/*std::cout << "fluids\n";
 		for (size_t x = 0; x < size_H; x++) {
 			for (size_t y = 0; y < size_W; y++) 
 			{ std::cout << current_matrix[x][y].parzial_pression << ", "; }
 			std::cout << '\n';
-		}
+		}*/
 	}
 };
 

@@ -228,7 +228,7 @@ namespace ReKat::grapik {
 
 		if ( fullscreen ) { glfwWindowHint(GLFW_DECORATED, 0); }
 
-		glfwWindowHint ( GLFW_RESIZABLE, resizable );
+		if ( !resizable ) { glfwWindowHint ( GLFW_RESIZABLE, resizable ); }
 
 		if ( fullscreen ) {
 			GLFWmonitor* _monitor =  glfwGetPrimaryMonitor ( );
@@ -257,7 +257,9 @@ namespace ReKat::grapik {
 		{ return FAILED_LOAD_GLAD; }
 
 		glViewport ( 0, 0, Internal::SCR_WIDTH, Internal::SCR_HEIGTH );
-		glEnable ( GL_CULL_FACE ); glEnable ( GL_BLEND ); glEnable(GL_DEPTH_TEST);
+		glEnable ( GL_CULL_FACE ); 
+		glEnable ( GL_BLEND ); 
+		// glEnable ( GL_DEPTH_TEST );
 		glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
 		return SUCCESS;
