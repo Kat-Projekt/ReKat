@@ -21,27 +21,6 @@
 	{ std::cout << "\tErrore: " << error << " at line: " << __LINE__ << " of file: " << __FILE__ << '\n'; throw; } \
 	else { std::cout << "no erro";}
 
-namespace Timer {
-    auto start = std::chrono::system_clock::now();
-    float delta_time = 0;
-    float fixed_delta_time = 0;
-    double current_time = 0;
-    double current_fixed_time = 0;
-    double Get_Time_d ( ) 
-    { return (double)( std::chrono::system_clock::now ( ) - start ).count( ) / 10000000.0; }
-    float Get_Time ( ) 
-	{ return (float)(Get_Time_d()); }
-    void Update ( ) {
-		auto t = Get_Time_d ( );
-        delta_time = t - current_time;
-        current_time = t;
-    }
-	void Fixed_Update ( ) {
-		auto t = Get_Time_d ( );
-        fixed_delta_time = t - current_fixed_time;
-        current_fixed_time = t;
-    }
-}
 
 namespace ReKat {
 namespace grapik {
@@ -259,7 +238,7 @@ namespace ReKat::grapik {
 		glViewport ( 0, 0, Internal::SCR_WIDTH, Internal::SCR_HEIGTH );
 		glEnable ( GL_CULL_FACE ); 
 		glEnable ( GL_BLEND ); 
-		// glEnable ( GL_DEPTH_TEST );
+		glEnable ( GL_DEPTH_TEST );
 		glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 
 		return SUCCESS;
@@ -293,7 +272,6 @@ namespace ReKat::grapik {
 	static void Update ( ) {
 		ReKat::grapik::Input::Update ( );
 		ReKat::grapik::Pool ( );
-		Timer::Update ( );
 	}
 }
 

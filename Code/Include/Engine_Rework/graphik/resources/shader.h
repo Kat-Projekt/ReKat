@@ -136,7 +136,7 @@ int Shader::Make ( const char* vertexPath, const char* fragmentPath, const char*
 	{ return FAILED_COMPILING_FRAGMENT; }
 
 	// if geometry shader is given, compile geometry shader
-	unsigned int geometry = -1;
+	unsigned int geometry = 0;
 	if ( geometryPath != nullptr ) {
 		const char * gShaderCode = geometryCode.c_str();
 		geometry = glCreateShader(GL_GEOMETRY_SHADER);
@@ -146,7 +146,7 @@ int Shader::Make ( const char* vertexPath, const char* fragmentPath, const char*
 		{ return FAILED_COMPILING_GEOMETRY; }
 	}
 	// if tessellation control shader is given, compile tessellation shader
-	unsigned int tessControl = -1;
+	unsigned int tessControl = 0;
 	if ( tessControlPath != nullptr ) {
 		const char * tcShaderCode = tessControlCode.c_str();
 		tessControl = glCreateShader(GL_TESS_CONTROL_SHADER);
@@ -157,7 +157,7 @@ int Shader::Make ( const char* vertexPath, const char* fragmentPath, const char*
 
 	}
 	// if tessellation evaluation shader is given, compile tessellation shader
-	unsigned int tessEval = -1;
+	unsigned int tessEval = 0;
 	if ( tessEvalPath != nullptr ) {
 		const char * teShaderCode = tessEvalCode.c_str();
 		tessEval = glCreateShader(GL_TESS_EVALUATION_SHADER);

@@ -14,9 +14,9 @@ int load ( ) {
 	// adding components to objekts 
 	obj_0->Add_Component < simulation > ( );
 	obj_0->Add_Component < simulation_render > ( );
-	obj_0->Add_Component < Fps > ( )->MAX_FPS = 100;
+	obj_0->Add_Component < Fps > ( )->MAX_FPS = -1;
 	obj_0->Add_Component < Camera > ( );
-	// obj_0->Add_Component < Sprite > ( )->Set ( Manager::Texture_Get ( "test" ), Manager::Shader_Get ( "sprite" ), obj_0->Get_Component < Camera > ( ) );
+	obj_0->Add_Component < Sprite > ( )->Set ( Manager::Texture_Get ( "test" ), Manager::Shader_Get ( "sprite" ), obj_0->Get_Component < Camera > ( ) );
 	// adding entry point
 	Manager::Set_Active_Scene ( "main" );
 	return 0;

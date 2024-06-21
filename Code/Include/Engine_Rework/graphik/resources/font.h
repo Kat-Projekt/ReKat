@@ -6,11 +6,7 @@
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
-#ifdef DIAGNOSTIC 
-#define DEBUG(msg) std::cout << msg
-#else
-#define DEBUG(msg)
-#endif
+#include "../debugger.hpp"
 
 class Font {
 private:
@@ -46,7 +42,7 @@ public:
 };
 
 int Font::Make ( const char * path ) {
-	DEBUG("start\n");
+	DEBUG("start");
 	FT_Library ft;
 	if ( FT_Init_FreeType ( &ft ) ) 
 	{ return FAILED_INIT_FREETYPE; }
@@ -67,9 +63,9 @@ int Font::Make ( const char * path ) {
 	unsigned char * combined_buffer = (unsigned char*) calloc (_width*_heigth, sizeof(unsigned char));
 	char_widths = (unsigned int*) calloc (128, sizeof(unsigned int));
 
-	DEBUG("Texture size: " + std::to_string (_width) + " : " + std::to_string (_heigth) + "\n");
+	DEBUG("Texture size: " + std::to_string (_width) + " : " + std::to_string (_heigth));
 
-	DEBUG("allocated\n");
+	DEBUG("allocated");
 
 	// load first 128 characters of ASCII set
 	int Baseline = 0;
@@ -86,11 +82,11 @@ int Font::Make ( const char * path ) {
 		{ Baseline = glyphHang; }
 	}
 	
-	DEBUG("Baseline: " + std::to_string (Baseline) + "\n");
+	DEBUG("Baseline: " + std::to_string (Baseline));
 
 	// draw all characters
 	for ( unsigned char c = 32 ; c < 128 ; c++ ) {
-		DEBUG("Check: " + std::to_string (c) + "\n");
+		DEBUG("Check: " + std::to_string (c));
 		// Load character glyph 
 		if ( FT_Load_Char(face, c, FT_LOAD_RENDER) ) { continue; }
 
@@ -103,11 +99,11 @@ int Font::Make ( const char * path ) {
 		x += 1; // 1 pixel padding from the left side of the tile
 		y += (_font_heigth+_padding) - face->glyph->bitmap_top + Baseline - _padding*0.5;
 
-		DEBUG("- drawing at: " + std::to_string (x) + " : " + std::to_string (y) + "\n");
+		DEBUG("- drawing at: " + std::to_string (x) + " : " + std::to_string (y));
 
 		// draw the character
 		const FT_Bitmap& bitmap = face->glyph->bitmap;
-		DEBUG("- bitmap size: " + std::to_string (bitmap.width) + " : " + std::to_string (bitmap.rows) + "\n");
+		DEBUG("- bitmap size: " + std::to_string (bitmap.width) + " : " + std::to_string (bitmap.rows));
 
 		for ( int xx = 0; xx < bitmap.width; xx++ ) {
 			for ( int yy = 0; yy < bitmap.rows; yy++ ) {
@@ -117,7 +113,7 @@ int Font::Make ( const char * path ) {
 		}
 	}
 
-	DEBUG("bufferized\n");
+	DEBUG("bufferized");
 
 	/*std::cout << " W: " << _width << " H: " << _heigth << '\n';
 	std::cout << " HHH: " << face->height << " A: " << face->ascender << " D: " << face->descender << '\n';

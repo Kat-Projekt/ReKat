@@ -44,6 +44,9 @@ public:
 		// position attribute
 		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
 		glEnableVertexAttribArray(0);
+		// color attribute
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
+		glEnableVertexAttribArray(1);
 		// texture coord attribute
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
 		glEnableVertexAttribArray(2);
@@ -52,12 +55,32 @@ public:
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
+		// create a texture
+		unsigned char * data = ( unsigned char * ) calloc ( sim->total, sizeof(unsigned char) );
 		for ( size_t i = 0; i < sim->total; i++ ) {
-			ourShader->setFloat ("particles[" + std::to_string ( i ) + "]", sim->current_matrix[i].parzial_pression);
+			unsigned char d = sim->current_matrix [i].parzial_pression * 256;
+			if ( sim->current_matrix [i].parzial_pression == 1 ) { d = 255; }
+			data[i] = d;
 		}
 
+		unsigned int texture;
+		glGenTextures(1, &texture);
+		glBindTexture(GL_TEXTURE_2D, texture); // all upcoming GL_TEXTURE_2D operations now have effect on this texture object
+		// set the texture wrapping parameters
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	// set texture wrapping to GL_REPEAT (default wrapping method)
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+		// set texture filtering parameters
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+		// load image, create texture and generate mipmaps
+
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, sim->size_W, sim->size_H, 0, GL_RED, GL_UNSIGNED_BYTE, data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+
         // render container
-        ourShader->Use();
+        glBindTexture(GL_TEXTURE_2D, texture);
+        ourShader->Use( );
+		ourShader->setInt ( "image", 0 );
         glBindVertexArray(VAO);
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		

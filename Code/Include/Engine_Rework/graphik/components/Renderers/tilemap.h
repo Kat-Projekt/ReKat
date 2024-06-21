@@ -1,8 +1,8 @@
 #ifndef TILEMAP_H
 #define TILEMAP_H
 
-#include "camera.h"
-#include "../Resources/manager.hpp"
+#include "../camera.h"
+#include "../../Resources/manager.hpp"
 
 #define GL_ERRORS(msg) if (glGetError() != GL_NO_ERROR) { std::cout << "error: " << msg << " at line: " << __LINE__ << " of file: " << __FILE__; } 
 
@@ -21,6 +21,7 @@ private:
 	vec4 _color = {1,1,1,1};
 public:
     void Start ( ) {
+        DEBUG ( "- - starting tilemap");
 		int H, W;
 		_shader->setInt ( "image", 0 );
 
@@ -105,6 +106,8 @@ public:
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
+
+        DEBUG ( "- - started tilemap");
     }
 
 	void Update ( ) {

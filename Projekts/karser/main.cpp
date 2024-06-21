@@ -129,7 +129,7 @@ public:
 			if ( into_square && c == '{' ) { graph_into_square = true; }
 
 			// if c is a divider
-			if ( !graph_into_square && ( c == '[' || c == '{' || c == '}' || c == ']' || c == ';' || c == ':' || c == ',' || c == '=' ) ) {
+			if ( !graph_into_square && ( c == '[' || c == '{' || c == '}' || c == ']' || c == ';' || c == ',' || c == '=' ) ) {
 				tokens.push_back ( token );
 				token = "";
 				skip = true;
@@ -536,7 +536,7 @@ public:
 			for ( auto arg : ris.Arguments ) {
 				load << ", " << arg.value;
 			}
-			load << " );\n";			
+			load << " );\n";
 		}
 		load << "\tif ( result != 0 ) { throw; }\n";
 
@@ -559,6 +559,7 @@ public:
 
 		// link objekts
 		load << "\t// linking objekts \n";
+		// creating hieratchy
 		for ( auto obj : pj.Objekts ) {
 			for ( auto child : obj.Childs ) {
 				if ( ! in_map ( objekts_list, child.name ) ) 
@@ -567,24 +568,30 @@ public:
 			}
 		}
 
-		// add components to objekts
+		// add components to objekts 
+		// // first add
+		// // second set
 		load << "\t// adding components to objekts \n";
+		for ( auto obj : pj.Objekts ) {
+			for ( auto comp : obj.Components ) 
+			{ load << '\t' << objekts_list[obj.name] << "->Add_Component < " << comp.name << " > ( );\n"; }
+		}
+
 		int additional_components = 0;
-		for ( auto obj : pj.Objekts ) {	
+		for ( auto obj : pj.Objekts ) {
 			for ( auto comp : obj.Components ) {
 				if ( comp.Arguments.size ( ) != 0 ) { // there are arguments
-					load << "\tauto com_" << additional_components << " = new " << comp.name << " ( );\n";
-					load << "\tcom_" << additional_components << "->Set (";
+					load << "\tauto com_" << additional_components << " = " << obj.name << " -> Get_Component < " << comp.name << " > ( );\n";
+
+					load << "\tcom_" << additional_components << " -> Set (";
 					for ( size_t i = 0; i < comp.Arguments.size( ) ; i++ ) {
 						if ( i != 0 ) { load << ", "; } else { load << ' ';}
 						load << comp.Arguments[i].value;
 					}
 					load << " );\n";
-					load << '\t' << objekts_list[obj.name] << "->Add_Component ( com_" + std::to_string ( additional_components ) + " );\n";
 					additional_components ++;
 					continue;
 				}
-				load << '\t' << objekts_list[obj.name] << "->Add_Component < " << comp.name << " > ( );\n";
 			}
 		}
 

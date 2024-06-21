@@ -17,6 +17,7 @@ public:
 	int frame = 0;
 
     void Start ( ) {
+        DEBUG ( "- - Starting Sprite");
         unsigned int VBO;
         float vertices[] = { 
             // pos      // tex
@@ -41,7 +42,9 @@ public:
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
 		
+        DEBUG ( "- - setting shader");
 		_shader->setInt ( "image", 0 );
+        DEBUG ( "- - Started Sprite");
     }
 
 	void Update ( ) {

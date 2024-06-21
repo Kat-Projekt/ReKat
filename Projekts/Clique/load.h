@@ -47,7 +47,7 @@ int Load ( ) {
 	auto death = new Objekt ( "Death" );
 
 	// creating Objekts
-	auto UI_Container = new Objekt ( "UI" );
+	auto UI_Container = new Objekt ( "UI" );	
 	auto camera = new Objekt ( "Camera" );
 	auto map = new Objekt ( "map" );
 	auto mode_indicator = new Objekt ( "mode indicator", {-500,-450,0} );

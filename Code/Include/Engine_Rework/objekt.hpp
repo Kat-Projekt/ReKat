@@ -1,17 +1,7 @@
 #ifndef OBJEKT_H
 #define OBJEKT_H
 
-#ifdef DIAGNOSTIC 
-#include <iostream>
-#define DEBUG(...) std::cout , __VA_ARGS__ , std::endl
-template <typename T>
-std::ostream& operator,(std::ostream& out, const T& t)
-{ out << t; return out; }
-std::ostream& operator,(std::ostream& out, std::ostream&(*f)(std::ostream&))
-{ out << f; return out; }
-#else
-#define DEBUG(...)
-#endif
+#include "debugger.hpp"
 
 template < typename T >
 class _behaviour {
@@ -40,7 +30,9 @@ public:
 	{ _active = active; if ( !_started ) { Start( ); } }
 	bool Get_Active ( ) { return _active; }
 
-	virtual void Delete ( ) { }
+	virtual void Delete ( ) {
+		delete this;
+	}
 };
 
 #include "utility/printer.h"
@@ -82,12 +74,17 @@ public:
 		{ c->data->Delete ( ); c = c->next; }
 
 		DEBUG ( "Freeing Objekt: ", _name );
-		std::cout << _childrens << '\n';
+		auto ci = _childrens.Get_Begin ( );
+		while ( ci != nullptr ) 
+		{ ci->data->Free ( ); ci = ci->next; }
+
 		_childrens.Deallocate ( );
 		DEBUG ( "Freed Childrens of: ", _name );
 		std::cout << _components << '\n';
 		_components.Deallocate ( );
 		DEBUG ( "Freed Components of: ", _name );
+
+		delete this;
 	}
 	~Objekt ( ) {
 		Free ( );
@@ -367,11 +364,11 @@ namespace Manager {
 		Start ( );
 	}
 	static void Set_Active_Scene ( std::string s ) {
-		std::cout << "adding acrive scene\n";
+		DEBUG ( "adding active scene" );
 		auto S = objekts.Get_Begin ( );
 		while ( S != nullptr ) {
 			if ( S->data->Get_Name () == s ) 
-			{ _current_scene = S->data; Start ( ); std::cout << "added main scene"; break; }
+			{ _current_scene = S->data; Start ( );  DEBUG ( "added main scene" ); break; }
 			S = S->next;
 		}
 	}
