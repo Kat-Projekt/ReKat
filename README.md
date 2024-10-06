@@ -1,18 +1,9 @@
-# ReKat
+# 4RealEngine5
 
-for a complete presentation compile the ReKat.tex file
+With this branch of ReKat i'm offering the bare bones implementation of the engine without utily tools or projekts.
+In this repo are contained the exaples for every module under the Test folder
 
-if you want a specific language compile the doc in the language directory
+## Compilation
 
-## Summary
-
-ReKat is a collection of apis for building a openGL application with audio and network connection
-
-## Tool neaded  
-
-For building this projekt you will need:
-
-- CMake
-- Any Cpp compiler
-  - for Linux: use gcc
-  - for Windows use [MinGW-w64](https://winlibs.com/), ( during testing visual studio can't succesfuly run the networking system )
+For compiling the engine you can use ` cmake . -B ../Build`
+This will compile every Test unit
