@@ -63,7 +63,7 @@ namespace Manager {
 
 	// Makes the resources disapear
 	// ----------------------------
-	static void Free ( ) {
+	static void Free_Video ( ) {
 		for ( auto F : _fonts    ) { F.second->End(); }
 		for ( auto S : _shaders  ) { S.second->End(); }
 		for ( auto T : _textures ) { T.second->End(); }

@@ -1,8 +1,9 @@
 #ifndef FPS_H
 #define FPS_H
 
-#include "../objekt.h"
+#include "../../objekt.hpp"
 #include "../graphik.hpp"
+#include "../../phisiks/phisiks.hpp"
 
 class Fps : public Behaviour {
 private:
@@ -24,9 +25,8 @@ public:
 		{ while ( _t + _delta*(_fps + 1) > Timer::Get_Time ( ) ) { } }
 
 		if ( _t + 1 < Timer::Get_Time ( ) ) {
-			std::cout << "\n---- Fps: " << _fps << '\n';
-			std::cout << "---- Rendered: " << obj->Count_Childrens () << '\n';
-			obj->Print_Tree ( " - " );
+			DEBUG ( 5, "FPS: ", _fps );
+			DEBUG ( 6, "Rendered ", obj->Count_Childrens (), " objekts" );
 			_t = Timer::Get_Time(); 
 			_fps = 0;
 		}

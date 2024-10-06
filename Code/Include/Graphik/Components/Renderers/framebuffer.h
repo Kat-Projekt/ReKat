@@ -1,10 +1,10 @@
 #ifndef FRAMEBUFFER_H
 #define FRAMEBUFFER_H
 
-#include "../../objekt.h"
-#include "camera.h"
-#include "../../graphik.hpp"
+#include "../../../objekt.hpp"
+#include "../camera.h"
 #include "../../Resources/shader.h"
+#include "../../graphik.hpp"
 
 int gl_error;
 #define GL_ERRORS(msg) gl_error = glGetError( ); if ( gl_error != GL_NO_ERROR) { std::cout << "gl_error: '" << gl_error << "' error: '" << msg << "' at line: " << __LINE__ << " of file: " << __FILE__ << '\n'; } 

@@ -1,8 +1,9 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "../objekt.h"
+#include "../../objekt.hpp"
 #include "../graphik.hpp"
+#include "../graphik_debugger.hpp"
 
 class Camera : public Behaviour {
 public:
@@ -16,6 +17,7 @@ public:
 	}
 
 	auto UI_Projkection ( ) {
+        DEBUG ( 5, "Getting_UI_Projkection" );
 		float X = ReKat::grapik::Input::screen_ration * 500.0f;
         return glm::ortho ( - X, + X, - 500.0f, 500.0f, -1.0f, 1.0f );
 	}

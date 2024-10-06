@@ -1,16 +1,16 @@
 #ifndef TILEMAP_H
 #define TILEMAP_H
 
-#include "camera.h"
-#include "../Resources/manager.hpp"
+#include "../camera.h"
+#include "../../Resources/manager.hpp"
 
-#define GL_ERRORS(msg) if (glGetError() != GL_NO_ERROR) { std::cout << "error: " << msg << " at line: " << __LINE__ << " of file: " << __FILE__; } 
+#include "../../graphik_debugger.hpp"
 
 class Tilemap : public Behaviour {
 private:
 	std::string _path;
 
-	int _instances = -1;
+	int _instances;
     unsigned int _quad;
 	
     Shader  *_shader = nullptr; 
@@ -20,61 +20,8 @@ private:
 	vec2 _tile_set = {32,32};
 	vec4 _color = {1,1,1,1};
 public:
-	void Configure ( std::vector < int > &D, int H, int W ) {
-		std::vector < vec3 > pos_frame;
-		for (size_t x = 0; x < W; x++) {
-			for (size_t y = 0; y < H; y++) {
-				int F = D[y*W + x];
-				std::cout << F;
-				if ( F >= 0 ) { pos_frame.push_back ( { x, y, F } ); }
-			}
-			std::cout << '\n';
-		}
-		_instances = pos_frame.size ( );
-		std::cout << "instaces " <<  _instances << '\n';
-		unsigned int VBO;
-		unsigned int instanceVBO;
-
-        float vertices[] = { 
-            // pos      // tex
-            0.0f, 1.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 1.0f,
-            1.0f, 0.0f, 1.0f, 1.0f,
-
-            0.0f, 1.0f, 0.0f, 0.0f,
-            1.0f, 0.0f, 1.0f, 1.0f,
-            1.0f, 1.0f, 1.0f, 0.0f
-        };
-
-		// generating buffers
-        glGenVertexArrays(1, &_quad);
-        glGenBuffers(1, &VBO);
-		glGenBuffers(1, &instanceVBO);
-
-		// loading data to buffers
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-		glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vec3) * pos_frame.size(), pos_frame.data(), GL_STATIC_DRAW);
-
-		// configuring array buffer
-        glBindVertexArray(_quad);
-		// per instance data ( pos and tex )
-        glEnableVertexAttribArray(0);
-        glBindBuffer(GL_ARRAY_BUFFER, VBO);
-        glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)0);
-		// instance data
-		glEnableVertexAttribArray(1);
-        glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
-		// set attribute 1 as an instace array
-		glVertexAttribDivisor(1, 1);
-
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindVertexArray(0);
-	}
     void Start ( ) {
-		if ( _instances != -1 ) { return; }
+        DEBUG ( 4,"Starting tilemap");
 		int H, W;
 		_shader->setInt ( "image", 0 );
 
@@ -117,7 +64,7 @@ public:
 		}
 
 		_instances = pos_frame.size ( );
-		std::cout << _instances << '\n';
+        DEBUG ( 6, "instances: ", _instances );
 
         unsigned int VBO;
 		unsigned int instanceVBO;
@@ -159,6 +106,8 @@ public:
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
+
+        DEBUG ( 5,"Started tilemap");
     }
 
 	void Update ( ) {

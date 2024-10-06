@@ -38,32 +38,32 @@ public:
     int Make ( const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr, const char* tessControlPath = nullptr, const char* tessEvalPath = nullptr );
     // activate the shader
     // -------------------
-    void Use() { glUseProgram(ID); }
+    void Use() { glUseProgram(ID); GL_CHECK_ERROR; }
 	// deletes the shader
 	// ------------------
 	void End ( ) { glDeleteProgram (ID); }
     // utility uniform functions
     // -------------------------
-    void setBool(const std::string &name, bool value) { Use(); glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value); }
+    void setBool(const std::string &name, bool value) { Use(); glUniform1i(glGetUniformLocation(ID, name.c_str()), (int)value); GL_CHECK_ERROR; }
     // ------------------------------------------------------------------------
-    void setInt(const std::string &name, int value) { Use(); glUniform1i(glGetUniformLocation(ID, name.c_str()), value); }
+    void setInt(const std::string &name, int value) { Use(); glUniform1i(glGetUniformLocation(ID, name.c_str()), value); GL_CHECK_ERROR; }
     // ------------------------------------------------------------------------
-    void setFloat(const std::string &name, float value) { Use(); glUniform1f(glGetUniformLocation(ID, name.c_str()), value); }
+    void setFloat(const std::string &name, float value) { Use(); glUniform1f(glGetUniformLocation(ID, name.c_str()), value); GL_CHECK_ERROR; }
     // ------------------------------------------------------------------------
-    void setVec2(const std::string &name, const glm::vec2 &value) { Use(); glUniform2fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]); }
-    void setVec2(const std::string &name, float x, float y) { Use(); glUniform2f(glGetUniformLocation(ID, name.c_str()), x, y); }
+    void setVec2(const std::string &name, const glm::vec2 &value) { Use(); glUniform2fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]); GL_CHECK_ERROR; }
+    void setVec2(const std::string &name, float x, float y) { Use(); glUniform2f(glGetUniformLocation(ID, name.c_str()), x, y); GL_CHECK_ERROR; }
     // ------------------------------------------------------------------------
-    void setVec3(const std::string &name, const glm::vec3 &value) { Use(); glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]); }
-    void setVec3(const std::string &name, float x, float y, float z) { Use(); glUniform3f(glGetUniformLocation(ID, name.c_str()), x, y, z); }
+    void setVec3(const std::string &name, const glm::vec3 &value) { Use(); glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]); GL_CHECK_ERROR; }
+    void setVec3(const std::string &name, float x, float y, float z) { Use(); glUniform3f(glGetUniformLocation(ID, name.c_str()), x, y, z); GL_CHECK_ERROR; }
     // ------------------------------------------------------------------------
-    void setVec4(const std::string &name, const glm::vec4 &value) { Use(); glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]); }
-    void setVec4(const std::string &name, float x, float y, float z, float w) { Use(); glUniform4f(glGetUniformLocation(ID, name.c_str()), x, y, z, w); }
+    void setVec4(const std::string &name, const glm::vec4 &value) { Use(); glUniform4fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]); GL_CHECK_ERROR; }
+    void setVec4(const std::string &name, float x, float y, float z, float w) { Use(); glUniform4f(glGetUniformLocation(ID, name.c_str()), x, y, z, w); GL_CHECK_ERROR; }
     // ------------------------------------------------------------------------
-    void setMat2(const std::string &name, const glm::mat2 &mat) { Use(); glUniformMatrix2fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]); }
+    void setMat2(const std::string &name, const glm::mat2 &mat) { Use(); glUniformMatrix2fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]); GL_CHECK_ERROR; }
     // ------------------------------------------------------------------------
-    void setMat3(const std::string &name, const glm::mat3 &mat) { Use(); glUniformMatrix3fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]); }
+    void setMat3(const std::string &name, const glm::mat3 &mat) { Use(); glUniformMatrix3fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]); GL_CHECK_ERROR; }
     // ------------------------------------------------------------------------
-    void setMat4(const std::string &name, const glm::mat4 &mat) { Use(); glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]); }
+    void setMat4(const std::string &name, const glm::mat4 &mat) { Use(); glUniformMatrix4fv(glGetUniformLocation(ID, name.c_str()), 1, GL_FALSE, &mat[0][0]); GL_CHECK_ERROR; }
 private:
     // utility function for checking shader compilation/linking errors.
     // ----------------------------------------------------------------
@@ -116,7 +116,7 @@ int Shader::Make ( const char* vertexPath, const char* fragmentPath, const char*
 			teShaderFile.close();
 			tessEvalCode = teShaderStream.str();
 		}
-	} catch ( std::ifstream::failure& e ) { return FAILED_LOADING_SHADER; }
+	} catch ( std::ifstream::failure& e ) { DEBUG ( 2, "Shader loading error ", e.code() ); return FAILED_LOADING_SHADER; }
 	const char* vShaderCode = vertexCode.c_str();
 	const char * fShaderCode = fragmentCode.c_str();
 	// 2. compile shaders
@@ -136,7 +136,7 @@ int Shader::Make ( const char* vertexPath, const char* fragmentPath, const char*
 	{ return FAILED_COMPILING_FRAGMENT; }
 
 	// if geometry shader is given, compile geometry shader
-	unsigned int geometry = -1;
+	unsigned int geometry = 0;
 	if ( geometryPath != nullptr ) {
 		const char * gShaderCode = geometryCode.c_str();
 		geometry = glCreateShader(GL_GEOMETRY_SHADER);
@@ -146,7 +146,7 @@ int Shader::Make ( const char* vertexPath, const char* fragmentPath, const char*
 		{ return FAILED_COMPILING_GEOMETRY; }
 	}
 	// if tessellation control shader is given, compile tessellation shader
-	unsigned int tessControl = -1;
+	unsigned int tessControl = 0;
 	if ( tessControlPath != nullptr ) {
 		const char * tcShaderCode = tessControlCode.c_str();
 		tessControl = glCreateShader(GL_TESS_CONTROL_SHADER);
@@ -157,7 +157,7 @@ int Shader::Make ( const char* vertexPath, const char* fragmentPath, const char*
 
 	}
 	// if tessellation evaluation shader is given, compile tessellation shader
-	unsigned int tessEval = -1;
+	unsigned int tessEval = 0;
 	if ( tessEvalPath != nullptr ) {
 		const char * teShaderCode = tessEvalCode.c_str();
 		tessEval = glCreateShader(GL_TESS_EVALUATION_SHADER);

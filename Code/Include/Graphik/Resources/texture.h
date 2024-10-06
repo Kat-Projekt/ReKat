@@ -2,6 +2,7 @@
 #define TEXTURE_H
 
 #include <glad/glad.h>
+#include "../graphik_debugger.hpp"
 
 #ifndef STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
@@ -38,7 +39,10 @@ public:
     static int Make ( unsigned char* data, unsigned int width, unsigned int height, int nrChannels );
     // activate the texture
 	// --------------------
-    void Use ( ) const { glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, this->ID); }
+    void Use ( ) { 
+        glActiveTexture(GL_TEXTURE0); GL_CHECK_ERROR; 
+        glBindTexture(GL_TEXTURE_2D, this->ID); GL_CHECK_ERROR; 
+    }
 	// deletes the texture
 	// -------------------
 	void End ( ) { glDeleteTextures(1,&ID); }
@@ -59,18 +63,20 @@ int Texture::Make ( const char * file ) {
         else if (nrChannels == 3) { Format = GL_RGB; }
         else if (nrChannels == 4) { Format = GL_RGBA; }
 
-        glBindTexture(GL_TEXTURE_2D, this->ID);
-        glTexImage2D(GL_TEXTURE_2D, 0, Format, width, height, 0, Format, GL_UNSIGNED_BYTE, data);
+        glActiveTexture(GL_TEXTURE0); GL_CHECK_ERROR;
+        glBindTexture(GL_TEXTURE_2D, this->ID); GL_CHECK_ERROR;
+        glTexImage2D(GL_TEXTURE_2D, 0, Format, width, height, 0, Format, GL_UNSIGNED_BYTE, data); GL_CHECK_ERROR;
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, this->Wrap_S);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, this->Wrap_T);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, this->Filter_Min);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, this->Filter_Max);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, this->Wrap_S); GL_CHECK_ERROR;
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, this->Wrap_T); GL_CHECK_ERROR;
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, this->Filter_Min); GL_CHECK_ERROR;
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, this->Filter_Max); GL_CHECK_ERROR;
 
-        glGenerateMipmap(GL_TEXTURE_2D);
-        glBindTexture(GL_TEXTURE_2D, 0);
-    } else { stbi_image_free(data); std::cout << "error loading: " << file << '\n'; return FAILED_LOAD_IMAGE; }
+        glGenerateMipmap(GL_TEXTURE_2D); GL_CHECK_ERROR;
+        glBindTexture(GL_TEXTURE_2D, 0); GL_CHECK_ERROR;
+    } else { stbi_image_free(data); DEBUG ( 1, "Failed loading Texture: ", file ); return FAILED_LOAD_IMAGE; }
 
+    DEBUG ( 4, "Succesfuly loaded image: ", file );
     stbi_image_free(data);
     return SUCCESS; 
 }
