@@ -2,7 +2,7 @@
 #define RIGIDBODY_H
 
 #include "../../objekt.hpp"
-#include "timer.hpp"
+#include "../timer.hpp"
 
 class Rigidbody : public Behaviour {
 public:

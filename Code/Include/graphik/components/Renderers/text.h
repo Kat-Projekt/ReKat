@@ -2,8 +2,8 @@
 #define TEXT_H
 
 #include "../camera.h"
-#include "../../Resources/shader.h"
-#include "../../Resources/font.h"
+#include "../../resources/shader.h"
+#include "../../resources/font.h"
 
 class Text : public Behaviour {
     unsigned int _quad;

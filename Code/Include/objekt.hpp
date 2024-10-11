@@ -211,7 +211,8 @@ public:
 		}
         auto O = _childrens.Get_Begin ( );
 		while ( O != nullptr ) {
-			L.append ( &O->data->Get_Component_Recursive < C > ( ) );
+			auto Data = O->data->Get_Component_Recursive < C > ( );
+			L.append ( &Data );
 			O = O->next;
 		}
 		if ( L.size () == 0 ) { DEBUG ( 3,"No components found");}

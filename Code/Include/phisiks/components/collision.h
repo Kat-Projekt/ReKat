@@ -14,8 +14,8 @@ void Resolve_Collision ( C1 c1, C2 c2 ) {
 		if ( ! c1->Is_Trigger( ) && ! c2->Is_Trigger( ) ) { // reaction
 			if ( ! c1->Is_Static ( ) ) { // first dinamic
 				if ( ! c2->Is_Static ( ) ) { // both dinamic
-					float M1 = c1->obj->Get_Component < Rigidbody > ()->mass;
-					float M2 = c2->obj->Get_Component < Rigidbody > ()->mass;
+					float M1 = c1->obj->template Get_Component < Rigidbody > ()->mass;
+					float M2 = c2->obj->template Get_Component < Rigidbody > ()->mass;
 					float M = M1 + M2;
 					M1 = M1 / M;
 					M2 = M2 / M;
@@ -27,20 +27,20 @@ void Resolve_Collision ( C1 c1, C2 c2 ) {
 					if ( C.exit_direction == vec3{0,0,0} ) { return; }
 					vec3 normalize_exit = normalize(C.exit_direction);
 
-					c1->obj->Get_Component < Rigidbody >()->Vincolar_Reaction( normalize_exit );
-					c2->obj->Get_Component < Rigidbody >()->Vincolar_Reaction( -normalize_exit );
+					c1->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction( normalize_exit );
+					c2->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction( -normalize_exit );
 					return;
 				}
 				c1->obj->Inc_Pos ( C.exit_direction );
 				if ( C.exit_direction == vec3{0,0,0} ) { return; }
 				vec3 normalize_exit = normalize(C.exit_direction);
-				c1->obj->Get_Component < Rigidbody >()->Vincolar_Reaction(normalize_exit);
+				c1->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction(normalize_exit);
 			}
 			if ( ! c2->Is_Static ( ) ){ // second dinamic 
 				c2->obj->Inc_Pos ( -C.exit_direction );
 				if ( C.exit_direction == vec3{0,0,0} ) { return; }
 				vec3 normalize_exit = normalize(C.exit_direction);
-				c2->obj->Get_Component < Rigidbody >()->Vincolar_Reaction(-normalize_exit);
+				c2->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction(-normalize_exit);
 			}
 
 			c1->obj->Andle_Collsions ( c2->obj, false );

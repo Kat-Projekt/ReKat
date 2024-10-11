@@ -1,5 +1,5 @@
 #define DIAGNOSTIC
-#include "graphik/components.hpp"
+#include <graphik/components.hpp>
 
 int main ( ) {
     std::cout << "La librerie e' caricata correttamente\n";

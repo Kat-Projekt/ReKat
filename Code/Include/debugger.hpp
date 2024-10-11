@@ -1,10 +1,26 @@
 #ifndef COLOR
 #define COLOR
-#if (defined (LINUX) || defined (__linux__) || defined (__APPLE__)) // linux implementation
-	#include <stdio.h>
-	#include <string>
+#if (defined (LINUX) || defined (__linux__) || defined (__APPLE__)) // unix implementation
+#include <iostream>
+#include <string>
+#define FOREGROUND_RED 1
+#define FOREGROUND_BLUE 2
+#define FOREGROUND_GREEN 4
+#define FOREGROUND_INTENSITY 0
+#define BACKGROUND_RED 8
+#define BACKGROUND_BLUE 16
+#define BACKGROUND_GREEN 32
+#define BACKGROUND_INTENSITY 0
+
 	void color ( std::string string, int color ) {
-		printf( ( std::string ( "\033[" ) + std::to_string ( color ) + std::string ( "m" ) + string + std::string ( "\033[0m" ) ).c_str() );
+		int foreground_color = ( color & 1 ) == 1 ? 31 : ( color & 2 ) == 2 ? 34 : ( color & 4 ) == 4 ? 32 : 0;
+		int background_color = ( color & 8 ) == 8 ? 41 : ( color & 16 ) == 16 ? 44 : ( color & 32 ) == 32 ? 42 : 0;
+
+		std::cout << ( (  std::string ( "\033[1;" ) 
+						+ ( foreground_color != 0 ? std::to_string ( foreground_color ) : std::string( ) )
+						+ ( background_color != 0 ? std::string ( ";" ) + std::to_string ( background_color ) : std::string( ) ) + std::string ( "m" )
+						+ string
+						+ std::string ( "\033[0m" ) ).c_str() );
 	}
 #elif (defined (_WIN32) || defined (_WIN64)) // windows implementaion
 	#include <stdio.h>
@@ -20,14 +36,20 @@
 #endif
 
 #ifndef DEBUG
-
+#define DIAGNOSTIC
 #ifdef DIAGNOSTIC
 #ifndef DEBUG_LEVEL
 #define DEBUG_LEVEL 8
 #endif
 
 #include <iostream>
+
+#if (defined (LINUX) || defined (__linux__) || defined (__APPLE__)) // unix implementation
+// #define DEBUG(level, ...) ( ( level < DEBUG_LEVEL ) ? ( DEBUG_##level(__VA_ARGS__) ) : ( std::cout ) )
+#define DEBUG(...)
+#elif
 #define DEBUG(level, ...) ( ( level < DEBUG_LEVEL ) ? ( DEBUG_##level(__VA_ARGS__) ) : ( std::cout ) )
+#endif
 
 #define DEBUG_0(...) ( color ( "MESSAGE TO TERMINATE", FOREGROUND_RED | FOREGROUND_INTENSITY ), throw )
 #define DEBUG_1(...) ( color ( "FATAL", FOREGROUND_RED | FOREGROUND_INTENSITY ), __DEBUG( "", __VA_ARGS__ ), throw )

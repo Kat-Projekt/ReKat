@@ -3,7 +3,7 @@
 
 #include "../../../objekt.hpp"
 #include "../camera.h"
-#include "../../Resources/shader.h"
+#include "../../resources/shader.h"
 #include "../../graphik.hpp"
 
 int gl_error;

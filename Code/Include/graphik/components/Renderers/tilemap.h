@@ -2,7 +2,7 @@
 #define TILEMAP_H
 
 #include "../camera.h"
-#include "../../Resources/manager.hpp"
+#include "../../resources/manager.hpp"
 
 #include "../../graphik_debugger.hpp"
 

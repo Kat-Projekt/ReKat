@@ -13,7 +13,7 @@ if ( REKAT_LIBRARY )
     include ( Library )
 else ( )
     message ( "Linking filling" )
-    include ( included )
+    include ( Included )
 endif ( )
 
 # compile the examples

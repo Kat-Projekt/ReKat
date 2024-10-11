@@ -1,5 +1,13 @@
 #ifndef COLOR
 #define COLOR
+#define FOREGROUND_RED 1
+#define FOREGROUND_BLUE 2
+#define FOREGROUND_GREEN 3
+#define FOREGROUND_INTENSITY 4
+#define BACKGROUND_RED 1
+#define BACKGROUND_BLUE 3
+#define BACKGROUND_GREEN 5
+#define BACKGROUND_INTENSIFY 7
 #if (defined (LINUX) || defined (__linux__) || defined (__APPLE__)) // linux implementation
 	#include <stdio.h>
 	#include <string>
