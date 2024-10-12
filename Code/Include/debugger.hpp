@@ -47,7 +47,7 @@
 #if (defined (LINUX) || defined (__linux__) || defined (__APPLE__)) // unix implementation
 // #define DEBUG(level, ...) ( ( level < DEBUG_LEVEL ) ? ( DEBUG_##level(__VA_ARGS__) ) : ( std::cout ) )
 #define DEBUG(...)
-#elif
+#else
 #define DEBUG(level, ...) ( ( level < DEBUG_LEVEL ) ? ( DEBUG_##level(__VA_ARGS__) ) : ( std::cout ) )
 #endif
 

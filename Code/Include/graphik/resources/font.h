@@ -26,7 +26,7 @@ public:
 	unsigned int  * char_widths;
 
 	Font ( ) { _font_heigth = 30; };
-	Font ( int font_heigth ) { _font_heigth = font_heigth; }
+	Font ( unsigned int font_heigth ) { _font_heigth = font_heigth; }
 	Font ( const char * path, unsigned int font_heigth = 30 ) : _font_heigth(font_heigth) { Make ( path ); }
 	~Font ( ) { End( ); }
 

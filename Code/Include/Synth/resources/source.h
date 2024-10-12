@@ -6,14 +6,14 @@
 #include <AL/alc.h>
 
 // debuging
-#include "synth_debugger.hpp"
+#include "../synth_debugger.hpp"
 
 #include <glm/glm.hpp>
 
 class Source {
-public:
+private:
 	ALuint source;
-
+public:
 	Source ( ) { };
 	~Source ( ) { End( ); };
 
@@ -30,6 +30,19 @@ public:
 		DEBUG ( 4, "Generated Source ", source );
 		return 0;
 	}
+
+	void Move ( glm::vec3 _pos ) {
+		alSource3f(source, AL_POSITION, _pos.x, _pos.y, _pos.z ); AL_CHECK_ERROR;
+	}
+
+	bool Is_Busy ( ) {
+		int source_state;
+		alGetSourcei ( source, AL_SOURCE_STATE, &source_state ); AL_CHECK_ERROR;
+		if ( source_state == AL_PLAYING ) { return true; }
+		return false;
+	}
+
+	ALuint Get_Source ( ) { return source; }
 
 	void End ( ) 
 	{ alDeleteSources ( 1, &source ); }

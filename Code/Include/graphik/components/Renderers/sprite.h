@@ -81,9 +81,13 @@ public:
         DEBUG (5, "Drawn Sprite");
 	}
 
-	Sprite* Set ( Texture* texture, Shader* shader, Camera* camera, ivec2 frames = {1,1}, int frame = 0, vec4 color = {1,1,1,1} ) 
+	Sprite* Set ( Texture* texture, Shader* shader, Camera* camera, ivec2 frames = {1,1}, int frame = 0, vec4 color = {1,1,1,1}, bool UI_sprite = false ) 
 	{ _texture = texture; _shader = shader; _camera = camera;
-	_frames = frames; this->frame = frame; _color = color; return this; }
+	_frames = frames; this->frame = frame; _color = color; _UI_render = UI_sprite; return this; }
+
+    Sprite* Set ( std::string texture, std::string shader, Camera* camera, ivec2 frames = {1,1}, int frame = 0, vec4 color = {1,1,1,1}, bool UI_sprite = false ) 
+	{ _texture = Manager::Texture_Get ( texture ); _shader = Manager::Shader_Get ( shader ); _camera = camera;
+	_frames = frames; this->frame = frame; _color = color; _UI_render = UI_sprite; return this; }
 
 	Sprite* Set ( bool UI_sprite ) { _UI_render = UI_sprite; return this; }
 };

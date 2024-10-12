@@ -6,10 +6,10 @@
 #include <AL/alc.h>
 
 // debuging
-#include "synth_debugger.hpp"
+#include "../synth_debugger.hpp"
 
 // load lib
-#include "audioFile.h"
+#include "../audioFile.h"
 
 class Buffer {
 public:
@@ -19,9 +19,9 @@ public:
 	~Buffer ( ) { End( ); };
 
 	int Make ( short* _buf, long _len, int _sample_freq = 44100 ) {
-		int error;
+		DEBUG ( 4, "buffer len: ", _len );
 		alGenBuffers ( 1, &buffer ); AL_CHECK_ERROR;
-		alBufferData ( buffer, AL_FORMAT_MONO16, _buf, _len, _sample_freq ); AL_CHECK_ERROR;
+		alBufferData ( buffer, AL_FORMAT_MONO16, _buf, _len + ( _len % 2 == 1 ) /* _len has to be even */, _sample_freq ); AL_CHECK_ERROR;
 
 		DEBUG ( 4, "Created Buffer ", buffer );
 		return 0;
@@ -35,7 +35,7 @@ public:
 	int Make ( std::string path, int _sample_freq = 44100  ) {
 		AudioFile < double > a;
 		if ( ! a.load ( path ) ) 
-		{ DEBUG ( 2, "Failed Opening File ", path ) }
+		{ DEBUG ( 2, "Failed Opening File ", path ); }
 
 		ALsizei _len = a.getNumSamplesPerChannel ( );
 		ALsizei _sample_rate = a.getSampleRate ( );
@@ -43,6 +43,9 @@ public:
 
 		return Make ( data, _len, _sample_freq );
 	}
+
+	ALuint Get_Buffer ( ) { return buffer; }
+
 	void End ( )
 	{ alDeleteBuffers ( 1, &buffer ); }
 };

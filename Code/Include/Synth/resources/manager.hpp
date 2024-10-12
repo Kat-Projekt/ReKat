@@ -44,7 +44,7 @@ namespace Manager {
 			return findit->second;
 		} else { return nullptr; }
 	}
-	static int Source_Load ( std::string name, glm::vec3 pos ) {
+	static int Source_Load ( std::string name, glm::vec3 pos = {0,0,0} ) {
 		Source *s = new Source ( );
 		_sources.insert( { name, s } );
 		return (*s).Make( pos );
@@ -53,8 +53,10 @@ namespace Manager {
 	// Makes the resources disapear
 	// ----------------------------
 	static void Free_Audio ( ) {
-		for ( auto F : _buffers    ) { F.second->End(); }
-		for ( auto S : _sources  ) { S.second->End(); }
+		DEBUG ( 3, "Freeing Buffers" );
+		for ( auto F : _buffers ) { F.second->End(); }
+		DEBUG ( 3, "Freeing Sources" );
+		for ( auto S : _sources ) { S.second->End(); }
 	}
 }; // namespace Manager
 
