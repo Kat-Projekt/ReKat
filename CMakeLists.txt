@@ -17,7 +17,7 @@ else ( )
 endif ( )
 
 # compile the examples
-set ( TESTS Render_Test Core_Test Text_Display_Test )
+set ( TESTS Render_Test Core_Test Text_Display_Test Generic_Test )
 
 if ( REKAT_TEST )
     foreach ( TEST ${TESTS} )

@@ -175,7 +175,7 @@ public:
 			if ( _started ) { c->_Start( ); }
         	return c;
 		}
-		Error("\t\tWrong component decraration");
+		DEBUG ( 2, "Wrong component decraration" );
     }
     template < class C > 
     C* Add_Component ( C* c ) {
@@ -186,7 +186,7 @@ public:
 			if ( _started ) { c->_Start( ); }
         	return c;
 		}
-		Error("\t\tWrong component Behaviour");
+		DEBUG ( 2, "Wrong component Behaviour" );
     }
 	
     template < class C > 

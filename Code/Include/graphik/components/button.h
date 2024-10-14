@@ -1,18 +1,21 @@
 #ifndef BUTTON
 #define BUTTON
-#include "../objekt.h"
+#include "../../objekt.hpp"
 #include "../graphik.hpp"
 using namespace ReKat::grapik::Input;
+
+typedef void (Behaviour::*Behaviour_Fun) (void); 
 
 class Button : public Behaviour {
 private:
     bool hower = false;
     bool click = false;
     int  start_frame = 0;
-    void (* _call ) ();
-	void (Behaviour::*_b_call) ();
+    void (* _call ) () = nullptr;
+	Behaviour* _cla;
+	Behaviour_Fun _b_call = nullptr;
 public:
-	void UI_Update ( ) {
+	void Update ( ) {
 		// calculate hover
 		vec2 Pos = obj->Get_Pos ( );
 		vec2 Size = obj->Get_Size ( );
@@ -22,8 +25,19 @@ public:
 
 		if ( Key_Down ("Mouse1") && hower ) {
 			if ( _call != nullptr ) { (*_call) (); }
-			if ( _b_call != nullptr ) { (*this.*_b_call) (); }
+			if ( _b_call != nullptr ) { std::invoke ( _b_call, _cla ); }
 		}
+	}
+
+	template < class C >
+	void Set ( C* _class, void ( C::*_fun ) ( void ) ) {
+		DEBUG ( 4,"Adding Function from class: ", std::string(typeid(*_class).name()) );
+		if ( std::is_base_of<Behaviour, C>::value ) {
+			_cla = ( Behaviour* ) _class;
+            _b_call = ( Behaviour_Fun ) _fun;
+			return;
+		}
+		DEBUG ( 2, "Wrong component Behaviour" );
 	}
 };
 
