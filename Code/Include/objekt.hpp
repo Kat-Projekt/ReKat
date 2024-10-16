@@ -13,7 +13,6 @@ public:
 	void _Start ( ) { if ( _active && !_started ) { Start ( ); } _started = true; }
 	void _Update ( ) { if ( _active ) { Update ( ); } }
 	void _Fixed_Update ( ) { if ( _active ) { Fixed_Update ( ); } }
-	void _UI_Update ( ) { if ( _active ) { UI_Update ( ); } }
 
 	void _Collision ( T* _obj ) { if ( _active ) { Collision ( _obj ); } }
 	void _Collision_Trigger ( T* _obj ) { if ( _active ) { Collision_Trigger ( _obj ); } }
@@ -21,7 +20,6 @@ public:
     virtual void Start ( ) { }
     virtual void Update ( ) { }
 	virtual void Fixed_Update ( ) { }
-	virtual void UI_Update ( ) { }
 
     virtual void Collision ( T* _obj ) { _obj; }
     virtual void Collision_Trigger ( T* _obj ) { _obj; }
