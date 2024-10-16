@@ -129,6 +129,16 @@ public:
 		}
 		return nullptr;
 	}
+	bool Has_Children ( Objekt* child ) {
+		auto C = _childrens.Get_Begin ( );
+		while ( C != nullptr ) {
+			if ( C->data == child ) 
+			{ return true; }
+			if ( C->data->Has_Children ( child ) ) { return true; }
+			C = C->next;
+		}
+		return false;
+	}
 	List < Objekt* > Get_Childrens ( ) { return _childrens; }
 	int Count_Childrens ( ) {
 		int count = 0;
@@ -173,7 +183,7 @@ public:
 			if ( _started ) { c->_Start( ); }
         	return c;
 		}
-		Error("\t\tWrong component decraration");
+		DEBUG ( 2, "Wrong component decraration" );
     }
     template < class C > 
     C* Add_Component ( C* c ) {
@@ -184,7 +194,7 @@ public:
 			if ( _started ) { c->_Start( ); }
         	return c;
 		}
-		Error("\t\tWrong component Behaviour");
+		DEBUG ( 2, "Wrong component Behaviour" );
     }
 	
     template < class C > 
@@ -378,6 +388,8 @@ namespace Manager {
 			S = S->next;
 		}
 	}
+	
+	static Objekt* Get_Active_Scene ( ) { return _current_scene; }
 }
 
 #endif
