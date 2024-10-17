@@ -135,6 +135,8 @@ public:
 
 	Element* Get_Begin ( ) { return _first; }
 	Element* Get_Endin ( ) { return _last; }
+	Element* begin ( ) { return _first; }
+	Element* end ( ) { return _last; }
 
 	void Print ( ) {
 		auto C = _first;

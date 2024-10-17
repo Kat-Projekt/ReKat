@@ -6,7 +6,7 @@
 
 #ifndef STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include <stb_image.h>
 #endif
 
 class Texture {
@@ -76,8 +76,8 @@ int Texture::Make ( const char * file ) {
         glBindTexture(GL_TEXTURE_2D, 0); GL_CHECK_ERROR;
     } else { stbi_image_free(data); DEBUG ( 1, "Failed loading Texture: ", file ); return FAILED_LOAD_IMAGE; }
 
-    DEBUG ( 4, "Succesfuly loaded image: ", file );
     stbi_image_free(data);
+    DEBUG ( 4, "Succesfuly loaded image: ", file );
     return SUCCESS; 
 }
 

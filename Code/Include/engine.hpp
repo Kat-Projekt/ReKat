@@ -5,3 +5,4 @@
 #include "online/components.hpp"
 #include "synth/components.hpp"
 #include "utility/math.h"
+#include "utility/interpolation.h"

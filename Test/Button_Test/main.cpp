@@ -1,22 +1,29 @@
 #define DIAGNOSTIC
+#define DEBUG_LEVEL 5
 #include <graphik/components.hpp>
 
 class Interupt : public Behaviour {
 private:
     /* data */
 public:
-    void Terminate ( ) { throw; }
+    void Terminate ( ) { std::cout <<  3, "hello maremma hane"	; }
 };
 
 int main ( ) {
     ReKat::grapik::Start ( "Button_Test", 800, 600 );
 
+    Manager::Texture_Load ( "logo", "Logo.png" );
+    Manager::Shader_Load ( "sprite", "sprite.vs", "sprite.fs" );
+    Camera camera;
+
     Objekt main ( "giov" );
-    Objekt butt ( "pier" );
+    Objekt butt ( "pier", {0,0,0},{500,500,500} );
     main.Add_Child ( &butt );
 
     Interupt ii;
-    butt.Add_Component < Button > ( )->Set ( &ii, &Interupt::Terminate );
+    main.Add_Component ( &camera );
+    butt.Add_Component < Button > ( )->OnHover ( &ii, &Interupt::Terminate );
+	butt.Add_Component < Sprite > ( )->Set ( "logo", "sprite", &camera );
     
     Manager::Set_Active_Scene ( &main );
 
@@ -33,6 +40,7 @@ int main ( ) {
     ReKat::grapik::Terminate ( );
 }
 
+/*
 #define DIAGNOSTIC
 #include <graphik/components.hpp>
 
@@ -76,4 +84,4 @@ int main ( ) {
     Manager::Free_Video ( );
     main.Free ( );
     return 0;
-}
+}*/

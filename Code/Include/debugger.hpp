@@ -45,8 +45,8 @@
 #include <iostream>
 
 #if (defined (LINUX) || defined (__linux__) || defined (__APPLE__)) // unix implementation
-// #define DEBUG(level, ...) ( ( level < DEBUG_LEVEL ) ? ( DEBUG_##level(__VA_ARGS__) ) : ( std::cout ) )
-#define DEBUG(...)
+#define DEBUG(level, ...) ( ( level < DEBUG_LEVEL ) ? ( ( void ) DEBUG_##level(__VA_ARGS__) ) : ( ( void ) 0 ) )
+// #define DEBUG(...)
 #else
 #define DEBUG(level, ...) ( ( level < DEBUG_LEVEL ) ? ( DEBUG_##level(__VA_ARGS__) ) : ( std::cout ) )
 #endif
@@ -71,7 +71,7 @@
 	7. IMPORTANT NOTICE
 */
 
-#define __DEBUG(error_type,...) std::cout , error_type, "\t[" , time(0) , "]: " __FILE__ , " at " , __LINE__ , "\t: " , __VA_ARGS__ , std::endl
+#define __DEBUG(error_type,...) ( std::cout , error_type, "\t[" , time(0) , "]: " __FILE__ , " at " , __LINE__ , "\t: " , __VA_ARGS__ , std::endl )
 template <typename T>
 std::ostream& operator,(std::ostream& out, const T& t)
 { out << t; return out; }

@@ -1,6 +1,5 @@
 #define DIAGNOSTIC
 #include <debugger.hpp>
-#include <graphik\graphik_debugger.hpp>
 
 int main ( ) {
     DEBUG ( 2, "livello " );
@@ -11,5 +10,5 @@ int main ( ) {
     // DEBUG ( 1, "livello " );
     // DEBUG ( 0, "livello " );
     
-    GL_CHECK_ERROR;
+    // GL_CHECK_ERROR;
 }

@@ -9,8 +9,13 @@
 class Hash_Map {
 private:
     float _spacing;
-    List < Collider > _particle_map;
-    List < int > _cell_count;
+    std::vector < std::vector < Collider * > * > _particle_map;
+	struct indexed_collider	{
+		Collider* collider;
+		int hash;
+	};
+    List < indexed_collider > indexed_colliders;
+    int max = 0;
 
     // uses and arkimedes spiral for mapping used for 3d spaces instad of 3d
     int Normalize_and_Hash ( vec3 _point ) {
@@ -23,37 +28,75 @@ private:
         // parte centrale
         int coordinata_max = ( norm.x > norm.y ) ? ( ( norm.z > norm.x ) ? norm.z : norm.x ) : ( ( norm.z > norm.y ) ? norm.z : norm.y );
         int index = pow ( 2 * coordinata_max - 1, 2 ); // 2-> 3 in tree dimensions
-
+		
+		// find quadrant
+		// if + + continue;
+		// if + - add coordinata_max * 2 + 1
+		// if - - add 2 * ( coordinata_max * 2 + 1 )
+		// if - + add 3 * ( coordinata_max * 2 + 1 )
+		
         index += ( norm.x <= norm.y ) ? ( 1 + norm.x ) : ( 1 + 2 * norm.x - norm.y ); // for 2 dimensions
         return index;
     }
+
+	struct Neibours {
+		int number;
+		int* hash;
+	};
+
+	Neibours Get_Neibours ( int hash ) {
+		
+	}
 
 public:
     // creates a spacial hashmap
     Hash_Map ( float spacing ) : _spacing ( 1 / spacing ) { }
 
-    void Set_Colliders ( List < Collider > colliders ) {
-        // itereate and add to hash map
-        List < std::pair < int, Collider > > indexed_colliders;
-        int max = 0;
-        
-        auto C = colliders.Get_Begin ( );
+    void Set_Colliders ( List < Collider* > colliders ) {
+        // itereate and add to hash map        
+        auto C = colliders.begin ( );
+
 		while ( C != nullptr ) {
-            auto Hash = Normalize_and_Hash ( C->data.obj->Get_Pos ( ) );
+            auto Hash = Normalize_and_Hash ( C->data->obj->Get_Pos ( ) );
             if ( Hash > max ) { max = Hash; } // get max hash
-            indexed_colliders.append ( {Hash , C->data } );
+            indexed_colliders.append ( { C->data, Hash } );
 			C = C->next;
 		}
-        max ++; // add an adition slot for comulative sum
 
-        for (  i = 0; i < max; i++ ) {
-            /* code */
-        }
-        
+		_particle_map.resize ( max );
 
-
-
+		for ( auto C = indexed_colliders.begin ( ); C != nullptr; C = C->next ) {
+			auto vect = _particle_map [ C->data.hash ];
+			if ( vect == nullptr ) {
+				vect = new std::vector < Collider* >;
+				_particle_map [ C->data.hash ] = vect; 
+			}
+			vect->push_back ( C->data.collider );
+		}
     }
+
+	struct collision_check {
+		Collider * collider1;
+		Collider * collider2;
+	};
+	
+	List < collision_check > Get_collisions_to_check ( ) {
+		List < collision_check > checks;
+		
+		for ( auto C = indexed_colliders.begin ( ); C != nullptr; C = C->next ) {
+			// get neibours
+			// check if emply
+			// if not add { C1.collider, C2.collider } to checks to make
+			// ordered so that C.collider < C2.collider 
+			// but first check that { c1,c2 } are not already considered
+
+
+		}
+
+		// remove duplicate cheks
+
+		return checks;
+	}
 
     ~Hash_Map ( );
 };
@@ -65,8 +108,8 @@ namespace phisiks {
     static float _last_phisik_update;
     static float _phisik_update_ratio;
     static int _phisik_fps;
-    static List < Collider > Colliders;
-    static List < Rigidbody > Rigidbodys;
+    static List < Collider* > Colliders;
+    static List < Rigidbody* > Rigidbodys;
     static void Resolve_Collision ( );
 
     template < class C1, class C2 >
@@ -100,10 +143,10 @@ namespace phisiks {
         // check if every collider is active
         DEBUG ( 5, "Getting Active Colliders" );
         List < Collider > active_colliders;
-        auto C = Colliders.Get_Begin ( );
+        auto C = Colliders.begin ( );
 		while ( C != nullptr ) {
-            if ( Active->Has_Children ( C->data.obj ) )
-            { active_colliders.append ( C->data ); }
+            if ( Active->Has_Children ( C->data->obj ) )
+            { active_colliders.append ( *C->data ); }
 			C = C->next;
 		}
 
@@ -117,7 +160,7 @@ namespace phisiks {
     static void Add_Collider ( C collider ) {
         DEBUG ( 4,"Adding Colider: ", std::string(typeid(*collider).name()), " from ", collider.obj.Get_Name () );
 		if ( std::is_base_of<Collider, C>::value ) {
-			Collider.append ( ( Collider * ) ( collider ) );
+			Colliders.append ( ( Collider * ) ( collider ) );
         	return;
 		}
 		DEBUG ( 2, "Wrong Collider type" );
