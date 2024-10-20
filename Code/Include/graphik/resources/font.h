@@ -84,7 +84,6 @@ int Font::Make ( const char * path ) {
 
 	// draw all characters
 	for ( unsigned char c = 32 ; c < 128 ; c++ ) {
-		DEBUG( 6,"Check: " + std::to_string (c));
 		// Load character glyph 
 		if ( FT_Load_Char(face, c, FT_LOAD_RENDER) ) { continue; }
 
@@ -97,12 +96,9 @@ int Font::Make ( const char * path ) {
 		x += 1; // 1 pixel padding from the left side of the tile
 		y += (_font_heigth+_padding) - face->glyph->bitmap_top + Baseline - _padding*0.5;
 
-		DEBUG( 6,"drawing at: " + std::to_string (x) + " : " + std::to_string (y));
-
 		// draw the character
 		const FT_Bitmap& bitmap = face->glyph->bitmap;
-		DEBUG( 6,"bitmap size: " + std::to_string (bitmap.width) + " : " + std::to_string (bitmap.rows));
-
+		
 		for ( int xx = 0; xx < bitmap.width; xx++ ) {
 			for ( int yy = 0; yy < bitmap.rows; yy++ ) {
 				unsigned char r = bitmap.buffer[(yy*(bitmap.width)+xx)];
@@ -110,8 +106,6 @@ int Font::Make ( const char * path ) {
 			}
 		}
 	}
-
-	DEBUG( 5,"Bufferized");
 
 	/*std::cout << " W: " << _width << " H: " << _heigth << '\n';
 	std::cout << " HHH: " << face->height << " A: " << face->ascender << " D: " << face->descender << '\n';

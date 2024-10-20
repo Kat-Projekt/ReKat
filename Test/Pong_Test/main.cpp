@@ -40,6 +40,7 @@ public:
 class Ball_Controller : public Behaviour {
 	Text *_punteggio = nullptr;
 	int _larghezza_campo = 0;
+	Audio_Source *_bip;
 	int punti_plater1 = 0;
 	int punti_plater2 = 0;
 
@@ -50,11 +51,12 @@ class Ball_Controller : public Behaviour {
 		} else {
 			obj->Get_Component < Rigidbody > ( )->velocity = { -speed * 0.7, -speed * 0.4, 0 };
 		}
+		_bip->Play (1);
 	}
 
 	void Update_Punteggio ( ) {
-		if ( punti_plater1 == 3 ) { _punteggio->Set ( "Player 1 Wins", Text::LEFT ); obj->Get_Component < Rigidbody > ( )->velocity = {0,0,0}; return; }
-		if ( punti_plater2 == 3 ) { _punteggio->Set ( "Player 2 Wins", Text::RIGHT ); obj->Get_Component < Rigidbody > ( )->velocity = {0,0,0}; return; }
+		if ( punti_plater1 == 3 ) { _punteggio->Set ( "Player 1 Wins", Text::LEFT ); obj->Get_Component < Rigidbody > ( )->velocity = {0,0,0}; _bip->Play (2); return; }
+		if ( punti_plater2 == 3 ) { _punteggio->Set ( "Player 2 Wins", Text::RIGHT ); obj->Get_Component < Rigidbody > ( )->velocity = {0,0,0}; _bip->Play (2); return; }
 
 		_punteggio->Set ( std::to_string ( punti_plater1 ) + std::string ( " - " ) + std::to_string ( punti_plater2 ), Text::CENTER );
 	}
@@ -86,17 +88,21 @@ class Ball_Controller : public Behaviour {
 	}
 
 	public: 
-	void Set ( Text *Punteggio, int largezza_campo ) {
+	void Set ( Text *Punteggio, int largezza_campo, Audio_Source *bip ) {
 		_punteggio = Punteggio;
 		_larghezza_campo = largezza_campo / 2;
+		_bip = bip;
 	}
+
+	
+    void Collision ( Objekt* _obj ) { _bip->Play (0); }
 };
 
 // classic pong game with local multi player
 int main ( ) {
 	ReKat::phisiks::Start ( 120 );
 	ReKat::grapik::Start ( "Pong", 800, 600 );
-	// ReKat::synth::Start ( );
+	ReKat::synth::Start ( );
 
 	int largezza_campo = 1000;
 	int distanza_palette = 800;
@@ -116,10 +122,15 @@ int main ( ) {
     Manager::Font_Load ( "font", "Font.ttf",80 );
     Manager::Shader_Load ( "sprite", "sprite.vs", "sprite.fs" );
     Manager::Shader_Load ( "text", "text.vs", "text.fs" );
+	Manager::Buffer_Load ( "bip", "bip.wav" );
+	Manager::Buffer_Load ( "bup", "bup.wav" );
+	Manager::Buffer_Load ( "badun", "badun.wav" );
+	Manager::Source_Load ( "bip" );
 	Camera* cam = new Camera;
 	DEBUG ( 3, "LOADED" );
 
 	Scene.Add_Component ( cam );
+	auto bip = Scene.Add_Component < Audio_Source > ( )->Set ( "bip", "bip" )->Set("bup")->Set("badun");
 	auto pun = Punteggio.Add_Component < Text > ( )->Set ( "font", "text", cam, {1,1,1,1} );
 
 	Player1.Add_Component < Sprite > ( )->Set ( "sprite", "sprite", cam, {2,1}, 1 ); // square sprite
@@ -132,7 +143,7 @@ int main ( ) {
 	Ball.Add_Component < Sprite > ( )->Set ( "sprite", "sprite", cam, {2,1}, 0 ); // circle sprite
 	Ball.Add_Component < Box_Collider > ( )->Set_Size ( Ball.Get_Size().x );
 	Ball.Add_Component < Rigidbody > ( );
-	Ball.Add_Component < Ball_Controller > ( )->Set ( pun, largezza_campo );
+	Ball.Add_Component < Ball_Controller > ( )->Set ( pun, largezza_campo, bip );
 
 	Manager::Set_Active_Scene ( &Scene );
 
@@ -148,9 +159,9 @@ int main ( ) {
 	
 
 	Manager::Free_Video ( );
-	// Manager::Free_Audio ( );
+	Manager::Free_Audio ( );
 	
 	ReKat::grapik::End ( );
-	// ReKat::synth::End ( );
+	ReKat::synth::End ( );
 	return 0;
 }
