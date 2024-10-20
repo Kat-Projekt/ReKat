@@ -36,7 +36,6 @@
 #endif
 
 #ifndef DEBUG
-#define DIAGNOSTIC
 #ifdef DIAGNOSTIC
 #ifndef DEBUG_LEVEL
 #define DEBUG_LEVEL 8
@@ -71,7 +70,11 @@
 	7. IMPORTANT NOTICE
 */
 
+#ifndef EXPANCE
+#define __DEBUG(error_type,...) ( std::cout , error_type, "\t: " , __VA_ARGS__ , std::endl )
+#else
 #define __DEBUG(error_type,...) ( std::cout , error_type, "\t[" , time(0) , "]: " __FILE__ , " at " , __LINE__ , "\t: " , __VA_ARGS__ , std::endl )
+#endif
 template <typename T>
 std::ostream& operator,(std::ostream& out, const T& t)
 { out << t; return out; }

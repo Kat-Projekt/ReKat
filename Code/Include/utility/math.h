@@ -24,7 +24,7 @@ bool Near ( vec2 p1, vec2 p2, float d ) {
 }
 
 template < typename T >
-T lerp ( T a, T b, float t ) { return a + (b - a) * t; }
+T Lerp ( T a, T b, float t ) { return a + (b - a) * t; }
 
 vec2 Qerp ( vec2 a, vec2 b, float t ) {
 	return a + (b - a) * t * t;

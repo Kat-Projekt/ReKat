@@ -53,9 +53,8 @@ namespace Manager {
 	// Makes the resources disapear
 	// ----------------------------
 	static void Free_Audio ( ) {
-		DEBUG ( 3, "Freeing Buffers" );
+		color ( "FREEING AUDIO\n", BACKGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY );
 		for ( auto F : _buffers ) { F.second->End(); }
-		DEBUG ( 3, "Freeing Sources" );
 		for ( auto S : _sources ) { S.second->End(); }
 	}
 }; // namespace Manager

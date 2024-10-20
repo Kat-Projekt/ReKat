@@ -49,7 +49,6 @@ public:
 	void Set ( std::string path ) { _path = path; }
 
 	Collision_Result Check_Collision ( Box_Collider * B ) {
-		vec2 rec_scale;
 		vec2 half_size = B->Get_Size ( ) * 0.5f;
 		vec2 pos = B->Get_Pos ( );
 		vec2 X_limit = { pos.x - half_size.x, pos.x + half_size.x };
@@ -80,8 +79,8 @@ public:
 
 		// tile to check
 		vec3 out_vector = {0,0,0};
-		for (size_t x = Min_X; x <= Max_X; x++) {
-			for (size_t y = Min_Y; y <= Max_Y; y++) {
+		for ( int x = Min_X; x <= Max_X; x++ ) {
+			for ( int y = Min_Y; y <= Max_Y; y++ ) {
 				if ( D[x + y * W] != 1 ) { continue; }
 				vec2 tile_pos = obj->Get_Pos() + vec3{ obj->Get_Size().x * x, -obj->Get_Size().y * y, 0 };
 				vec2 P_Delta = tile_pos - (vec2)B->Get_Pos();
@@ -108,7 +107,6 @@ public:
 		return { out_vector != vec3{0,0,0}, out_vector };
 	}
 	Collision_Result Check_Collision ( Sfere_Collider * S ) {
-		vec2 rec_scale;
 		vec2 half_size = vec2(S->Get_Size ( )) * 0.5f;
 		vec2 pos = S->Get_Pos ( );
 		vec2 X_limit = { pos.x - half_size.x, pos.x + half_size.x };
@@ -139,8 +137,8 @@ public:
 
 		// tile to check
 		vec3 out_vector = {0,0,0};
-		for (size_t x = Min_X; x <= Max_X; x++) {
-			for (size_t y = Min_Y; y <= Max_Y; y++) {
+		for ( int x = Min_X; x <= Max_X; x++ ) {
+			for ( int y = Min_Y; y <= Max_Y; y++ ) {
 				if ( D[x + y * W] != 1 ) { continue; }
 
 				vec3 tile_pos = obj->Get_Pos() + vec3{ obj->Get_Size().x * x, -obj->Get_Size().y * y, 0 };
@@ -173,6 +171,7 @@ public:
 
 		return { out_vector != vec3{0,0,0}, out_vector };
 	}
+	Collision_Result Check_Collision(Tilemap_Collider* T) { T;  return { false, {0,0,0} }; }
 };
 
 template < typename C >

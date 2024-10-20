@@ -147,15 +147,22 @@ public:
 	friend std::ostream& operator << ( std::ostream& os, List<T>& list ) {
 		auto C = list.Get_Begin( );
 		auto E = list.Get_Endin( );
-		std::cout << "B: " << list.Get_Begin ( ) << " E: " << E << " S: " << list.size( );
-		if ( list.size ( ) == 0 ) { return os; }
-		os << "\n";
+		// std::cout << "B: " << list.Get_Begin ( ) << " E: " << E << " S: " << list.size( ) << '\t';
+		os << "S: " << list.size () << " { ";
+		if ( list.size ( ) == 0 ) { os << "}"; return os; }
+		os << C->data;
+		C = C->next;
 		while ( C != nullptr ) {
-			std::cout << C << " {" << C->data << " p: " << C->prev << " n: " << C->next << ( C != E ? "} : " : "}");
+			// os << C << " {" << C->data << " p: " << C->prev << " n: " << C->next << ( C != E ? "} : " : "}");
+			os << ", " << C->data;
 			C = C->next;
 		}
+		os << " }";
 		return os;
 	}
+
+	friend std::ostream& operator,(std::ostream& out, List<T>& list )
+	{ out << list; return out; }
 };
 
 

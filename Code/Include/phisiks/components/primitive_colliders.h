@@ -8,8 +8,9 @@ class Collider : public Behaviour {
 private:
 	bool _trigger = false;
 	bool _static = true;
+	vec3 _offset;
 public:
-	virtual void _Start ( ) { }
+	virtual void _Start ( );
 	virtual void Start ( ) { _static = ! obj->Has_Component < Rigidbody > ( ); _Start( ); }
 
 	bool Is_Trigger ( ) { return _trigger; }
@@ -26,8 +27,13 @@ public:
 		glm::vec3 p = obj->Get_Rot_Pivot ( );
 		vec3 rot_vector = vec3{ size.x * ( p.x*cos(rot) - p.y*sin(rot) ), size.y * ( p.x*sin(rot) + p.y * cos(rot) ), 0 };
 		pos -= rot_vector;
+		pos += _offset;
 		return pos;	
 	}
+
+	Collider* Set_Offset ( vec3 offset ) { _offset = offset; return this; }
+
+	virtual int Collider_Type ( ) { return 0; }
 };
 
 // ------------------------------- Collider Types -----------------------------------
@@ -36,10 +42,10 @@ class Box_Collider : public Collider {
 private:
 	vec3 _size = {0,0,0};
 public:
-	void _Start ( ) { if ( _size == vec3{0,0,0} ) { _size = obj->Get_Size (); }}
 	Collider* Set_Size ( float size ) { _size = vec3(size); return this; }
 	Collider *Set_Size ( glm::vec3 size ) { _size = size; return this; }
 	vec3 Get_Size ( ) { return _size; }
+	int Collider_Type ( ) { return 1; }
 };
 
 class Sfere_Collider : public Collider {
@@ -48,6 +54,7 @@ private:
 public:
 	Collider *Set_Size ( float size ) { _size = size * 0.5f; return this; }
 	float Get_Size ( ) { return _size; }
+	int Collider_Type ( ) { return 2; }
 };
 
 struct Collision_Result {

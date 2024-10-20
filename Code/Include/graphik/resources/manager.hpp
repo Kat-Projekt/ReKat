@@ -64,6 +64,7 @@ namespace Manager {
 	// Makes the resources disapear
 	// ----------------------------
 	static void Free_Video ( ) {
+		color ( "FREEING VIDEO\n", BACKGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY );
 		for ( auto F : _fonts    ) { F.second->End(); }
 		for ( auto S : _shaders  ) { S.second->End(); }
 		for ( auto T : _textures ) { T.second->End(); }

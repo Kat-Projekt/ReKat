@@ -5,23 +5,53 @@
 #include "../../resources/manager.hpp"
 
 class Text : public Behaviour {
+public:
+	enum ALIGNMENT {
+		RIGHT,
+		CENTER,
+		LEFT
+	};
+private:
     unsigned int _quad;
 	unsigned int _inst;
-
+	
+	
 	std::string _text = "";
+	ALIGNMENT _text_aligne;
+	bool _x_warp = false;
+
 
 	Camera  *_camera = nullptr;
     Shader  *_shader = nullptr; 
 	Font *_font = nullptr;
 
 	vec4 _color = {1,1,1,1};
+
 public:
 	void Update_Instance_Buffer ( ) {
 		if ( _font == nullptr ) { return; }
 		// contains glyph texure index width and pos in pixels
 		// {index,width,x,y} {index,width,x,y} {69'E',10,0,0} {32' ',20,10,0}
 		int* instance_buffer = (int*) calloc (_text.size()*3, sizeof(int));
+		
 		int comulative_x = 0;
+		if ( _text_aligne != RIGHT ) {
+			// calculate comulative_x
+			for ( size_t c = 0; c < _text.size(); c++ )	{
+				if ( _text[c] == 32 ) 
+				{ comulative_x += _font->Get_Heigth()/2; }
+
+				comulative_x += _font->char_widths[_text[c]];
+			}
+		}
+
+		switch ( _text_aligne ) {
+			case CENTER: comulative_x = comulative_x = ( obj->Get_Size ( ).x - comulative_x ) * 0.5; break;
+			case RIGHT: comulative_x = obj->Get_Size ( ).x * 0.5; break;
+			case LEFT: comulative_x = - comulative_x + obj->Get_Size ( ).x * 0.5; break;
+		}
+
+
 		for ( size_t c = 0; c < _text.size(); c++ )	{
 			instance_buffer[c*4+0] = _text[c];
 			instance_buffer[c*4+3] = 0;
@@ -37,7 +67,7 @@ public:
 			comulative_x += _font->char_widths[_text[c]];
 		}
 		for (size_t c = 0; c < _text.size(); c++) {
-			DEBUG ( 4, "{ ",instance_buffer[c*4+0], ',',
+			DEBUG ( 6, "{ ",instance_buffer[c*4+0], ',',
 							instance_buffer[c*4+1], ',',
 							instance_buffer[c*4+2], ',',
 							instance_buffer[c*4+3], " }" );
@@ -137,9 +167,11 @@ public:
 	{ _font = Manager::Font_Get ( font ); _shader = Manager::Shader_Get ( shader ); _camera = camera; 
 	_color = color; return this; }
 
-	Text * Set ( std::string text ) { 
+	Text * Set ( std::string text, ALIGNMENT al = RIGHT, bool x_warp = false ) {
 		if ( _text != text ) {
 			_text = text;
+			_text_aligne = al;
+			_x_warp = x_warp;
 			Update_Instance_Buffer ( );
 		}
 		DEBUG (3, "Text changed: ", text );

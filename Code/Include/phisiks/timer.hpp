@@ -15,12 +15,12 @@ namespace Timer {
 	{ return (float)(Get_Time_d()); }
     void Update ( ) {
 		auto t = Get_Time_d ( );
-        delta_time = t - current_time;
+        delta_time = (float)(t - current_time);
         current_time = t;
     }
 	void Fixed_Update ( ) {
 		auto t = Get_Time_d ( );
-        fixed_delta_time = t - current_fixed_time;
+        fixed_delta_time = (float)(t - current_fixed_time);
         current_fixed_time = t;
     }
 }
