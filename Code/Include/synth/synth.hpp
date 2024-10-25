@@ -35,7 +35,7 @@ namespace ReKat::synth {
     static int Start ( ) {
 		// creating device
 		device = alcOpenDevice ( NULL );
-		if ( !device ) { DEBUG ( 2, "Failed to inizializate al device" ); }
+		if ( !device ) { DEBUG ( 1, "Failed to inizializate al device" ); }
 
 		// creating context
 		context = alcCreateContext ( device, NULL );

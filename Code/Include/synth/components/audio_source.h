@@ -5,7 +5,7 @@
 #include "../resources/manager.hpp"
 
 class Audio_Source : public Behaviour {
-	Source* source;
+	Source* source = nullptr;
 	List < Buffer* > buffers;
 public:
 	// create context
@@ -14,13 +14,14 @@ public:
 	}
 
 	void Update ( ) {
-		source->Move ( obj->Get_Pos ( ) );
+		if ( source != nullptr ) 
+		{ source->Move ( obj->Get_Pos ( ) ); }
 		DEBUG ( 5, "Updated Audio Source Position");
 	}
 
 	void Play ( int what ) {		
 		if ( source->Is_Busy ( ) ) { DEBUG (3, "Trying to play a busy source"); return; }
-		
+		if ( what >= buffers.size( ) ) { DEBUG (3, "Trying to play an non existing buffer"); return; }
 		alSourcei( source->Get_Source ( ), AL_BUFFER, buffers[what]->Get_Buffer ( ) ); AL_CHECK_ERROR;
 		alSourcePlay( source->Get_Source ( ) ); AL_CHECK_ERROR;
 	}

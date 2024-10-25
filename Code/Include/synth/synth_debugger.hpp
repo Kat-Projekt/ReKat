@@ -1,8 +1,11 @@
+#ifndef AL_LIBTYPE_STATIC
+#define AL_LIBTYPE_STATIC
+#endif
+
 #ifndef DEBUG_SYNTH
 #define DEBUG_SYNTH
 
 #include "../debugger.hpp"
-#define AL_LIBTYPE_STATIC
 #include <AL/al.h>
 #include <AL/alc.h>
 

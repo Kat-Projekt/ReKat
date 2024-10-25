@@ -26,9 +26,14 @@ private:
 	Font *_font = nullptr;
 
 	vec4 _color = {1,1,1,1};
+	bool is_up_to_date = true;
 
 public:
 	void Update_Instance_Buffer ( ) {
+		// only one update for the buffer per frame
+		if ( is_up_to_date ) { return; }
+		is_up_to_date = true;
+
 		if ( _font == nullptr ) { return; }
 		// contains glyph texure index width and pos in pixels
 		// {index,width,x,y} {index,width,x,y} {69'E',10,0,0} {32' ',20,10,0}
@@ -41,7 +46,7 @@ public:
 				if ( _text[c] == 32 ) 
 				{ comulative_x += _font->Get_Heigth()/2; }
 
-				comulative_x += _font->char_widths[_text[c]];
+				comulative_x += _font->char_widths[(int)_text[c]];
 			}
 		}
 
@@ -62,9 +67,9 @@ public:
 				instance_buffer[c*4+2] = comulative_x;
 				comulative_x += _font->Get_Heigth()/2;
 			}
-			instance_buffer[c*4+1] = _font->char_widths[_text[c]];
+			instance_buffer[c*4+1] = _font->char_widths[(int)_text[c]];
 			instance_buffer[c*4+2] = comulative_x;
-			comulative_x += _font->char_widths[_text[c]];
+			comulative_x += _font->char_widths[(int)_text[c]];
 		}
 		for (size_t c = 0; c < _text.size(); c++) {
 			DEBUG ( 6, "{ ",instance_buffer[c*4+0], ',',
@@ -73,16 +78,22 @@ public:
 							instance_buffer[c*4+3], " }" );
 		}
 
+		// emply the buffer
+		if ( glIsBuffer ( _inst ) ) 
+		{ glDeleteBuffers ( 1, &_inst ); GL_CHECK_ERROR; DEBUG (5, "Cleared Buffer"); }
+		
 		// load data into buffer
 		glGenBuffers (1, &_inst); GL_CHECK_ERROR;
         glBindBuffer(GL_ARRAY_BUFFER, _inst); GL_CHECK_ERROR;
         glBufferData(GL_ARRAY_BUFFER, (sizeof(int)*4) *_text.size(), instance_buffer, GL_STATIC_DRAW); GL_CHECK_ERROR;
+		DEBUG (5, "load data into buffer");
 		// setting
-		glBindVertexArray(_quad); GL_CHECK_ERROR;
-		glVertexAttribPointer(1, 4, GL_INT, GL_FALSE, 4 * sizeof(int), (void*)0); GL_CHECK_ERROR;
+		glBindVertexArray(_quad); 
+		glVertexAttribPointer(1, 4, GL_INT, GL_FALSE, 4 * sizeof(int), (void*)0);
+		DEBUG (5,"setted vertex array");
 		// unbind
-        glBindVertexArray(0); GL_CHECK_ERROR;
-        glBindBuffer(GL_ARRAY_BUFFER, 0); GL_CHECK_ERROR;
+        glBindVertexArray(0); 
+        glBindBuffer(GL_ARRAY_BUFFER, 0); 
 		DEBUG (4, "Updated Istance Buffer" );
 	}
 
@@ -129,6 +140,9 @@ public:
 	}
 
     void Update ( ) {
+		// make sures that the buffer is update once per frame
+		is_up_to_date = false;
+
 		if ( _text.size() == 0 ) { return; }
         DEBUG ( 5, "Staring Updating Text");
 		// prepare transformations

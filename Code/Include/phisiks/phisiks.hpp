@@ -194,7 +194,7 @@ public:
             List < Collider * > Neiboursing_colliders;
             // Add same cell colliders
             for ( auto Coll = _particle_map[C->data.hash]->begin ( ); Coll != nullptr; Coll = Coll->next ) {
-                if ( int( Coll->data ) != int( C->data.collider ) ) 
+                if ( Coll->data != C->data.collider ) 
                 { Neiboursing_colliders.append ( Coll->data ); DEBUG ( 6, "added: ",  Coll->data, " with ", C->data.collider ); }
             }
             
@@ -205,7 +205,7 @@ public:
             // adding checks
             for ( auto Coll = Neiboursing_colliders.begin ( ); Coll != nullptr; Coll = Coll->next ) {
                 collision_check check;
-                if ( int( Coll->data ) > int(This_collider) ) {
+                if ( intptr_t( Coll->data ) > intptr_t(This_collider) ) {
                     check.collider1 = This_collider;
                     check.collider2 = Coll->data;
                 } else {
@@ -218,7 +218,7 @@ public:
                 for ( auto test = checks.begin ( ); test != nullptr; test = test->next ) {
                     if ( check.collider1 == test->data.collider1 && 
                          check.collider2 == test->data.collider2 ) 
-                    { dublicate = true; }
+                    { dublicate = true; DEBUG ( 6, "found dublicate collison: ", check.collider1 ); }
                 }
                 
                 if ( !dublicate ) 
