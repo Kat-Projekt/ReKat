@@ -2,7 +2,7 @@
 #define EXPANCE
 #include <engine.hpp>
 
-float speed = 104 * 7;
+float speed = 104 * 21;
 
 class AI_Controller : public Behaviour {
 public:
@@ -47,15 +47,17 @@ class Ball_Controller : public Behaviour {
 	int punti_plater2 = 0;
 	float actual_speed = speed;
 	bool started = false;
+	double start_time = 0;
 
 	void Start_Game ( ) {
 		obj->Set_Pos ( {0,0,0} );
-		if ( punti_plater1 > punti_plater2 ) {
+		if ( punti_plater1 < punti_plater2 ) {
 			obj->Get_Component < Rigidbody > ( )->velocity = { speed * 0.7, speed * 0.4, 0 };
 		} else {
 			obj->Get_Component < Rigidbody > ( )->velocity = { -speed * 0.7, -speed * 0.4, 0 };
 		}
 		_bip->Play (1);
+		start_time = Timer::current_time;
 	}
 
 	void Update_Punteggio ( ) {
@@ -68,6 +70,7 @@ class Ball_Controller : public Behaviour {
 	void Update ( ) {
 		auto rigi = obj->Get_Component < Rigidbody > ( );
 
+		DEBUG (3, "signal ",ReKat::sygnal::GetSignal ( "START" ).bdata );
 		if ( ReKat::sygnal::GetSignal ( "START" ).bdata == true && !started ) {
 			rigi->velocity = { speed * 0.7, speed * 0.4, 0 };
 			started = true;
@@ -83,6 +86,14 @@ class Ball_Controller : public Behaviour {
 
 		// segna giocatore 2
 		if ( obj->Get_Pos ( ).x < - _larghezza_campo ) { punti_plater2 ++; Start_Game ( ); Update_Punteggio ( ); }
+
+		if ( punti_plater1 == 3 || punti_plater2 == 3 ) { // uno dei due vince
+			if ( Key_Down ( "T" ) ) {
+				punti_plater1 = 0;
+				punti_plater2 = 0;
+				Start_Game ( );
+			}
+		}
 	}
 
 	public: 
@@ -95,8 +106,13 @@ class Ball_Controller : public Behaviour {
 	
     void Collision ( Objekt* _obj ) {
 		float speed_gain = 0.01;
-		actual_speed = speed * ( 1 + speed_gain * Timer::current_time );
+		actual_speed = speed * ( 1 + speed_gain * ( Timer::current_time - start_time ) );
 		vec3 norm = normalize ( obj->Get_Pos( ) - _obj->Get_Pos( ) );
+		// limit angle at 45 degree
+		if ( abs(norm.y) > 0.7071067811865475 ) {
+			norm.x = ( norm.x > 0 ? 0.7071067811865475 : -0.7071067811865475 );
+			norm.y = ( norm.y > 0 ? 0.7071067811865475 : -0.7071067811865475 );
+		}
 		obj->Get_Component < Rigidbody > ( )->velocity = { norm * actual_speed };
 		_bip->Play (0);
 	}
@@ -116,12 +132,12 @@ public:
 		std::string count = "READY??";
 		// count to 3
 		float C_time = Timer::Get_Time ( );
-		if ( C_time > start_time + 3 ) { count = "1"; }
-		if ( C_time > start_time + 4 ) { count = "2"; }
-		if ( C_time > start_time + 5 ) { count = "3"; }
-		if ( C_time > start_time + 6 ) { count = "START!!"; ReKat::sygnal::SetSignal ( "START",{S_BOOL,1} ); }
+		if ( C_time > start_time + 1 ) { count = "1"; }
+		if ( C_time > start_time + 1.5 ) { count = "2"; }
+		if ( C_time > start_time + 2 ) { count = "3"; }
+		if ( C_time > start_time + 2.5 ) { count = "START!!"; ReKat::sygnal::SetSignal ( "START",{S_BOOL,1} ); }
 
-		if ( C_time > start_time + 7 ) { return; }
+		if ( C_time > start_time + 3 ) { return; }
 
 		_text->Set ( count );
 	}
@@ -130,17 +146,17 @@ public:
 // classic pong game with local multi player
 int main ( ) {
 	ReKat::phisiks::Start ( 120 );
-	ReKat::grapik::Start ( "Pong", 800, 600 );
+	ReKat::grapik::Start ( "Pong", 800, 450,false,false,true );
 	ReKat::synth::Start ( );
 
-	int largezza_campo = 1000;
-	int distanza_palette = 800;
+	int largezza_campo = 1300;
+	int distanza_palette = 1200;
 
 	Objekt Scene ( "scene" );
 	Objekt Punteggio ( "Punteggio", { 0,300,0 } );
-	Objekt Player1 ( "player1", {distanza_palette/2,0,0}, {50,300,100} );
-	Objekt Player2 ( "player2", {-distanza_palette/2,0,0}, {50,300,100} );
-	Objekt Ball ( "BALS" );
+	Objekt Player1 ( "player1", {distanza_palette/2,0,0}, {20,100,100} );
+	Objekt Player2 ( "player2", {-distanza_palette/2,0,0}, {20,100,100} );
+	Objekt Ball ( "BALS", {0,0,0}, {20,20,20} );
 
 	Scene.Add_Child ( &Punteggio );
 	Scene.Add_Child ( &Player1 );
@@ -172,7 +188,7 @@ int main ( ) {
 
 	Ball.Add_Component < Sprite > ( )->Set ( "sprite", "sprite", cam, {2,1}, 0 ); // circle sprite
 	Ball.Add_Component < Box_Collider > ( )->Set_Size ( Ball.Get_Size().x );
-	Ball.Add_Component < Rigidbody > ( );
+	Ball.Add_Component < Rigidbody > ( )->time_scale = 0.3;
 	Ball.Add_Component < Ball_Controller > ( )->Set ( pun, largezza_campo, bip );
 
 	Manager::Set_Active_Scene ( &Scene );

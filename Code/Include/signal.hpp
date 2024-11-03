@@ -28,15 +28,15 @@ namespace sygnal {
     std::unordered_map < std::string, signal > signals;
     
     void SetSignal ( std::string name, signal sign ) {
-        if ( signals.count ( name ) != 0 ) 
+        if ( signals.find ( name ) == signals.end() ) 
         { signals[name] = sign; return; }
         signals.insert ( { name, sign } );
     }
     
     signal GetSignal ( std::string name ) {
-        if ( signals.count ( name ) == 0 ) 
+        if ( signals.find ( name ) == signals.end() ) 
         { return {S_ERROR,0}; }
-        signals[name];
+        return signals[name];
     }
 
 } // namespace sygnal
