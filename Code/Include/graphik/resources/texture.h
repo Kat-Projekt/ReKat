@@ -39,7 +39,7 @@ public:
     static int Make ( unsigned char* data, unsigned int width, unsigned int height, int nrChannels );
     // activate the texture
 	// --------------------
-    void Use ( ) { 
+    inline void Use ( ) { 
         glActiveTexture(GL_TEXTURE0); GL_CHECK_ERROR; 
         glBindTexture(GL_TEXTURE_2D, this->ID); GL_CHECK_ERROR; 
     }

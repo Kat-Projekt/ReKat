@@ -1,23 +1,50 @@
 // #define DIAGNOSTIC
-#define EXPANCE
+// #define EXPANCE
 #include <engine.hpp>
 
 float speed = 104 * 21;
+float actual_speed = speed;
+
+class Change_Skin : public Behaviour {
+private:
+	Sprite* _sprite;
+	std::string _change_char = "C";
+public:
+	void Start ( ) 
+	{ _sprite = obj->Get_Component < Sprite > ( ); }
+
+	void Update ( ) {
+		if ( Key_Down ( _change_char ) ) 
+		{ Inc ( ); }
+	}
+
+	void Inc ( ) 
+	{ _sprite->frame ++; }
+
+	void Set ( Sprite* sprite ) 
+	{ _sprite = sprite; }
+
+	void Set ( std::string change_char ) 
+	{ _change_char = change_char; }
+};
 
 class AI_Controller : public Behaviour {
 public:
 	void Update ( ) {
 		// follow perfectly ball
-		if ( Key_Pressed ( "I" ) ) { obj->Inc_Pos ( {0,speed * Timer::delta_time,0} ); }
-		if ( Key_Pressed ( "K" ) ) { obj->Inc_Pos ( {0,-speed* Timer::delta_time,0} ); }
+		if ( Key_Pressed ( "I" ) ) { obj->Inc_Pos ( {0,actual_speed * Timer::delta_time,0} ); }
+		if ( Key_Pressed ( "K" ) ) { obj->Inc_Pos ( {0,-actual_speed* Timer::delta_time,0} ); }
 
 		// stop outof border:
 		auto offset = obj->Get_Size ( ).y * 0.5f;
 		if ( obj->Get_Pos ( ).y > 500 - offset ) 
-		{ obj->Inc_Pos ( {0,-speed * Timer::delta_time,0} ); }
+		{ obj->Inc_Pos ( {0,-actual_speed * Timer::delta_time,0} ); }
 		
 		if ( obj->Get_Pos ( ).y < - 500 + offset ) 
-		{ obj->Inc_Pos ( {0,speed * Timer::delta_time,0} ); }
+		{ obj->Inc_Pos ( {0,actual_speed * Timer::delta_time,0} ); }
+
+		if ( ReKat::sygnal::GetSignal ( "SCORE" ).bdata == true ) 
+		{ obj->Set_Pos ( { obj->Get_Pos().x,0,0 } ); }
 	}
 };
 
@@ -25,17 +52,20 @@ class Player_Controller : public Behaviour {
 private:
 public:
 	void Update ( ) {
-		if ( Key_Pressed ( "W" ) ) { obj->Inc_Pos ( {0,speed * Timer::delta_time,0} ); }
-		if ( Key_Pressed ( "S" ) ) { obj->Inc_Pos ( {0,-speed* Timer::delta_time,0} ); }
-		std::cout << Timer::delta_time;
+		if ( Key_Pressed ( "W" ) ) { obj->Inc_Pos ( {0,actual_speed * Timer::delta_time,0} ); }
+		if ( Key_Pressed ( "S" ) ) { obj->Inc_Pos ( {0,-actual_speed* Timer::delta_time,0} ); }
+		// std::cout << Timer::delta_time;
 
 		// stop outof border:
 		auto offset = obj->Get_Size ( ).y * 0.5f;
 		if ( obj->Get_Pos ( ).y > 500 - offset ) 
-		{ obj->Inc_Pos ( {0,-speed * Timer::delta_time,0} ); }
+		{ obj->Inc_Pos ( {0,-actual_speed * Timer::delta_time,0} ); }
 		
 		if ( obj->Get_Pos ( ).y < - 500 + offset ) 
-		{ obj->Inc_Pos ( {0,speed * Timer::delta_time,0} ); }
+		{ obj->Inc_Pos ( {0,actual_speed * Timer::delta_time,0} ); }
+
+		if ( ReKat::sygnal::GetSignal ( "SCORE" ).bdata == true ) 
+		{ obj->Set_Pos ( { obj->Get_Pos().x,0,0 } ); }
 	}
 };
 
@@ -45,7 +75,6 @@ class Ball_Controller : public Behaviour {
 	Audio_Source *_bip;
 	int punti_plater1 = 0;
 	int punti_plater2 = 0;
-	float actual_speed = speed;
 	bool started = false;
 	double start_time = 0;
 
@@ -65,9 +94,13 @@ class Ball_Controller : public Behaviour {
 		if ( punti_plater2 == 3 ) { _punteggio->Set ( "Player 2 Wins", Text::RIGHT ); obj->Get_Component < Rigidbody > ( )->velocity = {0,0,0}; _bip->Play (2); return; }
 
 		_punteggio->Set ( std::to_string ( punti_plater1 ) + std::string ( " - " ) + std::to_string ( punti_plater2 ), Text::CENTER );
+		ReKat::sygnal::SetSignal ( "SCORE", {S_BOOL,true} );
 	}
 
 	void Update ( ) {
+		// reset score signal
+		ReKat::sygnal::SetSignal ( "SCORE", {S_BOOL,false} );
+	
 		auto rigi = obj->Get_Component < Rigidbody > ( );
 
 		DEBUG (3, "signal ",ReKat::sygnal::GetSignal ( "START" ).bdata );
@@ -94,6 +127,7 @@ class Ball_Controller : public Behaviour {
 				Start_Game ( );
 			}
 		}
+
 	}
 
 	public: 
@@ -105,9 +139,10 @@ class Ball_Controller : public Behaviour {
 
 	
     void Collision ( Objekt* _obj ) {
-		float speed_gain = 0.01;
+		float speed_gain = 0.03;
 		actual_speed = speed * ( 1 + speed_gain * ( Timer::current_time - start_time ) );
-		vec3 norm = normalize ( obj->Get_Pos( ) - _obj->Get_Pos( ) );
+		auto an = obj->Get_Pos( ) - _obj->Get_Pos( );
+		vec3 norm = normalize ( vec3{an.x, an.y*0.7,an.x} );
 		// limit angle at 45 degree
 		if ( abs(norm.y) > 0.7071067811865475 ) {
 			norm.x = ( norm.x > 0 ? 0.7071067811865475 : -0.7071067811865475 );
@@ -146,11 +181,13 @@ public:
 // classic pong game with local multi player
 int main ( ) {
 	ReKat::phisiks::Start ( 120 );
-	ReKat::grapik::Start ( "Pong", 800, 450,false,false,true );
+	ReKat::grapik::Start ( "Pong", 1600, 900,false,false,true );
 	ReKat::synth::Start ( );
 
 	int largezza_campo = 1300;
 	int distanza_palette = 1200;
+
+	Objekt PostProcessor ( "post", {0,0,0}, {2000,1000,10} );
 
 	Objekt Scene ( "scene" );
 	Objekt Punteggio ( "Punteggio", { 0,300,0 } );
@@ -164,7 +201,11 @@ int main ( ) {
 	Scene.Add_Child ( &Ball );
 
     Manager::Texture_Load ( "sprite", "Sprites.png" );
+    Manager::Texture_Load ( "skin1", "skin1.png" );
+    Manager::Texture_Load ( "skin2", "skin2.png" );
+    Manager::Texture_Load ( "skin1p", "skin1p.png" );
     Manager::Font_Load ( "font", "Font.ttf",80 );
+    Manager::Shader_Load ( "postprocesor", "framebuffers.vs", "framebuffers.fs" );
     Manager::Shader_Load ( "sprite", "sprite.vs", "sprite.fs" );
     Manager::Shader_Load ( "text", "text.vs", "text.fs" );
 	Manager::Buffer_Load ( "bip", "bip.wav" );
@@ -174,24 +215,31 @@ int main ( ) {
 	Camera* cam = new Camera;
 	DEBUG ( 3, "LOADED" );
 
+	PostProcessor.Add_Component < Framebuffer > ( )->Set(1600,900)->Set(&Scene)->Set("postprocesor");
+
 	Scene.Add_Component ( cam );
 	auto bip = Scene.Add_Component < Audio_Source > ( )->Set ( "bip", "bip" )->Set("bup")->Set("badun");
-	auto pun = Punteggio.Add_Component < Text > ( )->Set ( "font", "text", cam, {1,1,1,1} );
+	auto pun = Punteggio.Add_Component < Text > ( )->Set ( "font", "text", cam, {0,1,1,1} );
 	Punteggio.Add_Component < Start_Timer > ( );
 
-	Player1.Add_Component < Sprite > ( )->Set ( "sprite", "sprite", cam, {2,1}, 1 ); // square sprite
+	Player1.Add_Component < Sprite > ( )->Set ( "skin1", "sprite", cam, {2,1}, 1 ); // square sprite
 	Player1.Add_Component < Box_Collider > ( )->Set_Size ( Player1.Get_Size ( ) );
 	Player1.Add_Component < AI_Controller > ( );
-	Player2.Add_Component < Sprite > ( )->Set ( "sprite", "sprite", cam, {2,1}, 1 );
+	Player2.Add_Component < Sprite > ( )->Set ( "skin2", "sprite", cam, {5,1}, 0 );
 	Player2.Add_Component < Box_Collider > ( )->Set_Size ( Player2.Get_Size ( ) );
 	Player2.Add_Component < Player_Controller > ( );
+	Player2.Add_Component < Change_Skin > ( );
 
-	Ball.Add_Component < Sprite > ( )->Set ( "sprite", "sprite", cam, {2,1}, 0 ); // circle sprite
+	Ball.Add_Component < Sprite > ( )->Set ( "skin1p", "sprite", cam ); // circle sprite
 	Ball.Add_Component < Box_Collider > ( )->Set_Size ( Ball.Get_Size().x );
 	Ball.Add_Component < Rigidbody > ( )->time_scale = 0.3;
 	Ball.Add_Component < Ball_Controller > ( )->Set ( pun, largezza_campo, bip );
 
-	Manager::Set_Active_Scene ( &Scene );
+	Manager::Set_Active_Scene ( &PostProcessor );
+	ReKat::phisiks::Set_Active ( &Scene );
+
+	// setting for the first time the score signal
+	ReKat::sygnal::SetSignal ( "SCORE", {S_BOOL,false} );
 
 	while ( ReKat::grapik::IsEnd ( ) ) {
 		glClearColor(0.0, 0.0, 0.0, 1.0f);

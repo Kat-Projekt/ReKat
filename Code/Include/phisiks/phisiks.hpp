@@ -244,8 +244,12 @@ namespace phisiks {
     static List < Collider* > Colliders;
     static List < Rigidbody* > Rigidbodys;
     static void Resolve_Collision ( );
+    static Objekt * Active = nullptr;
 
-    static void Start ( int phisik_fps ) { 
+    static void Start ( int phisik_fps ) {
+        // get active scene;
+        if ( Active == nullptr ) 
+        { Active = Manager::Get_Active_Scene ( ); }
         _phisik_fps = phisik_fps; 
         _phisik_update_ratio = 1 / _phisik_fps;
 
@@ -256,8 +260,6 @@ namespace phisiks {
     static void Update ( ) {
         DEBUG ( 4, "Updating Phisiks" );
         Timer::Update ( );
-        // get active scene;
-        auto Active = Manager::Get_Active_Scene ( );
 
         DEBUG ( 5, "Updating Fixed Updates" );
         DEBUG ( 6, _last_phisik_update );
@@ -398,6 +400,9 @@ namespace phisiks {
 		}
 		DEBUG ( 2, "Wrong Collider type" );
     }
+
+    static void Set_Active ( Objekt* new_Active ) 
+    { Active = new_Active; }
 } // namespace phisiks
 } // namespace ReKat 
 
