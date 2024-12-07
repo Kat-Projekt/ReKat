@@ -1,6 +1,11 @@
+#ifndef PARSER
+#define PARSER
+
 #include <iostream>
 #include <string>
 #include <vector>
+#include <fstream>
+#define DIAGNOSTIC
 #include <debugger.hpp>
 
 class Reader {
@@ -227,7 +232,7 @@ public:
 	}
 	
 	Parser ( Lexer _lexer ) {
-        DEBUG ( "Starting Parser" );
+        DEBUG ( 4, "Starting Parser" );
 		lexer = _lexer;
 		int temp = -1;
 
@@ -236,7 +241,7 @@ public:
 		while ( !lexer.Eof ( ) ) 
 		{ root.push_back ( Find_node ( ) ); }
 		
-        DEBUG ( "Done Parser" );
+        DEBUG ( 4, "Done Parser" );
 	}
 };
 
@@ -253,6 +258,11 @@ class Projekt {
 		std::string value;
 	};
 
+	friend std::ostream& operator << ( std::ostream& os, const _Argument a ) {
+		os << a.value;
+		return os;
+	}
+
 	struct _Resource {
 		std::string type;
 		std::string name;
@@ -264,9 +274,10 @@ class Projekt {
 		std::vector < _Argument > Arguments;
 	};
 
-	struct _Additional_scripts {
-		std::string path;
-	};
+	friend std::ostream& operator << ( std::ostream& os, const _Component c ) {
+		os << c.name;
+		return os;
+	}
 
 	struct _Objekt {
 		std::string name;
@@ -275,11 +286,15 @@ class Projekt {
 		std::vector < _Objekt > Childs;
 	};
 
+	friend std::ostream& operator << ( std::ostream& os, const _Objekt o ) {
+		os << o.name;
+		return os;
+	}
+
 	std::string name = "";
 	_Interface Interface;
 	std::vector < _Objekt > Objekts;
 	std::vector < _Resource > Resources;
-	std::vector < _Additional_scripts > Additional_scripts;
 	
 	std::string Projekt_Entry_Point;
 
@@ -303,8 +318,8 @@ class Projekt {
 
 		// find modules node: graphik, synth, katwork,
 		for ( auto n : p.root ) {
-            if ( n.token == "graphik" || n.token == "graphik" || n.token == "katwork" ) {
-                bool valore;
+            if ( n.token == "graphik" || n.token == "synth" || n.token == "katwork" ) {
+                bool valore = false;
                 if ( n.childrens[0].token == "true" ) { valore == true; }
                 else if ( n.childrens[0].token == "false" ) { valore == false; }
                 else { DEBUG ( 1, "erroneus boolean type after token: ", n.token ); }
@@ -317,6 +332,7 @@ class Projekt {
 		}
 
 		// configure resources
+		DEBUG ( 4, "Resources" );
 		for ( auto n : p.root ) {
 			if ( n.token == ".resources" ) {
 				for ( auto risorce_typ : n.childrens ) {
@@ -327,22 +343,14 @@ class Projekt {
 						resource.name = ris.token;
 						for ( auto arg : ris.childrens ) { resource.Arguments.push_back ( { arg.token } ); }
 						Resources.push_back ( resource );
+						DEBUG ( 5, resource.type, " : ", resource.name, " { ", resource.Arguments , " }" );
 					}
 				}
 			}
 		}
 
-		// configure additional include files
-		for ( auto n : p.root ) {
-			if ( n.token == ".components" ) {
-				for ( auto additional_include : n.childrens ) {
-					std::string include = additional_include.token;
-					Additional_scripts.push_back ( { include } );
-				}
-			}
-		}
-
 		// configure objekts
+		DEBUG ( 4, "Objkets" );
 		for ( auto n : p.root ) {
 			if ( n.token == ".objekts" ) {
 				for ( auto obj_token : n.childrens ) {
@@ -373,6 +381,7 @@ class Projekt {
 						}
 					}
 					Objekts.push_back (obj);
+					DEBUG ( 5, obj.name, " ( ", obj.Attributes, " ) : ", obj.Components , " : { ", obj.Childs, " }" );
 				}
 			}
 		}
@@ -382,3 +391,5 @@ class Projekt {
 inline Projekt parse ( std::string file ) {
     return Projekt ( Parser ( Lexer ( Reader ( file ) ) ) );
 }
+
+#endif

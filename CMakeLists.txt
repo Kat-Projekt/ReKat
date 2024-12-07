@@ -3,7 +3,8 @@ cmake_minimum_required ( VERSION 3.13 )
 project ( ReKat )
 
 option ( REKAT_LIBRARY "Compile the Engine as a library, else the headers will be included in the executable" OFF )
-option ( REKAT_TEST "Compile the test suite" ON )
+option ( REKAT_TEST "Compile the test suite" OFF )
+option ( REKAT_ENGINE "Compile the Engine interpreter" ON )
 
 list ( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/Cmake" )
 
@@ -37,4 +38,17 @@ if ( REKAT_TEST )
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Test/${TEST}/Resources $<TARGET_FILE_DIR:${TEST}> )
 
     endforeach ( TEST )
+endif ( )
+
+if ( REKAT_ENGINE )
+    file ( GLOB PROJECT_SOURCES ${CMAKE_SOURCE_DIR}/Src/main.cpp )
+    add_executable(Engine	    ${PROJECT_SOURCES}  ${PROJECT_HEADERS}
+                                ${PROJECT_CONFIGS}  ${LIBS_SOURCES})
+
+    target_link_libraries ( Engine glfw freetype OpenAL # OpenAL::OpenAL
+                        ${GLFW_LIBRARIES} ${GLAD_LIBRARIES} ${WINSOCK_LIBRARIES} )
+
+    set_target_properties ( Engine PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Engine_Interpreter )
+
 endif ( )

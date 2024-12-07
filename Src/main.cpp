@@ -10,6 +10,17 @@ int main ( int argc, char const *argv[] ) {
 	auto pj = parse ( argv[1] );
 
     // run the interpreter
+    load ( pj );
+
+    start ( );
+
+    if ( pj.Interface.graphik == true ) {
+        while ( ReKat::grapik::IsEnd( ) ) 
+        { Update ( ); }
+    } else {
+        while ( true ) 
+        { Update ( ); }
+    }
 
     return 0;
 }
