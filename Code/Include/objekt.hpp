@@ -35,6 +35,7 @@ public:
 
 #include "utility/printer.h"
 #include "utility/list.h"
+#include "utility/map.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
@@ -171,7 +172,7 @@ public:
     bool Get_Active ( ) { return _active; }
 
     void Set_Name ( std::string name ) { _name = name; }
-    std::string Get_Name ( ) { return _name; }
+    inline std::string Get_Name ( ) { return _name; }
 
     template < class C >
     C* Add_Component ( ) {
@@ -240,7 +241,7 @@ public:
     virtual void Start ( ) {
 		if ( _started ) { return; }
 		if ( !_active ) { return; }
-		DEBUG ( 4,"Starting Objekt: " + Get_Name() );
+		DEBUG ( 4,"Starting Objekt: ", Get_Name() );
         auto C = _components.Get_Begin ( );
 		while ( C != nullptr ) {
 			DEBUG ( 6," - Starting Componenet: ", std::string(typeid(*(C->data)).name()) );
@@ -255,13 +256,13 @@ public:
 			O = O->next;
 		}
 		DEBUG ( 6,"Childrens Started" );
-		DEBUG ( 5,"Started Objekt: " + Get_Name() );
+		DEBUG ( 5,"Started Objekt: ", Get_Name() );
 		_started = true;
     }
 
     virtual void Update ( ) {
 		if ( !_active ) { return; }
-		DEBUG ( 4,"Updating Objekt: " + Get_Name() );
+		DEBUG ( 4,"Updating Objekt: ", Get_Name() );
         auto C = _components.Get_Begin ( );
 		while ( C != nullptr ) {
 			DEBUG ( 6,"Updating Componenet: ", std::string(typeid(*C->data).name()));
@@ -275,12 +276,12 @@ public:
 			O = O->next;
 		}
 		DEBUG ( 6,"Childrens Updated" );
-		DEBUG ( 5,"Updated Objekt: " + Get_Name() );
+		DEBUG ( 5,"Updated Objekt: ", Get_Name() );
     }
 
     virtual void Fixed_Update ( ) {
 		if ( !_active ) { return; }
-		DEBUG ( 5,"Updating Fixed Objekt: " + Get_Name() );
+		DEBUG ( 5,"Updating Fixed Objekt: ", Get_Name() );
         auto C = _components.Get_Begin ( );
 		while ( C != nullptr ) {
 			DEBUG ( 6," - Updating Fixed Componenet: ", std::string(typeid(*C->data).name()));
@@ -328,7 +329,7 @@ public:
         model = glm::translate(model, position);
         if ( _rot.x != 0 ) { model = glm::rotate(model, glm::radians(_rot.x), glm::vec3(1.0f, 0.0f, 0.0f)); }
     	if ( _rot.y != 0 ) { model = glm::rotate(model, glm::radians(_rot.y), glm::vec3(0.0f, 1.0f, 0.0f)); }
-    	if ( _rot.z != 0 ) { model = glm::rotate(model, _rot.z, glm::vec3(0.0f, 0.0f, 1.0f)); }
+    	if ( _rot.z != 0 ) { model = glm::rotate(model, glm::radians(_rot.z), glm::vec3(0.0f, 0.0f, 1.0f)); }
         model = glm::translate(model, -Pivot);
 
         model = glm::scale(model, _size);
@@ -337,7 +338,7 @@ public:
 	}
 
 	void Print_Tree ( std::string level ) {
-		std::cout << level << _name << ( _active ? " v" : " x") << '\n';
+		std::cout << level << _name << " " << _pos << " " << _size << ( _active ? " v" : " x") << '\n';
 		auto _C = _components.Get_Begin ( );
 		while ( _C != nullptr ) {
 			std::cout << level << "+ " << typeid(*_C->data).name() << ( _C->data->Get_Active () ? " v" : " x") << '\n';
@@ -363,8 +364,18 @@ namespace Manager {
 	static void Update ( ) { if ( _current_scene != nullptr ) { 
 		color ( "UPDATING\n", BACKGROUND_BLUE | FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY );
 		_current_scene->Update();
+		color ( "UPDATED\n", BACKGROUND_BLUE | FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY );
 	} };
 
+	static Objekt* Objekt_Get ( std::string name ) {
+		auto S = objekts.Get_Begin ( );
+		while ( S != nullptr ) {
+			if ( S->data->Get_Name () == name ) 
+			{ return S->data; }
+			S = S->next;
+		}
+		DEBUG ( 1, "Cannot find objekt ", name );
+	}
 	static Objekt* Objekt_Load ( std::string name, vec3 pos = {0,0,0}, vec3 size = {100,100,100}, vec3 rot = {0,0,0}, vec3 rot_pivot = {0,0,0} ) {
 		auto o = new Objekt(name, pos, size, rot, rot_pivot);
 		objekts.append ( o );
@@ -384,7 +395,7 @@ namespace Manager {
 		auto S = objekts.Get_Begin ( );
 		while ( S != nullptr ) {
 			if ( S->data->Get_Name () == s ) 
-			{ _current_scene = S->data; Start ( ); DEBUG ( 5,"added main scene" ); break; }
+			{ _current_scene = S->data; Start ( ); DEBUG ( 5,"added main scene" ); return; }
 			S = S->next;
 		}
 	}

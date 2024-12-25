@@ -1,6 +1,8 @@
 #ifndef AUDIO_BUFFER
 #define AUDIO_BUFFER
 
+#include "../../resource.hpp"
+
 // include openal libs
 #include <AL/al.h>
 #include <AL/alc.h>
@@ -11,7 +13,7 @@
 // load lib
 #include "../audioFile.h"
 
-class Buffer {
+class Buffer : public Resource {
 public:
 	ALuint buffer;
 	

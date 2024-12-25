@@ -27,7 +27,6 @@ int load ( Projekt pj ) {
 int start ( ) {
 
     return 0;
-
 }
 
 int update ( ) {

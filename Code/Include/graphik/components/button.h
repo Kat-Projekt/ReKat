@@ -35,8 +35,7 @@ public:
 		// calculate hover
 		vec2 Pos = obj->Get_Pos ( );
 		vec2 Size = obj->Get_Size ( ) * 0.5f;
-		std::cout << mouse_pos;
-        if ( ( mouse_pos.x - Pos.x > -Size.x && mouse_pos.x - Pos.x < Size.x ) && 
+		if ( ( mouse_pos.x - Pos.x > -Size.x && mouse_pos.x - Pos.x < Size.x ) && 
              ( mouse_pos.y - Pos.y > -Size.y && mouse_pos.y - Pos.y < Size.y ) ) 
         { hover = true; } else { hover = false; }
 
@@ -114,7 +113,7 @@ public:
 	Button* OnHover ( void ( *call ) ( ) ) 
 	{ _hover_call = call; return this; }
 
-	Button* Set ( std::string click_is)
+	Button* Set ( std::string click_is )
 	{ _click_is = click_is; return this; }
 };
 

@@ -19,7 +19,7 @@ endif ( )
 
 # compile the examples
 set ( TESTS Render_Test Core_Test Text_Display_Test Button_Test Collision_Test Pong_Test Phisiks_Test )
-set ( TESTS Pong_Test )
+# set ( TESTS Pong_Test )
 
 if ( REKAT_TEST )
     foreach ( TEST ${TESTS} )

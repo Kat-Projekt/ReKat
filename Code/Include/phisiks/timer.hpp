@@ -23,6 +23,7 @@ namespace Timer {
 		auto t = Get_Time_d ( );
         delta_time = (float)(t - current_time);
         current_time = t;
+        DEBUG ( 3, "Time up to date" );
     }
 	void Fixed_Update ( ) {
 		auto t = Get_Time_d ( );

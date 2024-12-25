@@ -23,4 +23,22 @@ public:
 	}
 };
 
+namespace Manager {
+	static std::unordered_map < std::string, Camera* > cameras;
+	
+	static Camera * Camera_Load ( std::string name, Objekt* pointer ) {
+		if ( pointer == nullptr ) 
+		{ DEBUG ( 1, "Invalid camera pointer" ); return nullptr; }
+		auto C = pointer->Add_Component < Camera > ( );
+		cameras.insert ( {name, C} );
+	}
+	static Camera * Camera_Get ( std::string name ) {
+		if ( name == "" ) { return nullptr; }
+		auto findit = cameras.find(name);
+		if ( findit != cameras.end() ) {
+			return findit->second;
+		} else { return nullptr; }
+	}
+}
+
 #endif

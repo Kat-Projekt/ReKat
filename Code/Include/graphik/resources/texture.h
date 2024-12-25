@@ -1,6 +1,8 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
+#include "../../resource.hpp"
+
 #include <glad/glad.h>
 #include "../graphik_debugger.hpp"
 
@@ -9,7 +11,7 @@
 #include <stb_image.h>
 #endif
 
-class Texture {
+class Texture: public Resource {
 public:
     enum Status {
         SUCCESS,

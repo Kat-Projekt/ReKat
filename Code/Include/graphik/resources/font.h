@@ -1,6 +1,8 @@
 #ifndef FONT_H
 #define FONT_H
 
+#include "../../resource.hpp"
+
 #include "texture.h"
 
 #include <ft2build.h>
@@ -8,7 +10,7 @@
 
 #include "../graphik_debugger.hpp"
 
-class Font {
+class Font : public Resource {
 private:
 	unsigned int _padding = 2;
 	unsigned int _texture;
@@ -36,7 +38,7 @@ public:
 
 	Texture * Get_Texture ( ) { return new Texture(_texture); }
 
-    void Use ( ) const { glActiveTexture(GL_TEXTURE0); glBindTexture(GL_TEXTURE_2D, _texture); }
+    void Use ( ) const { glActiveTexture(GL_TEXTURE0); GL_CHECK_ERROR; glBindTexture(GL_TEXTURE_2D, _texture); GL_CHECK_ERROR; }
 
 	int Get_Heigth ( ) { return _font_heigth; }
 };

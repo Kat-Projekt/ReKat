@@ -111,7 +111,7 @@ public:
 	List* remove ( T data ) {
 		auto C = _first;
 		while ( C != nullptr ) {
-			if ( C->data == data ) { std::cout << "removed\n"; break; }
+			if ( C->data == data ) { break; }
 			C = C->next;
 		}
 		// not found
@@ -161,10 +161,8 @@ public:
 		return os;
 	}
 
-	friend std::ostream& operator,(std::ostream& out, List<T>& list )
+	friend std::ostream& operator, ( std::ostream& out, List<T>& list )
 	{ out << list; return out; }
 };
-
-
 
 #endif

@@ -5,7 +5,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
 #include "list.h"
-#include <vector>
+#include <cmath>
 
 using namespace glm;
 

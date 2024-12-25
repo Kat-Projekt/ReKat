@@ -1,8 +1,8 @@
-// #define DIAGNOSTIC
+#define DIAGNOSTIC
 // #define EXPANCE
 #include <engine.hpp>
 
-float speed = 104 * 21;
+float speed = 104 * 14;
 float actual_speed = speed;
 
 class Change_Skin : public Behaviour {
@@ -32,16 +32,16 @@ class AI_Controller : public Behaviour {
 public:
 	void Update ( ) {
 		// follow perfectly ball
-		if ( Key_Pressed ( "I" ) ) { obj->Inc_Pos ( {0,actual_speed * Timer::delta_time,0} ); }
-		if ( Key_Pressed ( "K" ) ) { obj->Inc_Pos ( {0,-actual_speed* Timer::delta_time,0} ); }
+		if ( Key_Pressed ( "I" ) ) { obj->Inc_Pos ( {0,speed * Timer::delta_time,0} ); }
+		if ( Key_Pressed ( "K" ) ) { obj->Inc_Pos ( {0,-speed* Timer::delta_time,0} ); }
 
 		// stop outof border:
 		auto offset = obj->Get_Size ( ).y * 0.5f;
 		if ( obj->Get_Pos ( ).y > 500 - offset ) 
-		{ obj->Inc_Pos ( {0,-actual_speed * Timer::delta_time,0} ); }
+		{ obj->Inc_Pos ( {0,-speed * Timer::delta_time,0} ); }
 		
 		if ( obj->Get_Pos ( ).y < - 500 + offset ) 
-		{ obj->Inc_Pos ( {0,actual_speed * Timer::delta_time,0} ); }
+		{ obj->Inc_Pos ( {0,speed * Timer::delta_time,0} ); }
 
 		if ( ReKat::sygnal::GetSignal ( "SCORE" ).bdata == true ) 
 		{ obj->Set_Pos ( { obj->Get_Pos().x,0,0 } ); }
@@ -52,17 +52,17 @@ class Player_Controller : public Behaviour {
 private:
 public:
 	void Update ( ) {
-		if ( Key_Pressed ( "W" ) ) { obj->Inc_Pos ( {0,actual_speed * Timer::delta_time,0} ); }
-		if ( Key_Pressed ( "S" ) ) { obj->Inc_Pos ( {0,-actual_speed* Timer::delta_time,0} ); }
+		if ( Key_Pressed ( "W" ) ) { obj->Inc_Pos ( {0,speed * Timer::delta_time,0} ); }
+		if ( Key_Pressed ( "S" ) ) { obj->Inc_Pos ( {0,-speed* Timer::delta_time,0} ); }
 		// std::cout << Timer::delta_time;
 
 		// stop outof border:
 		auto offset = obj->Get_Size ( ).y * 0.5f;
 		if ( obj->Get_Pos ( ).y > 500 - offset ) 
-		{ obj->Inc_Pos ( {0,-actual_speed * Timer::delta_time,0} ); }
+		{ obj->Inc_Pos ( {0,-speed * Timer::delta_time,0} ); }
 		
 		if ( obj->Get_Pos ( ).y < - 500 + offset ) 
-		{ obj->Inc_Pos ( {0,actual_speed * Timer::delta_time,0} ); }
+		{ obj->Inc_Pos ( {0,speed * Timer::delta_time,0} ); }
 
 		if ( ReKat::sygnal::GetSignal ( "SCORE" ).bdata == true ) 
 		{ obj->Set_Pos ( { obj->Get_Pos().x,0,0 } ); }
@@ -251,8 +251,7 @@ int main ( ) {
 		ReKat::phisiks::Update ( );
 	}
 
-	Manager::Free_Video ( );
-	Manager::Free_Audio ( );
+	Manager::Free ( );
 
 	ReKat::grapik::End ( );
 	ReKat::synth::End ( );

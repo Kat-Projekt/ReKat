@@ -3,6 +3,7 @@
 
 #include "../objekt.hpp"
 #include "components/collision.h"
+#include <unordered_map>
 
 #include "timer.hpp"
 
@@ -11,12 +12,7 @@
 class Hash_Map {
 private:
     float _spacing;
-    std::vector < List < Collider * > * > _particle_map;
-	struct indexed_collider	{
-		Collider* collider;
-		int hash;
-	};
-    List < indexed_collider > indexed_colliders;
+	Map < int, Collider* > indexed_colliders;
     int max = 0;
 
 public:
@@ -107,8 +103,9 @@ public:
         norm.z = floor ( norm.z );
         norm.z = 0; // ognore third dimension
 
-        std::vector < vec3 > neibours_relative_pos = { { 0, 1,0 }, {  1, 1,0 }, {  1,0,0 }, { 1,-1,0 }, 
-                                                       { 0,-1,0 }, { -1,-1,0 }, { -1,0,0 }, { -1,1,0 } };
+        std::vector < vec3 > neibours_relative_pos = { { 1, 1,0 }, { 0, 1,0 }, { -1, 1,0 },
+                                                       { 1, 0,0 }, { 0, 0,0 }, { -1, 0,0 },
+                                                       { 1,-1,0 }, { 0,-1,0 }, { -1,-1,0 }};
 
         Neibours N_indexes;
         N_indexes.hash = (int*) calloc ( 8, sizeof (int) );
@@ -140,29 +137,11 @@ public:
 		while ( C != nullptr ) {
             auto Hash = Normalize_and_Hash ( C->data->obj->Get_Pos ( ) );
             if ( Hash > max ) { max = Hash; } // get max hash
-            indexed_colliders.append ( { C->data, Hash } );
+            indexed_colliders.append ( { Hash, C->data } );
 			C = C->next;
-            
 		}
 
         DEBUG ( 5, "Normalized and Hashed with max: ", max );
-
-        max; // prevent over flow
-		_particle_map.resize ( max + 1 );
-
-		for ( auto C = indexed_colliders.begin ( ); C != nullptr; C = C->next ) {
-            DEBUG ( 5, "indexing ", C->data.hash );
-			auto vect = _particle_map [ C->data.hash ];
-			if ( vect == nullptr ) {
-                DEBUG ( 6, "inizialing" );
-				vect = new List < Collider* >;
-				_particle_map [ C->data.hash ] = vect; 
-                DEBUG ( 6, "Inizialized" );
-			}
-			vect->append ( C->data.collider );
-		}
-
-        DEBUG ( 5, "Particle map Populated" );
     }
 
 	struct collision_check {
@@ -186,21 +165,16 @@ public:
 		DEBUG ( 5, "Getting Collisions Checks" );
 		for ( auto C = indexed_colliders.begin ( ); C != nullptr; C = C->next ) {
 			// get neibours
-            auto Neibours_indexes = Get_Neibours ( C->data.collider->obj->Get_Pos ( ) );
-            auto This_collider = C->data.collider;
+            auto Neibours_indexes = Get_Neibours ( C->data->obj->Get_Pos ( ) );
+            auto This_collider = C->data;
 
             DEBUG ( 5, Neibours_indexes );
 
             List < Collider * > Neiboursing_colliders;
-            // Add same cell colliders
-            for ( auto Coll = _particle_map[C->data.hash]->begin ( ); Coll != nullptr; Coll = Coll->next ) {
-                if ( Coll->data != C->data.collider ) 
-                { Neiboursing_colliders.append ( Coll->data ); DEBUG ( 6, "added: ",  Coll->data, " with ", C->data.collider ); }
-            }
-            
-            // Add other cells colliders
-            for ( size_t i = 0; i < Neibours_indexes.number; i++ ) 
-            { Neiboursing_colliders.append ( _particle_map [ Neibours_indexes.hash[i] ] ); }
+            // Add colliders
+            Neiboursing_colliders.append ( indexed_colliders.get ( Neibours_indexes.hash, Neibours_indexes.number ) );
+            // remove same collider
+            Neiboursing_colliders.remove ( C->data );
 
             // adding checks
             for ( auto Coll = Neiboursing_colliders.begin ( ); Coll != nullptr; Coll = Coll->next ) {
@@ -247,9 +221,6 @@ namespace phisiks {
     static Objekt * Active = nullptr;
 
     static void Start ( int phisik_fps ) {
-        // get active scene;
-        if ( Active == nullptr ) 
-        { Active = Manager::Get_Active_Scene ( ); }
         _phisik_fps = phisik_fps; 
         _phisik_update_ratio = 1 / _phisik_fps;
 
@@ -260,11 +231,11 @@ namespace phisiks {
     static void Update ( ) {
         DEBUG ( 4, "Updating Phisiks" );
         Timer::Update ( );
+        if ( Active == nullptr ) { DEBUG (3,"no phisiks target"); return; }
 
         DEBUG ( 5, "Updating Fixed Updates" );
         DEBUG ( 6, _last_phisik_update );
 
-        Timer::Update ( );
         if ( _phisik_fps > 0 ) { 
         if ( _last_phisik_update + _phisik_update_ratio <= Timer::Get_Time ( ) ) {
             _last_phisik_update = Timer::Get_Time ( );
@@ -288,7 +259,7 @@ namespace phisiks {
         DEBUG ( 4, " Colliders to check: ", active_colliders );
 
         DEBUG ( 5, "Inizializing Spacial Map" );
-        Hash_Map map ( 100 );
+        Hash_Map map ( 200 );
         map.Set_Colliders ( active_colliders );
 
         auto checks = map.Get_collisions_to_check ( );
@@ -403,6 +374,8 @@ namespace phisiks {
 
     static void Set_Active ( Objekt* new_Active ) 
     { Active = new_Active; }
+    static void Set_Active (std::string new_Active ) 
+    { Active = Manager::Objekt_Get ( new_Active ); }
 } // namespace phisiks
 } // namespace ReKat 
 

@@ -132,7 +132,9 @@ public:
         glBindVertexArray(0);
 	}
 
-	Tilemap* Set ( std::string path, Texture* texture, Shader* shader, Camera* camera, vec2 tile_set = {1,1}, vec4 color = {1,1,1,1} ) 
-	{ _path = path; _texture = texture; _shader = shader; _camera = camera; _tile_set = tile_set; _color = color; return this; }
+	Tilemap* Set ( std::string path, Texture* tile_map, Shader* shader, Camera* camera, vec2 tile_set = {1,1}, vec4 color = {1,1,1,1} ) 
+	{ _path = path; _texture = tile_map; _shader = shader; _camera = camera; _tile_set = tile_set; _color = color; return this; }
+    Tilemap* Set ( std::string path, std::string texture, std::string shader, std::string camera, vec2 tile_set = {1,1}, vec4 color = {1,1,1,1} ) 
+	{ _path = path; _texture = Manager::Texture_Get ( texture ); _shader = Manager::Shader_Get ( shader ); _camera = Manager::Camera_Get ( camera ); _tile_set = tile_set; _color = color; return this; }
 };
 #endif

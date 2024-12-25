@@ -159,6 +159,7 @@ namespace Input {
 			if ( k->second == PRESSED ) { k->second = HELD; }
 			if ( k->second == RELEASED ) { k->second = NONE; }
 		}
+		color ( "UPDATED INPUT\n", BACKGROUND_GREEN | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY );
 	}
 	static bool Key_Down ( std::string key ) 
 	{ return ( keys[key] == PRESSED ? true : false ); }
@@ -272,6 +273,7 @@ namespace ReKat::grapik {
 	static void Update ( ) {
 		ReKat::grapik::Input::Update ( );
 		ReKat::grapik::Pool ( );
+		color ( "UPDATED GRAPY\n", BACKGROUND_GREEN | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY );
 	}
 }
 

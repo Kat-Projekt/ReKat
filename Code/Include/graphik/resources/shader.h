@@ -1,6 +1,8 @@
 #ifndef SHADER_H
 #define SHADER_H
 
+#include "../../resource.hpp"
+
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -11,7 +13,7 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-class Shader {
+class Shader : public Resource {
 public:
     enum Status {
         SUCCESS,

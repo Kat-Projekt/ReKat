@@ -1,4 +1,5 @@
 #define DIAGNOSTIC
+#define EXPANCE
 #include <graphik/components.hpp>
 
 int main ( ) {
@@ -18,7 +19,7 @@ int main ( ) {
     Camera camera;
 
     Logo.Add_Component < Sprite > ( )->Set ( "logo", "sprite", &camera );
-    Testo.Add_Component< Text > ( )->Set ( "font", "text", &camera, {1,0,1,1} );
+    Testo.Add_Component< Text > ( )->Set ( "font", "text", &camera, {1,0,1,1} )->Set ( "cazzo palle" );
     main.Add_Component ( &camera );
     Logo.Set_Size ( {300,300,100} );
     Logo.Set_Pos ( {0,300,0} );
@@ -37,7 +38,7 @@ int main ( ) {
     }
     
     ReKat::grapik::Terminate ( );
-    Manager::Free_Video ( );
+    Manager::Free ( );
     main.Free ( );
     return 0;
 }

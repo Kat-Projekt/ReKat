@@ -17,7 +17,6 @@ public:
 		if ( block_z ) { velocity.z = 0; acceleration.z = 0;}
 		if ( acceleration != vec3{0,0,0} ) { velocity += acceleration * Timer::fixed_delta_time * time_scale; }
 		obj->Inc_Pos ( velocity * Timer::fixed_delta_time * time_scale );
-		std::cout << "\t" << Timer::fixed_delta_time;
 	}
 
 	void Vincolar_Reaction ( vec3 plane_normal ) {

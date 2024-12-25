@@ -28,6 +28,7 @@
 	#include <iostream>
 	void color ( const char* string, WORD color ) {
 		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+		SetConsoleOutputCP(CP_UTF8);
 		SetConsoleTextAttribute(hConsole, color);
 		std::cout << string;
 		SetConsoleTextAttribute( hConsole, FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY );

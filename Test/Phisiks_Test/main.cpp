@@ -62,7 +62,7 @@ int main ( ) {
 	}
 	
 
-	Manager::Free_Video ( );
+	Manager::Free ( );
 	// Manager::Free_Audio ( );
 	
 	ReKat::grapik::End ( );

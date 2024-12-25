@@ -17,6 +17,7 @@ private:
 	
 	
 	std::string _text = "";
+	std::string _new_text = "";
 	ALIGNMENT _text_aligne;
 	bool _x_warp = false;
 
@@ -26,13 +27,15 @@ private:
 	Font *_font = nullptr;
 
 	vec4 _color = {1,1,1,1};
-	bool is_up_to_date = true;
+	bool is_up_to_date = false;
 
 public:
 	void Update_Instance_Buffer ( ) {
 		// only one update for the buffer per frame
 		if ( is_up_to_date ) { return; }
 		is_up_to_date = true;
+		
+        DEBUG ( 5, "Updating Instance buffer Text");
 
 		if ( _font == nullptr ) { return; }
 		// contains glyph texure index width and pos in pixels
@@ -88,16 +91,17 @@ public:
         glBufferData(GL_ARRAY_BUFFER, (sizeof(int)*4) *_text.size(), instance_buffer, GL_STATIC_DRAW); GL_CHECK_ERROR;
 		DEBUG (5, "load data into buffer");
 		// setting
-		glBindVertexArray(_quad); 
-		glVertexAttribPointer(1, 4, GL_INT, GL_FALSE, 4 * sizeof(int), (void*)0);
+		glBindVertexArray(_quad); GL_CHECK_ERROR;
+		glVertexAttribPointer(1, 4, GL_INT, GL_FALSE, 4 * sizeof(int), (void*)0); GL_CHECK_ERROR;
 		DEBUG (5,"setted vertex array");
 		// unbind
-        glBindVertexArray(0); 
-        glBindBuffer(GL_ARRAY_BUFFER, 0); 
+        glBindVertexArray(0); GL_CHECK_ERROR;
+        glBindBuffer(GL_ARRAY_BUFFER, 0); GL_CHECK_ERROR;
 		DEBUG (4, "Updated Istance Buffer" );
 	}
 
     void Start ( ) {
+        DEBUG ( 5, "Staring Text");
 		unsigned int VBO;
         float vertices[] = { 
             // pos      // tex
@@ -136,18 +140,26 @@ public:
         glBindVertexArray(0); GL_CHECK_ERROR;
 
 		_shader->setInt ( "image", 0 );
+
 		Update_Instance_Buffer ( );
 	}
 
     void Update ( ) {
 		// make sures that the buffer is update once per frame
 		is_up_to_date = false;
+		if ( _new_text != _text ) 
+		{ _text = _new_text; Update_Instance_Buffer ( ); }
 
 		if ( _text.size() == 0 ) { return; }
         DEBUG ( 5, "Staring Updating Text");
 		// prepare transformations
-		if ( _shader == nullptr || _font == nullptr || _camera == nullptr ) { DEBUG ( 1, "Component not set Correctly" ); return; }
+		if ( _shader == nullptr || _font == nullptr ) { DEBUG ( 1, "Component not set Correctly" ); return; }
 
+		if ( _camera == nullptr ) 
+		{ _shader->setMat4  ( "projection", Camera::UI_Projkection ( ) ); }
+		else
+		{ _shader->setMat4  ( "projection", _camera->Projkection ( ) ); }
+		
 		_shader->setMat4  ( "projection", _camera->UI_Projkection ( ) );
 		DEBUG ( 6, "Updated Camera uniform");
 
@@ -161,7 +173,6 @@ public:
         DEBUG ( 6, "Updated Model uniform");
 
 		_shader->setVec4 ( "spriteColor", _color );
-        _shader->setInt  ( "frame", 104 );
         DEBUG ( 6, "Updated Frame uniforms");
 
 		_font->Use();
@@ -173,24 +184,26 @@ public:
         DEBUG (5, "Drawn Text");
 	}
 
-	Text * Set ( Font* font, Shader* shader, Camera* camera, vec4 color = {1,1,1,1} ) 
+	Text * Set ( Font* font, Shader* shader, Camera* camera = nullptr, vec4 color = {1,1,1,1} ) 
 	{ _font = font; _shader = shader; _camera = camera; 
 	_color = color; return this; }
 
-	Text * Set ( std::string font, std::string shader, Camera* camera, vec4 color = {1,1,1,1} ) 
-	{ _font = Manager::Font_Get ( font ); _shader = Manager::Shader_Get ( shader ); _camera = camera; 
+	Text * Set ( std::string font, std::string shader, std::string camera = "", vec4 color = {1,1,1,1} ) 
+	{ _font = Manager::Font_Get ( font ); _shader = Manager::Shader_Get ( shader ); _camera = Manager::Camera_Get ( camera ); 
 	_color = color; return this; }
 
-	Text * Set ( std::string text, ALIGNMENT al = RIGHT, bool x_warp = false ) {
-		if ( _text != text ) {
-			_text = text;
-			_text_aligne = al;
-			_x_warp = x_warp;
-			Update_Instance_Buffer ( );
-		}
+	Text * Set ( std::string text, ALIGNMENT al = CENTER, bool x_warp = false ) {
+		_new_text = text;
+		_text_aligne = al;
+		_x_warp = x_warp;
 		DEBUG (3, "Text changed: ", text );
 		return this;
 	}
+
+	Text * Set ( vec4 color ) 
+	{ _color = color; return this; }
+
+	vec4 * Expose_Color ( ) { return &_color; }
 };
 
 #endif

@@ -17,7 +17,7 @@ add_subdirectory(Code/Lib/glfw)
 add_subdirectory(Code/Lib/freetype)
 
 if(MSVC)
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /std:c++17")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
 else()
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic -std=c++17")
 	if(NOT WIN32)
@@ -39,10 +39,8 @@ file(GLOB LIBS_SOURCES	Code/Lib/glad/src/glad.c
 file(GLOB PROJECT_HEADERS Code/Include/*.hpp
 						  Code/Inlcude/*.h)
 file(GLOB PROJECT_CONFIGS CMakeLists.txt
-						  Readme.md
-						 .gitattributes
-						 .gitignore
-						 .gitmodules)
+						  CMakePresets.json
+						  Readme.md)
 
 source_group("Include" FILES ${PROJECT_HEADERS})
 source_group("Sources" FILES ${PROJECT_SOURCES})

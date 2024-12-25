@@ -57,6 +57,7 @@ public:
 	void Update ( ) {
 		// prepare transformations
         DEBUG ( 5, "Staring Updating Sprite");
+        DEBUG ( 6, _shader, " ", _texture, " ", _camera, " ", _UI_render );
 		if ( _shader == nullptr || _texture == nullptr || ( _camera == nullptr && !_UI_render ) ) { DEBUG ( 2, "Component not set Correctly" ); return; }
 
 		_shader->setMat4  ( "projection", ( _UI_render ? Camera::UI_Projkection ( ) : _camera->Projkection ( )) );
@@ -89,8 +90,8 @@ public:
 	{ _texture = texture; _shader = shader; _camera = camera;
 	_frames = frames; this->frame = frame; _color = color; _UI_render = UI_sprite; return this; }
 
-    Sprite* Set ( std::string texture, std::string shader, Camera* camera = nullptr, ivec2 frames = {1,1}, int frame = 0, vec4 color = {1,1,1,1}, bool UI_sprite = false ) 
-	{ _texture = Manager::Texture_Get ( texture ); _shader = Manager::Shader_Get ( shader ); _camera = camera;
+    Sprite* Set ( std::string texture, std::string shader, std::string camera = "", ivec2 frames = {1,1}, int frame = 0, vec4 color = {1,1,1,1}, bool UI_sprite = false ) 
+	{ _texture = Manager::Texture_Get ( texture ); _shader = Manager::Shader_Get ( shader ); _camera = Manager::Camera_Get ( camera );
 	_frames = frames; this->frame = frame; _color = color; _UI_render = UI_sprite; return this; }
 
 	Sprite* Set ( bool UI_sprite ) { _UI_render = UI_sprite; return this; }

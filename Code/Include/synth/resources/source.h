@@ -1,6 +1,8 @@
 #ifndef SOURCE_H
 #define SOURCE_H
 
+#include "../../resource.hpp"
+
 // include openal libs
 #include <AL/al.h>
 #include <AL/alc.h>
@@ -10,7 +12,7 @@
 
 #include <glm/glm.hpp>
 
-class Source {
+class Source : public Resource {
 private:
 	ALuint source;
 public:
@@ -18,7 +20,6 @@ public:
 	~Source ( ) { End( ); };
 
 	int Make ( glm::vec3 _pos = {0,0,0} ) {
-		int error;
 		alGenSources((ALuint)1, &source); AL_CHECK_ERROR;
 		// confinguration
 		alSourcef(source, AL_PITCH, 1); AL_CHECK_ERROR;
