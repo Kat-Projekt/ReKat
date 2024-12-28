@@ -212,25 +212,25 @@ int main ( ) {
 	Manager::Buffer_Load ( "bup", "bup.wav" );
 	Manager::Buffer_Load ( "badun", "badun.wav" );
 	Manager::Source_Load ( "bip" );
-	Camera* cam = new Camera;
+
 	DEBUG ( 3, "LOADED" );
 
 	PostProcessor.Add_Component < Framebuffer > ( )->Set(1600,900)->Set(&Scene)->Set("postprocesor");
 
-	Scene.Add_Component ( cam );
+	Manager::Camera_Load ( "cam", &Scene );
 	auto bip = Scene.Add_Component < Audio_Source > ( )->Set ( "bip", "bip" )->Set("bup")->Set("badun");
-	auto pun = Punteggio.Add_Component < Text > ( )->Set ( "font", "text", cam, {0,1,1,1} );
+	auto pun = Punteggio.Add_Component < Text > ( )->Set ( "font", "text", "cam", {0,1,1,1} );
 	Punteggio.Add_Component < Start_Timer > ( );
 
-	Player1.Add_Component < Sprite > ( )->Set ( "skin1", "sprite", cam, {2,1}, 1 ); // square sprite
+	Player1.Add_Component < Sprite > ( )->Set ( "skin1", "sprite", "cam", {2,1}, 1 ); // square sprite
 	Player1.Add_Component < Box_Collider > ( )->Set_Size ( Player1.Get_Size ( ) );
 	Player1.Add_Component < AI_Controller > ( );
-	Player2.Add_Component < Sprite > ( )->Set ( "skin2", "sprite", cam, {5,1}, 0 );
+	Player2.Add_Component < Sprite > ( )->Set ( "skin2", "sprite", "cam", {5,1}, 0 );
 	Player2.Add_Component < Box_Collider > ( )->Set_Size ( Player2.Get_Size ( ) );
 	Player2.Add_Component < Player_Controller > ( );
 	Player2.Add_Component < Change_Skin > ( );
 
-	Ball.Add_Component < Sprite > ( )->Set ( "skin1p", "sprite", cam ); // circle sprite
+	Ball.Add_Component < Sprite > ( )->Set ( "skin1p", "sprite", "cam" ); // circle sprite
 	Ball.Add_Component < Box_Collider > ( )->Set_Size ( Ball.Get_Size().x );
 	Ball.Add_Component < Rigidbody > ( )->time_scale = 0.3;
 	Ball.Add_Component < Ball_Controller > ( )->Set ( pun, largezza_campo, bip );

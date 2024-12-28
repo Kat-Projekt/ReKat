@@ -2,6 +2,7 @@
 #define COLOR
 #if (defined (LINUX) || defined (__linux__) || defined (__APPLE__)) // unix implementation
 #include <iostream>
+#include "utility/printer.h"
 #include <string>
 #define FOREGROUND_RED 1
 #define FOREGROUND_BLUE 2

@@ -3,7 +3,7 @@
 
 #include "../../resource.hpp"
 #include "../../utility/math.h"
-#include < vector >
+#include <vector>
 
 enum PlayMode {
     LOOP,

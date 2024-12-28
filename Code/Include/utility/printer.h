@@ -1,3 +1,6 @@
+#ifndef PRINTER
+#define PRINTER
+
 #include <iostream>
 #include <vector>
 #include <glm/glm.hpp>
@@ -30,3 +33,5 @@ std::ostream& operator << ( std::ostream& os, const std::vector<T>& vec ) {
 	{ std::cout << "{" << e << "} "; }
 	return os;
 }
+
+#endif

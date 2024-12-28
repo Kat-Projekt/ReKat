@@ -43,7 +43,7 @@ public:
 
 		HH = H * obj->Get_Size().y;
 		WW = W * obj->Get_Size().x;
-		std::cout << D << '\n' << HH << '\t' << WW;
+		// std::cout << D << '\n' << HH << '\t' << WW;
 	}
 
 	void Set ( std::string path ) { _path = path; }

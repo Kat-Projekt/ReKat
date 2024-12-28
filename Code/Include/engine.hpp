@@ -1,5 +1,6 @@
 #include "objekt.hpp"
 #include "signal.hpp"
+#include "utility/printer.h"
 #include "utility/color.h"
 #include "utility/components.hpp"
 #include "phisiks/components.hpp"
