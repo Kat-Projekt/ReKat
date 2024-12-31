@@ -29,8 +29,6 @@ class Animation : public Resource {
 
     std::vector < frame > frames;
 
-
-
     PlayMode _play;
     
 public:
@@ -67,34 +65,34 @@ public:
         return this;
     }
 
-    void Use ( float time ) {
+    void Use ( float _time ) {
         if ( frames.size() == 0 ) { DEBUG (2, "trying to animate an empty animation" ); }
-        if ( time < 0 ) { DEBUG (2, "NEGATIVE TIME"); return; }
+        if ( _time < 0 ) { DEBUG (2, "NEGATIVE TIME"); return; }
         if ( _play == ONCE ) { 
-            if ( time > total_duration ) {
-                DEBUG (4, "end of animation ", time ); 
+            if ( _time > total_duration ) {
+                DEBUG (4, "end of animation ", _time ); 
                 return;
             } 
         }
 
-        time = std::fmod ( time, total_duration );
+        _time = std::fmod ( _time, total_duration );
 
-        DEBUG ( 3, "animating ", current_frame, " time: ", time, " frames: ", frames.size() );
+        DEBUG ( 3, "animating ", current_frame, " time: ", _time, " frames: ", frames.size() );
 
         // get frame
         auto F = frames[current_frame];
-        while ( ! ( F.enter_time < time && time < F.enter_time + F.duration ) ) {
-            if ( time < F.enter_time ) { current_frame --; F = frames[current_frame]; continue; }
+        while ( ! ( F.enter_time < _time && _time < F.enter_time + F.duration ) ) {
+            if ( _time < F.enter_time ) { current_frame --; F = frames[current_frame]; continue; }
             current_frame ++;
             F = frames[current_frame];
         }
 
         // begin interpolation
-        time = ( time - F.enter_time ) / F.duration;
+        _time = ( _time - F.enter_time ) / F.duration;
         if ( _parameter != nullptr ) 
-        { *_parameter = F.interpolator ( F.initial_state, F.final_state, time ); }
+        { *_parameter = F.interpolator ( F.initial_state, F.final_state, _time ); }
 
-        DEBUG ( 3, "animating ", current_frame, " time: ", time );
+        DEBUG ( 3, "animating ", current_frame, " time: ", _time );
     }
 
 	void End ( )

@@ -6,6 +6,7 @@
 #include "shader.h"
 #include "texture.h"
 #include "font.h"
+#include "tilemap_map.h"
 
 namespace Manager {
 	// Gets a Font
@@ -49,6 +50,19 @@ namespace Manager {
     }
 	static void Texture_Load ( std::string name, Texture* texture ) {
         _resources.insert( { (name + std::string(typeid(Texture).name())) , texture} );
+    }
+
+    static Tilemap_Map* Tilemap_Get  ( std::string name ) { 
+		if ( name == "" ) { return nullptr; }
+		auto findit = _resources.find(name + std::string(typeid(Tilemap_Map).name()));
+		if ( findit != _resources.end() ) {
+			return (Tilemap_Map*)findit->second;
+		} else { return nullptr; }
+	}
+    static int Tilemap_Load ( std::string name, const char * path ) {
+        Tilemap_Map *t = new Tilemap_Map;
+        _resources.insert( { (name + std::string(typeid(Texture).name())) , t} );
+        return (*t).Make(path);
     }
 }; // namespace Manager
 

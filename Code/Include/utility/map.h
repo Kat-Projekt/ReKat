@@ -21,6 +21,36 @@ public:
         K key;
 		T data;
     };
+
+
+	struct Iterator {
+		Element * ele;
+
+		Iterator& operator++() {
+			ele = ele->next;
+			return *this;
+		}
+		Iterator operator++(int) {
+			Iterator __t(*this);
+			++(*this);
+			return __t;
+		}
+
+		Iterator& operator--() {
+			ele = ele->prev;
+			return *this;
+		}
+		Iterator operator--(int) {
+			Iterator __t(*this);
+			--(*this);
+			return __t;
+		}
+
+		bool operator!= ( Iterator &I ) 
+		{ return ( I.ele != this->ele ); }
+
+		Pair operator*() const { return { ele->key, ele->data }; }
+	};
     
 private:
 	bool _unique = false;
@@ -29,7 +59,8 @@ private:
 	Element* _last = nullptr;
 	
 public:
-	Map ( bool Unique = false ) { _unique = Unique; };
+	Map ( bool Unique = false ) { _last = new Element; _unique = Unique; };
+	~Map ( ) { deallocate ( ); }
 	void deallocate ( ) {
 		auto C = _first;
 		while ( C != nullptr ) {
@@ -41,14 +72,14 @@ public:
 	// size of list
 	integer size ( ) { return _size; }
 
-    T* get ( K key, bool u ) {
+    T get ( K key, bool u ) {
         auto C = _first;
 		while ( C != nullptr ) {
             if ( C->key == key ) 
-            { return &C->data; }
+            { return C->data; }
 			C = C->next;
 		}
-		return nullptr;
+		DEBUG ( 1, "Cannot Find Keyd Item" );
     }
 
     List <T> * get ( K key ) {
@@ -62,17 +93,26 @@ public:
         return list;
     }
 
-    List <T> * get ( K* keys, integer _l ) {
-        List <T> * list = new List < T >;
+    List <T> get ( K* keys, integer _l ) {
+		DEBUG ( 5, "Getting" );
+        List <T> list;
         auto C = _first;
+		if ( _first == nullptr ) 
+		{ DEBUG ( 4, "Void _first" ); return list; }
 		while ( C != nullptr ) {
-            for ( integer i = 0; i < _l; i++ ) {
-                if ( C->key == keys[i] ) 
-                { list->append ( C->data ); }
-            }
-            
+			try {
+				DEBUG ( 5, "Getting with C: ", C->key );
+				for ( integer i = 0; i < _l; i++ ) {
+					DEBUG ( 6, "key: ", keys[i] );
+					if ( C->key == keys[i] ) 
+					{ list.append ( C->data ); }
+				}
+			} catch(const std::exception& e) {
+				DEBUG ( 2, e.what ( ) );
+			}
 			C = C->next;
 		}
+		DEBUG ( 5, "Getted" );
         return list;
     }
 	
@@ -99,7 +139,8 @@ public:
 			e->data = data_pair.data;
 			e->key  = data_pair.key;
 			e->prev = nullptr;
-			e->next = nullptr;
+			e->next = _last;
+			_last->prev = e;
 			_first = e;
 			_last = e;
 			_size = 1;
@@ -121,8 +162,16 @@ public:
 
 	Element* Get_Begin ( ) { return _first; }
 	Element* Get_Endin ( ) { return _last; }
-	Element* begin ( ) { return _first; }
-	Element* end ( ) { return _last; }
+	Iterator begin ( ) {
+		Iterator pippo;
+		pippo.ele = _first;
+		return pippo;
+	}
+	Iterator end ( ) {
+		Iterator pippo;
+		pippo.ele = _last->next;
+		return pippo;
+	}
 
 	void Print ( ) {
 		auto C = _first;

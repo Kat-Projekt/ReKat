@@ -36,4 +36,5 @@ float kernel[9] = float[](
         col += sampleTex[i] * kernel[i];
     
     FragColor = col;
+    FragColor = texture ( screenTexture, TexCoords.xy );
 } 

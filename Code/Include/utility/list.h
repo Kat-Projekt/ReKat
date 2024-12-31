@@ -2,6 +2,7 @@
 #define LIST_H
 
 #define integer unsigned long long int
+#include <iostream>
 
 #define Error(msg) std::cout << "error: " << msg << " at line: " << __LINE__ << " of file: " << __FILE__; throw
 
@@ -13,13 +14,41 @@ public:
 		T data;
 		Element * next = nullptr;
 	};
+	struct Iterator {
+		Element * ele;
+
+		Iterator& operator++() {
+			ele = ele->next;
+			return *this;
+		}
+		Iterator operator++(int) {
+			Iterator __t(*this);
+			++(*this);
+			return __t;
+		}
+
+		Iterator& operator--() {
+			ele = ele->prev;
+			return *this;
+		}
+		Iterator operator--(int) {
+			Iterator __t(*this);
+			--(*this);
+			return __t;
+		}
+
+		bool operator!= ( Iterator &I ) 
+		{ return ( I.ele != this->ele ); }
+
+		T operator*() const { return ele->data; }
+	};
+	
 private:
 	integer _size = 0;
 	Element* _first = nullptr;
 	Element* _last = nullptr;
-	
 public:
-	List ( ) { };
+	List ( ) { _last = new Element; };
 	void Deallocate ( ) {
 		auto C = _first;
 		while ( C != nullptr ) {
@@ -70,7 +99,8 @@ public:
 			Element* e = new Element;
 			e->data = data;
 			e->prev = nullptr;
-			e->next = nullptr;
+			e->next = _last;
+			_last->prev = e;
 			_first = e;
 			_last = e;
 			_size = 1;
@@ -89,21 +119,21 @@ public:
 		return this;
 	}
 
-	List* append ( List<T> * data ) {
-		if ( data == nullptr || data->size() == 0 ) { return this; }
+	List* append ( List<T> data ) {
+		if ( data.size() == 0 ) { return this; }
 		// first item
 		if ( _first == nullptr ) {
-			_first = data->Get_Begin ( );
-			_last = data->Get_Endin ( );
-			_size = data->size ( );
+			_first = data.Get_Begin ( );
+			_last = data.Get_Endin ( );
+			_size = data.size ( );
 			return this;
 		}
 
-		_last->next = data->Get_Begin ( );
-		data->Get_Begin ( )->prev = _last;
-		_last = data->Get_Endin ( );
+		_last->next = data.Get_Begin ( );
+		data.Get_Begin ( )->prev = _last;
+		_last = data.Get_Endin ( );
 
-		_size += data->size ( );
+		_size += data.size ( );
 		return this;
 	}
 
@@ -135,8 +165,16 @@ public:
 
 	Element* Get_Begin ( ) { return _first; }
 	Element* Get_Endin ( ) { return _last; }
-	Element* begin ( ) { return _first; }
-	Element* end ( ) { return _last; }
+	Iterator begin ( ) {
+		Iterator pippo;
+		pippo.ele = _first;
+		return pippo;
+	}
+	Iterator end ( ) {
+		Iterator pippo;
+		pippo.ele = _last->next;
+		return pippo;
+	}
 
 	void Print ( ) {
 		auto C = _first;

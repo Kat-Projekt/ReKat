@@ -13,9 +13,9 @@ private:
 	int _instances;
     unsigned int _quad;
 	
-    Shader  *_shader = nullptr; 
-    Texture *_texture = nullptr;
-	Camera  *_camera = nullptr;
+    std::string _shader = ""; 
+    std::string _texture = "";
+    std::string _camera = "";
 
 	vec2 _tile_set = {32,32};
 	vec4 _color = {1,1,1,1};
@@ -23,7 +23,7 @@ public:
     void Start ( ) {
         DEBUG ( 4,"Starting tilemap");
 		int H, W;
-		_shader->setInt ( "image", 0 );
+		Manager::Shader_Get( _shader )->setInt ( "image", 0 );
 
         std::vector < std::string > Data;
         std::ifstream Data_stream;
@@ -112,29 +112,30 @@ public:
 
 	void Update ( ) {
 		// prepare transformations
-		if ( _shader == nullptr || _texture == nullptr || _camera == nullptr ) { return; }
-
-		_shader->setMat4  ( "projection", _camera->Projkection ( ) );
+		if ( _shader == "" || _texture == "" || _camera == "" ) { return; }
+        auto shader = Manager::Shader_Get ( _shader );
+		shader->setMat4  ( "projection", Manager::Camera_Get( _camera )->Projkection ( ) );
  		
 		mat4 model = obj->Get_Model_Mat ( );
 
-		_shader->setMat4 ( "model", model );
+		shader->setMat4 ( "model", model );
 		
-		_shader->setVec4  ( "spriteColor", _color );
-        _shader->setFloat ( "SPRITE_COLUMNS", _tile_set.x );
-        _shader->setFloat ( "SPRITE_ROWS", _tile_set.y );
-        _shader->setFloat ( "NUM_OF_SPRITES", (int)(_tile_set.x * _tile_set.y) );
+		shader->setVec4  ( "spriteColor", _color );
+        shader->setFloat ( "SPRITE_COLUMNS", _tile_set.x );
+        shader->setFloat ( "SPRITE_ROWS", _tile_set.y );
+        shader->setFloat ( "NUM_OF_SPRITES", (int)(_tile_set.x * _tile_set.y) );
 
-		_texture->Use();
+		Manager::Texture_Get( _texture )->Use();
 
 		glBindVertexArray(_quad);
         glDrawArraysInstanced(GL_TRIANGLES, 0, 6, _instances);
         glBindVertexArray(0);
 	}
 
-	Tilemap* Set ( std::string path, Texture* tile_map, Shader* shader, Camera* camera, vec2 tile_set = {1,1}, vec4 color = {1,1,1,1} ) 
-	{ _path = path; _texture = tile_map; _shader = shader; _camera = camera; _tile_set = tile_set; _color = color; return this; }
+	/* Tilemap* Set ( std::string path, Texture* tile_map, Shader* shader, Camera* camera, vec2 tile_set = {1,1}, vec4 color = {1,1,1,1} ) 
+	{ _path = path; _texture = tile_map; _shader = shader; _camera = camera; _tile_set = tile_set; _color = color; return this; } */
+
     Tilemap* Set ( std::string path, std::string texture, std::string shader, std::string camera, vec2 tile_set = {1,1}, vec4 color = {1,1,1,1} ) 
-	{ _path = path; _texture = Manager::Texture_Get ( texture ); _shader = Manager::Shader_Get ( shader ); _camera = Manager::Camera_Get ( camera ); _tile_set = tile_set; _color = color; return this; }
+	{ _path = path; _texture = texture; _shader = shader; _camera = camera; _tile_set = tile_set; _color = color; return this; }
 };
 #endif

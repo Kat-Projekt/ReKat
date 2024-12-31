@@ -34,11 +34,11 @@ public:
 };
 
 #include "utility/printer.h"
-#include "utility/list.h"
 #include "utility/map.h"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
+
 using namespace glm;
 
 class Objekt {
@@ -68,21 +68,13 @@ public:
 	: _name(name), _pos(pos), _size(size), _rot(rot), _rot_pivot(rot_pivot) 
 	{ DEBUG ( 4,"Inizializing Objekt: ", name, ", pos: ", pos, ", size: ", size, ", rot: ", rot, ", rot_pivot: ", rot_pivot ); }
 	void Free ( ) {
-		auto c = _components.Get_Begin ( );
-		while ( c != nullptr ) 
-		{ c->data->Delete ( ); c = c->next; }
+		for ( auto C : _components ) 
+		{ C->Delete ( ); }
 
 		DEBUG ( 4,"Freeing Objekt: ", _name );
-		auto ci = _childrens.Get_Begin ( );
-		while ( ci != nullptr ) 
-		{ ci->data->Free ( ); ci = ci->next; }
+		for ( auto C : _childrens ) 
+		{ C->Free ( ); }
 
-		_childrens.Deallocate ( );
-		DEBUG ( 5,"Freed Childrens of: ", _name );
-		_components.Deallocate ( );
-		DEBUG ( 5,"Freed Components of: ", _name );
-
-		delete this;
 		DEBUG ( 4, _name, " is Free" );
 	}
 	~Objekt ( ) {
@@ -114,40 +106,32 @@ public:
 		if ( _father != nullptr ) { _father->Rem_Child ( this ); }
 		_active = false;
 		DEBUG ( 3, p + "Deleting Objekt: ", _name );
-		auto C = _childrens.Get_Begin ( );
-		while ( C != nullptr ) {
-			C->data->Delete( p + "\t");
-			C = C->next;
-		}
+		for ( auto C : _childrens ) 
+		{ C->Delete( p + "\t"); }
 		Free ( );
 	}
     Objekt* Get_Children ( std::string name ) {
-		auto C = _childrens.Get_Begin ( );
-		while ( C != nullptr ) {
-			if ( C->data->Get_Name() == name ) 
-			{ return C->data; }
-			C = C->next;
+		for ( auto C : _childrens )  {
+			if ( C->Get_Name() == name ) 
+			{ return C; }
 		}
 		return nullptr;
 	}
 	bool Has_Children ( Objekt* child ) {
-		auto C = _childrens.Get_Begin ( );
-		while ( C != nullptr ) {
-			if ( C->data == child ) 
+		for ( auto C : _childrens )  {
+			if ( C == child ) 
 			{ return true; }
-			if ( C->data->Has_Children ( child ) ) { return true; }
-			C = C->next;
+			if ( C->Has_Children ( child ) ) { return true; }
+			C = C;
 		}
 		return false;
 	}
 	List < Objekt* > Get_Childrens ( ) { return _childrens; }
 	int Count_Childrens ( ) {
 		int count = 0;
-		auto C = _childrens.Get_Begin ( );
-		while ( C != nullptr ) {
+		for ( auto C : _childrens ) {
 			count ++;
-			count += C->data->Count_Childrens ( );
-			C = C->next;
+			count += C->Count_Childrens ( );
 		}
 		return count;
 	}
@@ -201,11 +185,8 @@ public:
     template < class C > 
 	C* Get_Component ( ) {
 		DEBUG ( 6,"Getting Component" );
-		auto c = _components.Get_Begin ( );
-		while ( c != nullptr ) {
-			if ( typeid(*(c->data)) == typeid (C) ) { return (C*)c->data; }
-			c = c->next;
-		}
+		for ( auto c : _components ) 
+		{ if ( typeid(*(c)) == typeid (C) ) { return (C*)c; } }
 		DEBUG ( 3,"\t\tComponent Not Found" );
 		return nullptr;
 	}
@@ -213,28 +194,20 @@ public:
 	List < C* > Get_Component_Recursive ( ) {
 		DEBUG ( 6,"Getting Components" );
 		List < C* > L;
-		auto c = _components.Get_Begin ( );
-		while ( c != nullptr ) {
-			if ( typeid(*(c->data)) == typeid (C) ) { L.append ( (C*)c->data ); }
-			c = c->next;
+		for ( auto c : _components ) 
+		{ if ( typeid(*(c)) == typeid (C) ) { L.append ( (C*)c ); } }
+		for ( auto O : _childrens ) {
+			auto Data = O->Get_Component_Recursive < C > ( );
+			L.append ( Data );
 		}
-        auto O = _childrens.Get_Begin ( );
-		while ( O != nullptr ) {
-			auto Data = O->data->Get_Component_Recursive < C > ( );
-			L.append ( &Data );
-			O = O->next;
-		}
-		if ( L.size () == 0 ) { DEBUG ( 3,"No components found");}
+		if ( L.size () == 0 ) { DEBUG ( 3, "No components found" ); }
 		return L;
 	}
 
 	template < typename C >
 	bool Has_Component ( ) {
-		auto c = _components.Get_Begin ( );
-		while ( c != nullptr ) {
-			if ( typeid(*(c->data)) == typeid (C) ) { return true; }
-			c = c->next;
-		}
+		for ( auto c : _components ) 
+		{ if ( typeid(*(c)) == typeid (C) ) { return true; } }
 		return false;
 	}
 
@@ -242,19 +215,13 @@ public:
 		if ( _started ) { return; }
 		if ( !_active ) { return; }
 		DEBUG ( 4,"Starting Objekt: ", Get_Name() );
-        auto C = _components.Get_Begin ( );
-		while ( C != nullptr ) {
-			DEBUG ( 6," - Starting Componenet: ", std::string(typeid(*(C->data)).name()) );
-			C->data->_Start ( );
-			C = C->next;
-			DEBUG ( 6," - Componenet Started" );
+		for ( auto C : _components ) {
+			DEBUG ( 6," - Starting Componenet: ", std::string(typeid(*(C)).name()) );
+			C->_Start ( );
 		}
 		DEBUG ( 6,"Starting Childrens" );
-        auto O = _childrens.Get_Begin ( );
-		while ( O != nullptr ) {
-			O->data->Start ( );
-			O = O->next;
-		}
+		for ( auto O : _childrens ) 
+		{ O->Start ( ); }
 		DEBUG ( 6,"Childrens Started" );
 		DEBUG ( 5,"Started Objekt: ", Get_Name() );
 		_started = true;
@@ -263,18 +230,13 @@ public:
     virtual void Update ( ) {
 		if ( !_active ) { return; }
 		DEBUG ( 4,"Updating Objekt: ", Get_Name() );
-        auto C = _components.Get_Begin ( );
-		while ( C != nullptr ) {
-			DEBUG ( 6,"Updating Componenet: ", std::string(typeid(*C->data).name()));
-			C->data->_Update ( );
-			C = C->next;
+        for ( auto C : _components ) {
+			DEBUG ( 6,"Updating Componenet: ", std::string(typeid(*C).name()));
+			C->_Update ( );
 		}
 		DEBUG ( 6,"Updating Childrens" );
-		auto O = _childrens.Get_Begin ( );
-		while ( O != nullptr ) {
-			O->data->Update ( );
-			O = O->next;
-		}
+		for ( auto O : _childrens ) 
+		{ O->Update ( ); }
 		DEBUG ( 6,"Childrens Updated" );
 		DEBUG ( 5,"Updated Objekt: ", Get_Name() );
     }
@@ -282,41 +244,24 @@ public:
     virtual void Fixed_Update ( ) {
 		if ( !_active ) { return; }
 		DEBUG ( 5,"Updating Fixed Objekt: ", Get_Name() );
-        auto C = _components.Get_Begin ( );
-		while ( C != nullptr ) {
-			DEBUG ( 6," - Updating Fixed Componenet: ", std::string(typeid(*C->data).name()));
-			C->data->_Fixed_Update ( );
-			C = C->next;
+        for ( auto C : _components ) {
+			DEBUG ( 6,"Updating Fixed Componenet: ", std::string(typeid(*C).name()));
+			C->_Fixed_Update ( );
 		}
 		DEBUG ( 6,"Updating Childrens Fixed" );
-		auto O = _childrens.Get_Begin ( );
-		while ( O != nullptr ) {
-			O->data->Fixed_Update ( );
-			O = O->next;
-		}
+		for ( auto O : _childrens ) 
+		{ O->Fixed_Update ( ); }
 		DEBUG ( 6,"Childrens Updated Fixed" );
 		DEBUG ( 5,"Updated Fixed Objekt: " + Get_Name() );
     }
 
 	virtual void Andle_Collsions ( Objekt * collider, float trigger = false ) {
 		if ( trigger ) { // the collision is of thigger type
-			auto C = _components.Get_Begin ( );
-			while ( C != nullptr ) {
-				C->data->_Collision_Trigger ( collider );
-				C = C->next;
-			}
+			for ( auto C : _components ) 
+			{ C->_Collision_Trigger ( collider ); }
 		} else {
-			auto C = _components.Get_Begin ( );
-			while ( C != nullptr ) {
-				C->data->_Collision ( collider );
-				C = C->next;
-			}
-		}
-		
-		auto O = _childrens.Get_Begin ( );
-		while ( O != nullptr ) {
-			O->data->Andle_Collsions ( collider, trigger );
-			O = O->next;
+			for ( auto C : _components )
+			{ C->_Collision ( collider ); }
 		}
 	} 
 
@@ -339,18 +284,25 @@ public:
 
 	void Print_Tree ( std::string level ) {
 		std::cout << level << _name << " " << _pos << " " << _size << ( _active ? " v" : " x") << '\n';
-		auto _C = _components.Get_Begin ( );
-		while ( _C != nullptr ) {
-			std::cout << level << "+ " << typeid(*_C->data).name() << ( _C->data->Get_Active () ? " v" : " x") << '\n';
-			_C = _C->next;
-		}
+		for ( auto C : _components ) 
+		{ std::cout << level << "+ " << typeid(*C).name() << ( C->Get_Active () ? " v" : " x") << '\n'; }
 		level += "- ";
-		auto C = _childrens.Get_Begin ( );
-		while ( C != nullptr ) {
-			C->data->Print_Tree ( level );
-			C = C->next;
-		}
+		for ( auto C : _childrens )
+		{ C->Print_Tree ( level ); }
 	}
+	
+	friend std::ostream& operator << ( std::ostream& os, Objekt& n ) {
+        os << n.Get_Name ( ) << " " << n._pos << " " << n._size << ( n._active ? " v" : " x" ) << " { ";
+		// print components
+		for ( auto C : n._components ) 
+		{ std::cout << typeid(*C).name() << ( C->Get_Active () ? " v" : " x") << " "; }
+
+		os << " }";
+		
+		return os;
+	}
+	friend std::ostream& operator,(std::ostream& out, Objekt& n )
+	{ out << n; return out; }
 };
 
 namespace Manager {
@@ -368,11 +320,9 @@ namespace Manager {
 	} };
 
 	static Objekt* Objekt_Get ( std::string name ) {
-		auto S = objekts.Get_Begin ( );
-		while ( S != nullptr ) {
-			if ( S->data->Get_Name () == name ) 
-			{ return S->data; }
-			S = S->next;
+		for ( auto S : objekts )  {
+			if ( S->Get_Name () == name ) 
+			{ return S; }
 		}
 		DEBUG ( 1, "Cannot find objekt ", name );
 	}
@@ -382,25 +332,30 @@ namespace Manager {
 		return o;
 	}
 	static Objekt* Objekt_Load ( Objekt * o ) 
-	{ objekts.append( o ); return o;}
+	{ objekts.append ( o ); return o;}
 	static void Set_Active_Scene ( Objekt * o ) {
 		DEBUG ( 3,"adding active scene" );
-		if ( !objekts.contains( o ) ) { objekts.append ( o ); }
+		objekts.append ( o );
 		_current_scene = o;
-		Start ( );
 		DEBUG ( 5,"added main scene" );
 	}
 	static void Set_Active_Scene ( std::string s ) {
 		DEBUG ( 3,"adding active scene" );
-		auto S = objekts.Get_Begin ( );
-		while ( S != nullptr ) {
-			if ( S->data->Get_Name () == s ) 
-			{ _current_scene = S->data; Start ( ); DEBUG ( 5,"added main scene" ); return; }
-			S = S->next;
+		for ( auto S : objekts ) {
+			if ( S->Get_Name () == s ) 
+			{ _current_scene = S; DEBUG ( 5,"added main scene" ); return; }
 		}
 	}
 	
 	static Objekt* Get_Active_Scene ( ) { return _current_scene; }
+
+	static void Check_Resource_Integrity ( ) {
+		DEBUG ( 3, "STARTING INTEGRITY CHECK" );
+		DEBUG ( 4, "Current Scene: '", _current_scene->Get_Name ( ) );
+		
+		for ( auto C : objekts ) 
+		{ DEBUG ( 4,*C ); }
+	}
 }
 
 #endif

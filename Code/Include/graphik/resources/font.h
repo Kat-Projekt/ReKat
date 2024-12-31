@@ -59,10 +59,11 @@ int Font::Make ( const char * path ) {
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	// create bitmap parameters
-	int _width = ( _font_heigth + _padding ) * 16; // 16 per row with 2 px of padding
-	int _heigth = ( _font_heigth + _padding ) * 8; // 8 per collumb
-
-	unsigned char * combined_buffer = (unsigned char*) calloc (_width*_heigth, sizeof(unsigned char));
+	_width = ( _font_heigth + _padding ) * 16; // 16 per row with 2 px of padding
+	_heigth = ( _font_heigth + _padding ) * 8; // 8 per collumb
+	unsigned int p = _width*_heigth;
+	unsigned char combined_buffer[p];
+	DEBUG (5, "combined size: ", _width * _heigth );
 	char_widths = (unsigned int*) calloc (128, sizeof(unsigned int));
 
 	DEBUG( 5,"Texture size: " + std::to_string (_width) + " : " + std::to_string (_heigth));
@@ -96,34 +97,30 @@ int Font::Make ( const char * path ) {
 		int x = (c%16)*(_font_heigth+_padding);
 		int y = (c/16)*(_font_heigth+_padding);
 		x += 1; // 1 pixel padding from the left side of the tile
-		y += (_font_heigth+_padding) - face->glyph->bitmap_top + Baseline - _padding*0.5;
+		y += (int)(_font_heigth+_padding) - face->glyph->bitmap_top + Baseline - _padding*0.5;
 
 		// draw the character
 		const FT_Bitmap& bitmap = face->glyph->bitmap;
 		
+		DEBUG ( 5, "P ", (y+bitmap.rows-1) * _width+(x+bitmap.width-1) );
 		for ( int xx = 0; xx < bitmap.width; xx++ ) {
 			for ( int yy = 0; yy < bitmap.rows; yy++ ) {
+				// DEBUG ( 6, "Accesing bitmap ", y, "+", yy, " ", x, "+", xx );
 				unsigned char r = bitmap.buffer[(yy*(bitmap.width)+xx)];
+				// DEBUG ( 6, "Accesing combined" );
 				combined_buffer[(y+yy)*_width+(x+xx)] = r;
 			}
 		}
+		DEBUG ( 6, "Character: '", (char)c, "' created" );
 	}
 
-	/*std::cout << " W: " << _width << " H: " << _heigth << '\n';
-	std::cout << " HHH: " << face->height << " A: " << face->ascender << " D: " << face->descender << '\n';
-	for (size_t i = 0; i < _heigth; i++) {
-		for (size_t z = 0; z < _width; z++) 
-		{ std::cout <<  (int) combined_buffer [ i * _width + z ] << ','; }
-		std::cout << '\n';
-	}*/
+	DEBUG ( 5, "Created characters" );
 	
 	_texture = Texture::Make ( combined_buffer, _width, _heigth, 1 );
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	FT_Done_Face(face);
 	FT_Done_FreeType(ft);
-
-	free(combined_buffer);
 
 	DEBUG ( 5, "Font Loaded" );
 

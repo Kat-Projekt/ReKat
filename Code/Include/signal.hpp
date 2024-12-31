@@ -13,8 +13,6 @@ enum signal_type {
 };
 namespace ReKat {
 namespace sygnal {
-    
-
     typedef struct {
         signal_type type;
         union {

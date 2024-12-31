@@ -2,7 +2,7 @@
 // #define EXPANCE
 #include <engine.hpp>
 
-float speed = 104 * 14;
+float speed = 104 * 7;
 float actual_speed = speed;
 
 class Change_Skin : public Behaviour {
@@ -90,8 +90,8 @@ class Ball_Controller : public Behaviour {
 	}
 
 	void Update_Punteggio ( ) {
-		if ( punti_plater1 == 3 ) { _punteggio->Set ( "Player 1 Wins", Text::LEFT ); obj->Get_Component < Rigidbody > ( )->velocity = {0,0,0}; _bip->Play (2); return; }
-		if ( punti_plater2 == 3 ) { _punteggio->Set ( "Player 2 Wins", Text::RIGHT ); obj->Get_Component < Rigidbody > ( )->velocity = {0,0,0}; _bip->Play (2); return; }
+		if ( punti_plater1 == 3 ) { _punteggio->Set ( "V Wins", Text::LEFT ); obj->Get_Component < Rigidbody > ( )->velocity = {0,0,0}; _bip->Play (2); return; }
+		if ( punti_plater2 == 3 ) { _punteggio->Set ( "E 2 Wins", Text::RIGHT ); obj->Get_Component < Rigidbody > ( )->velocity = {0,0,0}; _bip->Play (2); return; }
 
 		_punteggio->Set ( std::to_string ( punti_plater1 ) + std::string ( " - " ) + std::to_string ( punti_plater2 ), Text::CENTER );
 		ReKat::sygnal::SetSignal ( "SCORE", {S_BOOL,true} );
@@ -181,30 +181,30 @@ public:
 // classic pong game with local multi player
 int main ( ) {
 	ReKat::phisiks::Start ( 120 );
-	ReKat::grapik::Start ( "Pong", 1600, 900,false,false,true );
+	ReKat::grapik::Start ( "Pong", 800, 600,false,false,false );
 	ReKat::synth::Start ( );
 
 	int largezza_campo = 1300;
 	int distanza_palette = 1200;
 
-	Objekt PostProcessor ( "post", {0,0,0}, {2000,1000,10} );
+	auto PostProcessor = Manager::Objekt_Load ( "post", {0,0,0}, {1600,1000,10} );
 
-	Objekt Scene ( "scene" );
-	Objekt Punteggio ( "Punteggio", { 0,300,0 } );
-	Objekt Player1 ( "player1", {distanza_palette/2,0,0}, {20,100,100} );
-	Objekt Player2 ( "player2", {-distanza_palette/2,0,0}, {20,100,100} );
-	Objekt Ball ( "BALS", {0,0,0}, {20,20,20} );
+	auto Scene = Manager::Objekt_Load ( "scene" );
+	auto Punteggio = Manager::Objekt_Load ( "Punteggio", { 0,300,0 } );
+	auto Player1 = Manager::Objekt_Load ( "player1", {distanza_palette/2,0,0}, {20,100,100} );
+	auto Player2 = Manager::Objekt_Load ( "player2", {-distanza_palette/2,0,0}, {20,100,100} );
+	auto Ball = Manager::Objekt_Load ( "BALS", {0,0,0}, {20,20,20} );
 
-	Scene.Add_Child ( &Punteggio );
-	Scene.Add_Child ( &Player1 );
-	Scene.Add_Child ( &Player2 );
-	Scene.Add_Child ( &Ball );
+	Scene->Add_Child ( Punteggio );
+	Scene->Add_Child ( Player1 );
+	Scene->Add_Child ( Player2 );
+	Scene->Add_Child ( Ball );
 
     Manager::Texture_Load ( "sprite", "Sprites.png" );
     Manager::Texture_Load ( "skin1", "skin1.png" );
     Manager::Texture_Load ( "skin2", "skin2.png" );
     Manager::Texture_Load ( "skin1p", "skin1p.png" );
-    Manager::Font_Load ( "font", "Font.ttf",80 );
+    Manager::Font_Load ( "font", "Font.ttf",90 );
     Manager::Shader_Load ( "postprocesor", "framebuffers.vs", "framebuffers.fs" );
     Manager::Shader_Load ( "sprite", "sprite.vs", "sprite.fs" );
     Manager::Shader_Load ( "text", "text.vs", "text.fs" );
@@ -215,43 +215,52 @@ int main ( ) {
 
 	DEBUG ( 3, "LOADED" );
 
-	PostProcessor.Add_Component < Framebuffer > ( )->Set(1600,900)->Set(&Scene)->Set("postprocesor");
+	PostProcessor->Add_Component < Framebuffer > ( )->Set(1600,900)->Set(Scene)->Set("postprocesor");
 
-	Manager::Camera_Load ( "cam", &Scene );
-	auto bip = Scene.Add_Component < Audio_Source > ( )->Set ( "bip", "bip" )->Set("bup")->Set("badun");
-	auto pun = Punteggio.Add_Component < Text > ( )->Set ( "font", "text", "cam", {0,1,1,1} );
-	Punteggio.Add_Component < Start_Timer > ( );
+	Manager::Camera_Load ( "cam", Scene );
+	auto bip = Scene->Add_Component < Audio_Source > ( )->Set ( "bip", "bip" )->Set("bup")->Set("badun");
+	auto pun = Punteggio->Add_Component < Text > ( )->Set ( "font", "text", "cam", {0,1,1,1} );
+	Punteggio->Add_Component < Start_Timer > ( );
 
-	Player1.Add_Component < Sprite > ( )->Set ( "skin1", "sprite", "cam", {2,1}, 1 ); // square sprite
-	Player1.Add_Component < Box_Collider > ( )->Set_Size ( Player1.Get_Size ( ) );
-	Player1.Add_Component < AI_Controller > ( );
-	Player2.Add_Component < Sprite > ( )->Set ( "skin2", "sprite", "cam", {5,1}, 0 );
-	Player2.Add_Component < Box_Collider > ( )->Set_Size ( Player2.Get_Size ( ) );
-	Player2.Add_Component < Player_Controller > ( );
-	Player2.Add_Component < Change_Skin > ( );
+	Scene->Add_Component < Fps > ( )->MAX_FPS = 120;
 
-	Ball.Add_Component < Sprite > ( )->Set ( "skin1p", "sprite", "cam" ); // circle sprite
-	Ball.Add_Component < Box_Collider > ( )->Set_Size ( Ball.Get_Size().x );
-	Ball.Add_Component < Rigidbody > ( )->time_scale = 0.3;
-	Ball.Add_Component < Ball_Controller > ( )->Set ( pun, largezza_campo, bip );
+	Player1->Add_Component < Sprite > ( )->Set ( "skin1", "sprite", "cam", {2,1}, 1 ); // square sprite
+	Player1->Add_Component < Box_Collider > ( )->Set_Size ( Player1->Get_Size ( ) );
+	Player1->Add_Component < AI_Controller > ( );
+	Player2->Add_Component < Sprite > ( )->Set ( "skin2", "sprite", "cam", {5,1}, 0 );
+	Player2->Add_Component < Box_Collider > ( )->Set_Size ( Player2->Get_Size ( ) );
+	Player2->Add_Component < Player_Controller > ( );
+	Player2->Add_Component < Change_Skin > ( );
 
-	Manager::Set_Active_Scene ( &PostProcessor );
-	ReKat::phisiks::Set_Active ( &Scene );
+	Ball->Add_Component < Sprite > ( )->Set ( "skin1p", "sprite", "cam" ); // circle sprite
+	Ball->Add_Component < Box_Collider > ( )->Set_Size ( Ball->Get_Size().x );
+	Ball->Add_Component < Rigidbody > ( )->time_scale = 1;
+	Ball->Add_Component < Ball_Controller > ( )->Set ( pun, largezza_campo, bip );
+
+
+	Manager::Set_Active_Scene ( "scene" );
+	ReKat::phisiks::Set_Active ( "scene" );
+
+	Manager::Check_Resource_Integrity ( );
+
+	Manager::Start ( );
 
 	// setting for the first time the score signal
 	ReKat::sygnal::SetSignal ( "SCORE", {S_BOOL,false} );
+
 
 	while ( ReKat::grapik::IsEnd ( ) ) {
 		glClearColor(0.0, 0.0, 0.0, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
-		Timer::Update ( );
 		Manager::Update ( );
+		Manager::Get_Active_Scene ( )->Print_Tree ( "" );
 		ReKat::grapik::Update ( );
 		ReKat::phisiks::Update ( );
+		DEBUG ( 4, "Rendered Frame" );
 	}
 
-	Manager::Free ( );
+	// Manager::Free ( );
 
 	ReKat::grapik::End ( );
 	ReKat::synth::End ( );

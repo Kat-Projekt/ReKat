@@ -3,10 +3,12 @@
 
 #include <chrono>
 
-#if (defined (LINUX) || defined (__linux__) || defined (__APPLE__)) // unix implementation
+#if (defined (LINUX) || defined (__linux__)) // unix implementation
 	#define TIME_SCALING 1/1000000000.0
 #elif (defined (_WIN32) || defined (_WIN64)) // windows implementaion
 	#define TIME_SCALING 1/10000000.0
+#elif (defined (__APPLE__))
+    #define TIME_SCALING 1/1000000.0
 #endif
 
 namespace Timer {

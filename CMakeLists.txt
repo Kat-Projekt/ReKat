@@ -4,7 +4,7 @@ project ( ReKat )
 
 option ( REKAT_LIBRARY "Compile the Engine as a library, else the headers will be included in the executable" OFF )
 option ( REKAT_TEST "Compile the test suite" OFF )
-option ( REKAT_ENGINE "Compile the Engine interpreter" ON )
+option ( REKAT_ENGINE "Compile the Engine interpreter" OFF )
 
 list ( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/Cmake" )
 
@@ -19,7 +19,7 @@ endif ( )
 
 # compile the examples
 set ( TESTS Render_Test Core_Test Collision_Test Pong_Test )
-# set ( TESTS Pong_Test )
+set ( TESTS Pong_Test )
 
 if ( REKAT_TEST )
     foreach ( TEST ${TESTS} )

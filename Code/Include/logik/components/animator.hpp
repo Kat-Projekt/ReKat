@@ -15,19 +15,17 @@ class Animator : public Behaviour {
         void Add_Animation ( Animation < A > * anima ) 
         { animations.append ( static_cast< Resource * >( anima ) ); }
 
-        void Interpolate ( float time ) {
-            for ( auto A = animations.begin ( ); A != nullptr; A = A->next ) 
-            { DEBUG ( 4, "Animating ", A ); A->data->Use ( time ); }
+        void Interpolate ( float _time ) {
+            for ( auto A : animations ) 
+            { DEBUG ( 4, "Animating ", A ); A->Use ( _time ); }
         }
     };
     
-    Node *Active_Node = nullptr;
-    Map < std::string, Node > nodes;
+    Node* Active_Node;
+    Map < std::string, Node* > nodes;
 public:
     Animator * Change_Animation ( std::string name ) {
         auto New_Node = nodes.get ( name, true );
-        if ( New_Node == nullptr ) 
-        { DEBUG (2, "animation node not found" ); return this; }
 
         Active_Node = New_Node;
         Metronome = 0;
@@ -35,7 +33,7 @@ public:
     }
 
     Animator * New_Node ( std::string name ) 
-    { nodes.append ( { name, Node ( ) } ); return this;}
+    { nodes.append ( { name, new Node ( ) } ); return this;}
 
     template < typename A >
     Animator * Add_Animation ( std::string node, Animation < A > * anim ) {
@@ -55,7 +53,7 @@ public:
     }
 
     void Start ( ) 
-    { nodes = Map < std::string, Node > ( true ); }
+    { nodes = Map < std::string, Node * > ( true ); }
 
     void Update ( ) {
         Metronome += Timer::delta_time;

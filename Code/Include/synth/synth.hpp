@@ -47,7 +47,7 @@ namespace ReKat::synth {
 		alListener3f ( AL_VELOCITY, 0, 0, 0 ); AL_CHECK_ERROR;
 		alListenerfv ( AL_ORIENTATION, listenerOri ); AL_CHECK_ERROR;
 
-		DEBUG ( 4, "Inizialized Synth System" );
+		DEBUG ( 3, "Inizialized Synth System" );
 		return 0;
 	}
 

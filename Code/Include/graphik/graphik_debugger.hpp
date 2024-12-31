@@ -9,6 +9,7 @@ int DEBUG_GRAPHIK_ERROR_CODE; // Global graphik error code
 
 #define GL_CHECK_ERROR \
 	{ DEBUG_GRAPHIK_ERROR_CODE = glGetError ( );      \
+    glFinish (); \
 	if ( DEBUG_GRAPHIK_ERROR_CODE != GL_NO_ERROR ) {\
         color ( "ERROR_G", FOREGROUND_INTENSITY | FOREGROUND_RED ); \
         switch ( DEBUG_GRAPHIK_ERROR_CODE ) { \

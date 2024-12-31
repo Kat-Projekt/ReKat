@@ -56,6 +56,7 @@ namespace Input {
 	static void(*_FreamBufferResize)(GLFWwindow*, int, int ) = nullptr;
 
 	static void Keyboard ( GLFWwindow* window, int key, int scancode, int action, int mode ) {
+		DEBUG ( 3, "Updating Keyboard" );
 		if ( _Keyboard != nullptr ) 
 		{ _Keyboard ( window, key, scancode, action, mode ); }
 		// adding meta charaters
@@ -73,22 +74,18 @@ namespace Input {
 			if ( key == GLFW_KEY_LEFT_ALT || key == GLFW_KEY_RIGHT_ALT ) { keys["Alt"] = RELEASED; return; }
 			if ( key == GLFW_KEY_DELETE || key == GLFW_KEY_BACKSPACE ) { keys["Del"] = RELEASED; return; }
 			if ( key == GLFW_KEY_ENTER ) { keys["Enter"] = RELEASED; return; }
-			if ( key == GLFW_KEY_ESCAPE ) { keys["Esc"] = RELEASED; return; }
-			
-			
+			if ( key == GLFW_KEY_ESCAPE ) { keys["Esc"] = RELEASED; return; }	
 		}
-		// adding caracter keys
-		if ( GLFW_KEY_A <= key && key <= GLFW_KEY_Z ) { 
-			if ( action == GLFW_PRESS ) { keys[std::string(1,(char)key)] = PRESSED; }
-			if ( action == GLFW_RELEASE ) { keys[std::string(1,(char)key)] = RELEASED; }
-		}
-		// adding number keys
-		if ( key >= GLFW_KEY_0 && key <= GLFW_KEY_9 ) {
+
+		if ( ( GLFW_KEY_A <= key && key <= GLFW_KEY_Z ) || 
+			 ( key >= GLFW_KEY_0 && key <= GLFW_KEY_9 ) ||
+			 ( key == GLFW_KEY_SPACE )) { 
 			if ( action == GLFW_PRESS ) { keys[std::string(1,(char)key)] = PRESSED; }
 			if ( action == GLFW_RELEASE ) { keys[std::string(1,(char)key)] = RELEASED; }
 		}
 	}
 	static void Mouse_pos ( GLFWwindow* window, double xpos, double ypos ) {
+		DEBUG ( 3, "Updating Mouse" );
 		if ( _Mouse_pos != nullptr ) 
 		{ _Mouse_pos ( window, xpos, ypos ); }
 		old_mouse_pos = mouse_pos;
@@ -116,11 +113,13 @@ namespace Input {
 		}
 	}
 	static void ScrollWell ( GLFWwindow* window, double xoffset, double yoffset ) {
+		DEBUG ( 3, "Updating ScroolWell" );
 		scrool_pos += yoffset;
 		if ( _ScrollWell != nullptr ) 
 		{ _ScrollWell ( window, xoffset, yoffset ); }
 	}
 	static void FreamBufferResize ( GLFWwindow* window, int width, int height ) {
+		DEBUG ( 3, "Updating Framebuffer" );
 		ReKat::grapik::Internal::SCR_HEIGTH = height;
 		ReKat::grapik::Internal::SCR_WIDTH = width;
 		screen_ration = (float)ReKat::grapik::Internal::SCR_WIDTH / (float)ReKat::grapik::Internal::SCR_HEIGTH;
@@ -148,6 +147,13 @@ namespace Input {
 		keys["Mouse1"] = NONE;
 		keys["Mouse2"] = NONE;
 		keys["Mouse3"] = NONE;
+
+		for ( int key = 32; key < 91; key++) {
+			if ( ( GLFW_KEY_A <= key && key <= GLFW_KEY_Z ) || 
+				 ( key >= GLFW_KEY_0 && key <= GLFW_KEY_9 ) ||
+				 ( key == GLFW_KEY_SPACE )) 
+			{ keys[std::string(1,(char)key)] = NONE; }
+		}
 	}
 	static void Print_Status ( ) {
 		for ( auto k : keys ) 
@@ -235,8 +241,9 @@ namespace ReKat::grapik {
 		glEnable ( GL_BLEND ); 
 		glEnable ( GL_DEPTH_TEST );
 		glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+		glFrontFace ( GL_CCW );
 
-		DEBUG ( 4, "Inizialized Graphik System" );
+		DEBUG ( 3, "Inizialized Graphik System" );
 		return SUCCESS;
 	}
 

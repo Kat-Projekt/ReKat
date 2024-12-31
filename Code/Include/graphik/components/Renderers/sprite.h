@@ -11,9 +11,9 @@ private:
 	bool _UI_render = false;
     unsigned int _quad;
     unsigned int VBO;
-    Texture *_texture = nullptr;
-    Shader  *_shader = nullptr; 
-	Camera  *_camera = nullptr;
+    std::string _texture = "";
+    std::string _shader = ""; 
+    std::string _camera = "";
 	ivec2 _frames = {1,1};
 	vec4 _color = {1,1,1,1};
 public:
@@ -49,7 +49,7 @@ public:
         // glBindVertexArray(0); GL_CHECK_ERROR;
 		
         DEBUG ( 6,"setting shader");
-		_shader->setInt ( "image", 0 );
+		Manager::Shader_Get ( _shader )->setInt ( "image", 0 );
         DEBUG ( 5,"Started Sprite");
         DEBUG ( 5, "VBO: ",VBO, " VAO: ", _quad );
     }
@@ -58,27 +58,31 @@ public:
 		// prepare transformations
         DEBUG ( 5, "Staring Updating Sprite");
         DEBUG ( 6, _shader, " ", _texture, " ", _camera, " ", _UI_render );
-		if ( _shader == nullptr || _texture == nullptr || ( _camera == nullptr && !_UI_render ) ) { DEBUG ( 2, "Component not set Correctly" ); return; }
+		if ( _shader == "" || _texture == "" || ( _camera == "" && !_UI_render ) ) 
+        { DEBUG ( 2, "Component not set Correctly" ); return; }
 
-		_shader->setMat4  ( "projection", ( _UI_render ? Camera::UI_Projkection ( ) : _camera->Projkection ( )) );
+        auto shader = Manager::Shader_Get ( _shader );
+
+		shader->setMat4  ( "projection", ( _UI_render ? 
+        Camera::UI_Projkection ( ) : Manager::Camera_Get( _camera )->Projkection ( )) );
         DEBUG ( 6, "Updated Camera uniform");
 
-        _shader->setFloat ( "SPRITE_COLUMNS", (int)_frames.x );
-        _shader->setFloat ( "SPRITE_ROWS", (int)_frames.y );
-        _shader->setFloat ( "NUM_OF_SPRITES", (int)(_frames.x * _frames.y) );
+        shader->setFloat ( "SPRITE_COLUMNS", (int)_frames.x );
+        shader->setFloat ( "SPRITE_ROWS", (int)_frames.y );
+        shader->setFloat ( "NUM_OF_SPRITES", (int)(_frames.x * _frames.y) );
         DEBUG ( 6, "Updated Sprite uniforms");
 
 		mat4 model = obj->Get_Model_Mat ( );
-		_shader->setMat4 ( "model", model );
+		shader->setMat4 ( "model", model );
         DEBUG ( 6, "Updated Model uniform");
 
-		_shader->setVec4 ( "spriteColor", _color );
-        _shader->setInt  ( "frame", frame );
+		shader->setVec4 ( "spriteColor", _color );
+        shader->setInt  ( "frame", frame );
         DEBUG ( 6, "Updated Frame uniforms");
 
 		glBindVertexArray(_quad); GL_CHECK_ERROR;
         glBindBuffer(GL_ARRAY_BUFFER, VBO); GL_CHECK_ERROR;
-		_texture->Use();
+		Manager::Texture_Get( _texture )->Use();
         DEBUG ( 5, "VBO: ",VBO, " VAO: ", _quad );
         glDrawArrays(GL_TRIANGLES, 0, 6); GL_CHECK_ERROR;
         glBindVertexArray(0); GL_CHECK_ERROR;
@@ -86,12 +90,12 @@ public:
         DEBUG (5, "Drawn Sprite");
 	}
 
-	Sprite* Set ( Texture* texture, Shader* shader, Camera* camera = nullptr, ivec2 frames = {1,1}, int frame = 0, vec4 color = {1,1,1,1}, bool UI_sprite = false ) 
+	/* Sprite* Set ( Texture* texture, Shader* shader, Camera* camera = nullptr, ivec2 frames = {1,1}, int frame = 0, vec4 color = {1,1,1,1}, bool UI_sprite = false ) 
 	{ _texture = texture; _shader = shader; _camera = camera;
-	_frames = frames; this->frame = frame; _color = color; _UI_render = UI_sprite; return this; }
+	_frames = frames; this->frame = frame; _color = color; _UI_render = UI_sprite; return this; } */
 
     Sprite* Set ( std::string texture, std::string shader, std::string camera = "", ivec2 frames = {1,1}, int frame = 0, vec4 color = {1,1,1,1}, bool UI_sprite = false ) 
-	{ _texture = Manager::Texture_Get ( texture ); _shader = Manager::Shader_Get ( shader ); _camera = Manager::Camera_Get ( camera );
+	{ _texture = texture; _shader = shader; _camera = camera;
 	_frames = frames; this->frame = frame; _color = color; _UI_render = UI_sprite; return this; }
 
 	Sprite* Set ( bool UI_sprite ) { _UI_render = UI_sprite; return this; }

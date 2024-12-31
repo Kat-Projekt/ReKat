@@ -14,4 +14,6 @@ int main ( ) {
     for ( int i = 0; i < 10; i++ ) {
         Manager::Update ( );
     }
+
+    DEBUG (3, "NEW OBJEKT" );
 }

@@ -16,11 +16,10 @@ int main ( ) {
     Manager::Font_Load ( "font", "Font.ttf",80 );
     Manager::Shader_Load ( "sprite", "sprite.vs", "sprite.fs" );
     Manager::Shader_Load ( "text", "text.vs", "text.fs" );
-    Camera camera;
+    Manager::Camera_Load ( "cam", &main );
 
-    Logo.Add_Component < Sprite > ( )->Set ( "logo", "sprite", &camera );
-    Testo.Add_Component< Text > ( )->Set ( "font", "text", &camera, {1,0,1,1} )->Set ( "cazzo palle" );
-    main.Add_Component ( &camera );
+    Logo.Add_Component < Sprite > ( )->Set ( "logo", "sprite", "cam" );
+    Testo.Add_Component< Text > ( )->Set ( "font", "text", "cam", {1,0,1,1} )->Set ( "cazzo palle" );
     Logo.Set_Size ( {300,300,100} );
     Logo.Set_Pos ( {0,300,0} );
     Manager::Set_Active_Scene ( &main );
@@ -36,7 +35,7 @@ int main ( ) {
         color ( "Update Success\n", FOREGROUND_BLUE | FOREGROUND_INTENSITY );
         ReKat::grapik::Update ( );
     }
-    
+
     ReKat::grapik::Terminate ( );
     Manager::Free ( );
     main.Free ( );

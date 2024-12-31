@@ -9,7 +9,28 @@
 
 #define MAX( a, b, c ) ( ( a > b ) ? ( ( a > c ) ? a : ( ( c > b ) ) ) )
 
-class Hash_Map {
+struct collision_check {
+    Collider * collider1;
+    Collider * collider2;
+
+    friend std::ostream& operator << ( std::ostream& os, collision_check& n ) {
+        os << '{';
+        os << n.collider1;
+        os << ", ";
+        os << n.collider2;
+        os << '}';
+		return os;
+	}
+	friend std::ostream& operator,(std::ostream& out, collision_check& n )
+	{ out << n; return out; }
+};
+
+class Collision_Narrower {
+    void Set_Colliders ( List < Collider* > &colliders ) { }
+	List < collision_check > Get_Collisions_To_Check ( ) { }
+};
+
+class Hash_Map : public Collision_Narrower {
 private:
     float _spacing;
 	Map < int, Collider* > indexed_colliders;
@@ -20,7 +41,7 @@ public:
     int Hash ( vec3 norm ) {
         // parte centrale
         int coordinata_max = ( abs ( norm.x ) > abs ( norm.y ) ) ? ( ( abs ( norm.z ) > abs ( norm.x ) ) ? abs ( norm.z ) : abs ( norm.x ) ) : ( ( abs ( norm.z ) > abs ( norm.y ) ) ? abs ( norm.z ) : abs ( norm.y ) );
-        int index = pow ( 2 * coordinata_max - 1, 2 ); // 2-> 3 in tree dimensions
+        int index = pow ( 2 * coordinata_max - 1, 2 ); // 2 -> 3 in tree dimensions
 		
 		// find quadrant
 		
@@ -87,6 +108,7 @@ public:
 
 	friend std::ostream& operator << ( std::ostream& os, Neibours& n ) {
         if ( n.number <= 0 ) { os << "none"; return os; }
+        os << "size: " << n.number << " ";
         os << n.hash[0];
 		for ( size_t i = 1; i < n.number; i++ ) {
             os << ", " << n.hash [ i ];
@@ -108,7 +130,7 @@ public:
                                                        { 1,-1,0 }, { 0,-1,0 }, { -1,-1,0 }};
 
         Neibours N_indexes;
-        N_indexes.hash = (int*) calloc ( 8, sizeof (int) );
+        N_indexes.hash = (int*) calloc ( 9, sizeof (int) );
         int count = 0;
         for ( auto n_pos : neibours_relative_pos ) {
             // iterate the neibours positions
@@ -118,10 +140,11 @@ public:
             { N_indexes.hash[count] = 0; count ++; continue; }
 
             int index = Hash ( new_pos );
-            if ( index > max ) { continue; }
-
-            N_indexes.hash[count] = index;
-            count++;
+            DEBUG ( 4, index, " ", max );
+            if ( index < max ) {
+                N_indexes.hash[count] = index;
+                count++;
+            }
         }
         N_indexes.number = count;
         return N_indexes;
@@ -130,76 +153,60 @@ public:
     // creates a spacial hashmap
     Hash_Map ( float spacing ) : _spacing ( 1 / spacing ) { }
 
-    void Set_Colliders ( List < Collider* > colliders ) {
+    void Set_Colliders ( List < Collider* > &colliders ) {
         // itereate and add to hash map        
-        auto C = colliders.begin ( );
-
-		while ( C != nullptr ) {
-            auto Hash = Normalize_and_Hash ( C->data->obj->Get_Pos ( ) );
+        for ( auto C : colliders ) {
+            auto Hash = Normalize_and_Hash ( C->obj->Get_Pos ( ) );
             if ( Hash > max ) { max = Hash; } // get max hash
-            indexed_colliders.append ( { Hash, C->data } );
-			C = C->next;
+            indexed_colliders.append ( { Hash, C } );
 		}
 
         DEBUG ( 5, "Normalized and Hashed with max: ", max );
     }
-
-	struct collision_check {
-		Collider * collider1;
-		Collider * collider2;
-	};
-
-    friend std::ostream& operator << ( std::ostream& os, collision_check& n ) {
-        os << '{';
-        os << n.collider1;
-        os << ", ";
-        os << n.collider2;
-        os << '}';
-		return os;
-	}
-	friend std::ostream& operator,(std::ostream& out, collision_check& n )
-	{ out << n; return out; }
 	
-	List < collision_check > Get_collisions_to_check ( ) {
+	List < collision_check > Get_Collisions_To_Check ( ) {
 		List < collision_check > checks;
 		DEBUG ( 5, "Getting Collisions Checks" );
-		for ( auto C = indexed_colliders.begin ( ); C != nullptr; C = C->next ) {
+		for ( auto C : indexed_colliders ) {
 			// get neibours
-            auto Neibours_indexes = Get_Neibours ( C->data->obj->Get_Pos ( ) );
-            auto This_collider = C->data;
+            auto Neibours_indexes = Get_Neibours ( C.data->obj->Get_Pos ( ) );
+            auto This_collider = C.data;
 
             DEBUG ( 5, Neibours_indexes );
 
-            List < Collider * > Neiboursing_colliders;
+            auto Neiboursing_colliders = List < Collider * > ( );
             // Add colliders
             Neiboursing_colliders.append ( indexed_colliders.get ( Neibours_indexes.hash, Neibours_indexes.number ) );
             // remove same collider
-            Neiboursing_colliders.remove ( C->data );
+            // Neiboursing_colliders.remove ( C );
 
             // adding checks
-            for ( auto Coll = Neiboursing_colliders.begin ( ); Coll != nullptr; Coll = Coll->next ) {
+            for ( auto Coll : Neiboursing_colliders ) {
                 collision_check check;
-                if ( intptr_t( Coll->data ) > intptr_t(This_collider) ) {
+                if ( intptr_t( Coll ) > intptr_t( This_collider ) ) {
                     check.collider1 = This_collider;
-                    check.collider2 = Coll->data;
+                    check.collider2 = Coll;
+                } else if ( intptr_t( Coll ) == intptr_t(This_collider) ) {
+                    DEBUG ( 6, "Same Collider" );
+                    continue;
                 } else {
                     check.collider2 = This_collider;
-                    check.collider1 = Coll->data;
+                    check.collider1 = Coll;
                 }
 
                 // check for duplicates:
                 bool dublicate = false;
-                for ( auto test = checks.begin ( ); test != nullptr; test = test->next ) {
-                    if ( check.collider1 == test->data.collider1 && 
-                         check.collider2 == test->data.collider2 ) 
+                for ( auto test : checks ) {
+                    if ( check.collider1 == test.collider1 && 
+                         check.collider2 == test.collider2 ) 
                     { dublicate = true; DEBUG ( 6, "found dublicate collison: ", check.collider1 ); }
                 }
                 
                 if ( !dublicate ) 
                 { checks.append ( check ); }
-            }            
+            }
 		}
-
+        DEBUG ( 4, "Retruring checks" );
 		return checks;
 	}
 
@@ -208,7 +215,24 @@ public:
     ~Hash_Map ( ) { }
 };
 
+class Brute_Force : public Collision_Narrower {
+	List < Collider* > _colliders;
 
+public:
+    void Set_Colliders ( List < Collider* > &colliders ) { _colliders = colliders; }
+	List < collision_check > Get_Collisions_To_Check ( ) {
+        List < collision_check > cheks;
+
+        for ( auto col : _colliders ) {
+            for ( auto coll : _colliders ) {
+                if ( coll == col ) { continue; }
+                cheks.append ( {col,coll} );
+            }
+        }
+        
+        return cheks;
+    }
+};
 
 namespace ReKat {
 namespace phisiks {
@@ -217,8 +241,7 @@ namespace phisiks {
     static int _phisik_fps;
     static List < Collider* > Colliders;
     static List < Rigidbody* > Rigidbodys;
-    static void Resolve_Collision ( );
-    static Objekt * Active = nullptr;
+    static std::string Active;
 
     static void Start ( int phisik_fps ) {
         _phisik_fps = phisik_fps; 
@@ -231,7 +254,6 @@ namespace phisiks {
     static void Update ( ) {
         DEBUG ( 4, "Updating Phisiks" );
         Timer::Update ( );
-        if ( Active == nullptr ) { DEBUG (3,"no phisiks target"); return; }
 
         DEBUG ( 5, "Updating Fixed Updates" );
         DEBUG ( 6, _last_phisik_update );
@@ -240,7 +262,7 @@ namespace phisiks {
         if ( _last_phisik_update + _phisik_update_ratio <= Timer::Get_Time ( ) ) {
             _last_phisik_update = Timer::Get_Time ( );
             Timer::Fixed_Update ( );
-            Active->Fixed_Update ( );
+            Manager::Objekt_Get ( Active )->Fixed_Update ( );
             DEBUG ( 3, "Running Fixed Update" );
         } else { return; } }
 
@@ -249,66 +271,65 @@ namespace phisiks {
         // check if every collider is active
         DEBUG ( 5, "Getting Active Colliders" );
         List < Collider *> active_colliders;
-        auto C = Colliders.begin ( );
-		while ( C != nullptr ) {
-            if ( Active->Has_Children ( C->data->obj ) )
-            { active_colliders.append ( C->data ); }
-			C = C->next;
+        for ( auto C : Colliders ) {
+            if ( Manager::Objekt_Get ( Active )->Has_Children ( C->obj ) )
+            { active_colliders.append ( C ); }
 		}
 
         DEBUG ( 4, " Colliders to check: ", active_colliders );
 
         DEBUG ( 5, "Inizializing Spacial Map" );
-        Hash_Map map ( 200 );
-        map.Set_Colliders ( active_colliders );
 
-        auto checks = map.Get_collisions_to_check ( );
+        Brute_Force map;
+        // Hash_Map map ( 200 );
+        map.Set_Colliders ( active_colliders );
+        auto checks = map.Get_Collisions_To_Check ( );
 
         DEBUG ( 4, "checks: ", checks );
 
-        for ( auto C = checks.begin ( ); C != nullptr; C = C->next ) {
+        for ( auto C : checks ) {
             // convert colliders
             Collision_Result result;
 
-            DEBUG (4, "Checking collision between: ", C->data );
+            DEBUG (4, "Checking collision between: ", C );
 
-            switch ( C->data.collider1->Collider_Type ( ) ) {
+            switch ( C.collider1->Collider_Type ( ) ) {
                 case 1: // box collider
-                    switch ( C->data.collider2->Collider_Type ( ) ) {
+                    switch ( C.collider2->Collider_Type ( ) ) {
                         case 1: // box collider
-                        result = Check_Collision ( ( Box_Collider* ) C->data.collider1, ( Box_Collider* ) C->data.collider2 );
+                        result = Check_Collision ( ( Box_Collider* ) C.collider1, ( Box_Collider* ) C.collider2 );
                         break;
                         case 2: // sfere collider
-                        result = Check_Collision ( ( Box_Collider* ) C->data.collider1, ( Sfere_Collider* ) C->data.collider2 );
+                        result = Check_Collision ( ( Box_Collider* ) C.collider1, ( Sfere_Collider* ) C.collider2 );
                         break;
                         case 3: // tilemap collider
-                        result = Check_Collision ( ( Tilemap_Collider* ) C->data.collider2, ( Box_Collider* ) C->data.collider1 );
+                        result = Check_Collision ( ( Tilemap_Collider* ) C.collider2, ( Box_Collider* ) C.collider1 );
                         break;
                     }
                 break;
                 case 2: // sfere collider
-                    switch ( C->data.collider2->Collider_Type ( ) ) {
+                    switch ( C.collider2->Collider_Type ( ) ) {
                         case 1: // box collider
-                        result = Check_Collision ( ( Box_Collider* ) C->data.collider2, ( Sfere_Collider* ) C->data.collider1 );
+                        result = Check_Collision ( ( Box_Collider* ) C.collider2, ( Sfere_Collider* ) C.collider1 );
                         break;
                         case 2: // sfere collider
-                        result = Check_Collision ( ( Sfere_Collider* ) C->data.collider1, ( Sfere_Collider* ) C->data.collider2 );
+                        result = Check_Collision ( ( Sfere_Collider* ) C.collider1, ( Sfere_Collider* ) C.collider2 );
                         break;
                         case 3: // tilemap collider
-                        result = Check_Collision ( ( Tilemap_Collider* ) C->data.collider1, ( Sfere_Collider* ) C->data.collider2 );
+                        result = Check_Collision ( ( Tilemap_Collider* ) C.collider1, ( Sfere_Collider* ) C.collider2 );
                         break;
                     }
                 break;
                 case 3: // tilemap collider
-                    switch ( C->data.collider2->Collider_Type ( ) ) {
+                    switch ( C.collider2->Collider_Type ( ) ) {
                         case 1: // box collider
-                        result = Check_Collision ( ( Tilemap_Collider* ) C->data.collider1, ( Box_Collider* ) C->data.collider2 );
+                        result = Check_Collision ( ( Tilemap_Collider* ) C.collider1, ( Box_Collider* ) C.collider2 );
                         break;
                         case 2: // sfere collider
-                        result = Check_Collision ( ( Tilemap_Collider* ) C->data.collider1, ( Sfere_Collider* ) C->data.collider2 );
+                        result = Check_Collision ( ( Tilemap_Collider* ) C.collider1, ( Sfere_Collider* ) C.collider2 );
                         break;
                         case 3: // tilemap collider
-                        result = Check_Collision ( ( Tilemap_Collider* ) C->data.collider1, ( Tilemap_Collider* ) C->data.collider2 );
+                        result = Check_Collision ( ( Tilemap_Collider* ) C.collider1, ( Tilemap_Collider* ) C.collider2 );
                         break;
                     }
                 break;
@@ -318,48 +339,49 @@ namespace phisiks {
 
             // inside collision
             if ( result.triggered ) {
-                if ( ! C->data.collider1->Is_Trigger( ) && ! C->data.collider2->Is_Trigger( ) ) { // reaction
-                    if ( ! C->data.collider1->Is_Static ( ) ) { // first dinamic
-                        if ( ! C->data.collider2->Is_Static ( ) ) { // both dinamic
-                            float M1 = C->data.collider1->obj->template Get_Component < Rigidbody > ()->mass;
-                            float M2 = C->data.collider2->obj->template Get_Component < Rigidbody > ()->mass;
+                if ( ! C.collider1->Is_Trigger( ) && ! C.collider2->Is_Trigger( ) ) { // reaction
+                    if ( ! C.collider1->Is_Static ( ) ) { // first dinamic
+                        if ( ! C.collider2->Is_Static ( ) ) { // both dinamic
+                            float M1 = C.collider1->obj->template Get_Component < Rigidbody > ()->mass;
+                            float M2 = C.collider2->obj->template Get_Component < Rigidbody > ()->mass;
                             float M = M1 + M2;
                             M1 = M1 / M;
                             M2 = M2 / M;
 
-                            C->data.collider1->obj->Inc_Pos ( result.exit_direction * ( 1 - M1 ) );
-                            C->data.collider2->obj->Inc_Pos ( - result.exit_direction * ( 1 - M2 ) );
+                            C.collider1->obj->Inc_Pos ( result.exit_direction * ( 1 - M1 ) );
+                            C.collider2->obj->Inc_Pos ( - result.exit_direction * ( 1 - M2 ) );
 
                             // vincolar reaction
                             if ( result.exit_direction == vec3{0,0,0} ) { return; }
                             vec3 normalize_exit = normalize(result.exit_direction);
 
-                            C->data.collider1->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction( normalize_exit );
-                            C->data.collider2->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction( -normalize_exit );
+                            C.collider1->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction( normalize_exit );
+                            C.collider2->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction( -normalize_exit );
                             return;
                         }
-                        C->data.collider1->obj->Inc_Pos ( result.exit_direction );
+                        C.collider1->obj->Inc_Pos ( result.exit_direction );
                         if ( result.exit_direction == vec3{0,0,0} ) { return; }
                         vec3 normalize_exit = normalize(result.exit_direction);
-                        C->data.collider1->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction(normalize_exit);
+                        C.collider1->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction(normalize_exit);
                     }
-                    if ( ! C->data.collider2->Is_Static ( ) ){ // second dinamic 
-                        C->data.collider2->obj->Inc_Pos ( -result.exit_direction );
+                    if ( ! C.collider2->Is_Static ( ) ){ // second dinamic 
+                        C.collider2->obj->Inc_Pos ( -result.exit_direction );
                         if ( result.exit_direction == vec3{0,0,0} ) { return; }
                         vec3 normalize_exit = normalize(result.exit_direction);
-                        C->data.collider2->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction(-normalize_exit);
+                        C.collider2->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction(-normalize_exit);
                     }
 
-                    C->data.collider1->obj->Andle_Collsions ( C->data.collider2->obj, false );
-                    C->data.collider2->obj->Andle_Collsions ( C->data.collider1->obj, false );
+                    C.collider1->obj->Andle_Collsions ( C.collider2->obj, false );
+                    C.collider2->obj->Andle_Collsions ( C.collider1->obj, false );
                 } else {
-                    C->data.collider1->obj->Andle_Collsions ( C->data.collider2->obj, true );
-                    C->data.collider2->obj->Andle_Collsions ( C->data.collider1->obj, true );
+                    C.collider1->obj->Andle_Collsions ( C.collider2->obj, true );
+                    C.collider2->obj->Andle_Collsions ( C.collider1->obj, true );
                 }
             }
         }
 
         // rigidbodies are rendered by the objekt
+        DEBUG ( 3, "Fixed Debug Ended" );
     }
 
     template < class C >
@@ -372,10 +394,10 @@ namespace phisiks {
 		DEBUG ( 2, "Wrong Collider type" );
     }
 
-    static void Set_Active ( Objekt* new_Active ) 
-    { Active = new_Active; }
+    static void Set_Active ( Objekt& new_Active ) 
+    { Active = new_Active.Get_Name ( ); }
     static void Set_Active (std::string new_Active ) 
-    { Active = Manager::Objekt_Get ( new_Active ); }
+    { Active = new_Active; }
 } // namespace phisiks
 } // namespace ReKat 
 
