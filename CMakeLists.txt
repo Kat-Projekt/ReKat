@@ -18,8 +18,8 @@ else ( )
 endif ( )
 
 # compile the examples
-set ( TESTS Render_Test Core_Test Collision_Test Pong_Test )
-set ( TESTS Pong_Test )
+set ( TESTS Render_Test Core_Test Collision_Test Pong )
+set ( TESTS Pong )
 
 if ( REKAT_TEST )
     foreach ( TEST ${TESTS} )

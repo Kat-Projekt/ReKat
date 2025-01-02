@@ -13,11 +13,18 @@ public:
 		Element * prev = nullptr;
 		T data;
 		Element * next = nullptr;
+
+		friend std::ostream& operator << ( std::ostream& os, const Element& ele ) {
+			os << ele.data << " { " << ele.prev << ", " << ele.next << " }";
+			return os;
+		}
 	};
 	struct Iterator {
 		Element * ele;
 
 		Iterator& operator++() {
+			if ( ele->next == nullptr ) 
+			{ DEBUG ( 1, "Continuing with a nullptr"); }
 			ele = ele->next;
 			return *this;
 		}
@@ -40,7 +47,9 @@ public:
 		bool operator!= ( Iterator &I ) 
 		{ return ( I.ele != this->ele ); }
 
-		T operator*() const { return ele->data; }
+		T operator*() const {
+			return ele->data;
+		}
 	};
 	
 private:
@@ -110,7 +119,7 @@ public:
 		Element* e = new Element;
 		e->data = data;
 		e->prev = _last;
-		e->next = nullptr;
+		e->next = _last->next;
 
 		_last->next = e;
 		_last = e;

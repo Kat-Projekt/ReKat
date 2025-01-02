@@ -215,12 +215,14 @@ public:
 		if ( _started ) { return; }
 		if ( !_active ) { return; }
 		DEBUG ( 4,"Starting Objekt: ", Get_Name() );
-		for ( auto C : _components ) {
+		for ( auto &&C : _components ) {
 			DEBUG ( 6," - Starting Componenet: ", std::string(typeid(*(C)).name()) );
 			C->_Start ( );
+			DEBUG ( 6,"Done" );
+			DEBUG ( 6,*this );
 		}
 		DEBUG ( 6,"Starting Childrens" );
-		for ( auto O : _childrens ) 
+		for ( auto &&O : _childrens ) 
 		{ O->Start ( ); }
 		DEBUG ( 6,"Childrens Started" );
 		DEBUG ( 5,"Started Objekt: ", Get_Name() );
@@ -230,12 +232,13 @@ public:
     virtual void Update ( ) {
 		if ( !_active ) { return; }
 		DEBUG ( 4,"Updating Objekt: ", Get_Name() );
-        for ( auto C : _components ) {
+        for ( auto &&C : _components ) {
 			DEBUG ( 6,"Updating Componenet: ", std::string(typeid(*C).name()));
 			C->_Update ( );
+			DEBUG ( 6,"Done" );
 		}
 		DEBUG ( 6,"Updating Childrens" );
-		for ( auto O : _childrens ) 
+		for ( auto &&O : _childrens ) 
 		{ O->Update ( ); }
 		DEBUG ( 6,"Childrens Updated" );
 		DEBUG ( 5,"Updated Objekt: ", Get_Name() );
@@ -247,6 +250,7 @@ public:
         for ( auto C : _components ) {
 			DEBUG ( 6,"Updating Fixed Componenet: ", std::string(typeid(*C).name()));
 			C->_Fixed_Update ( );
+			DEBUG ( 6,"Done" );
 		}
 		DEBUG ( 6,"Updating Childrens Fixed" );
 		for ( auto O : _childrens ) 
@@ -283,9 +287,9 @@ public:
 	}
 
 	void Print_Tree ( std::string level ) {
-		std::cout << level << _name << " " << _pos << " " << _size << ( _active ? " v" : " x") << '\n';
+		DEBUG ( 4, level, _name, " ", _pos, " ", _size, ( _active ? " v" : " x") );
 		for ( auto C : _components ) 
-		{ std::cout << level << "+ " << typeid(*C).name() << ( C->Get_Active () ? " v" : " x") << '\n'; }
+		{ DEBUG ( 5, level, "+ ", typeid(*C).name(), ( C->Get_Active () ? " v" : " x") ); }
 		level += "- ";
 		for ( auto C : _childrens )
 		{ C->Print_Tree ( level ); }
@@ -294,8 +298,9 @@ public:
 	friend std::ostream& operator << ( std::ostream& os, Objekt& n ) {
         os << n.Get_Name ( ) << " " << n._pos << " " << n._size << ( n._active ? " v" : " x" ) << " { ";
 		// print components
+		os << n._components.size ( ) << " ";
 		for ( auto C : n._components ) 
-		{ std::cout << typeid(*C).name() << ( C->Get_Active () ? " v" : " x") << " "; }
+		{ os << typeid(*C).name() << ( C->Get_Active () ? " v" : " x") << " "; }
 
 		os << " }";
 		
@@ -337,13 +342,14 @@ namespace Manager {
 		DEBUG ( 3,"adding active scene" );
 		objekts.append ( o );
 		_current_scene = o;
+		Start( );
 		DEBUG ( 5,"added main scene" );
 	}
 	static void Set_Active_Scene ( std::string s ) {
 		DEBUG ( 3,"adding active scene" );
 		for ( auto S : objekts ) {
 			if ( S->Get_Name () == s ) 
-			{ _current_scene = S; DEBUG ( 5,"added main scene" ); return; }
+			{ _current_scene = S; DEBUG ( 5,"added main scene" ); Start( ); return; }
 		}
 	}
 	

@@ -13,8 +13,8 @@ namespace Manager {
 	// -------------
     static Font* Font_Get  ( std::string name )
 	{ return Get < Font > ( name ); }
-    static int Font_Load ( std::string name, const char* fontPath, int heigth = 48 ) {
-        Font *s = new Font ( heigth );
+    static int Font_Load ( std::string name, const char* fontPath, int heigth = 48, int letters_spacing = 0 ) {
+        Font *s = new Font ( heigth, letters_spacing );
         _resources.insert( { (name + std::string(typeid(Font).name())) , s } );
         return (*s).Make( fontPath );
     }

@@ -2,7 +2,7 @@
 // #define EXPANCE
 #include <engine.hpp>
 
-float speed = 104 * 7;
+float speed = 104 * 14;
 float actual_speed = speed;
 
 class Change_Skin : public Behaviour {
@@ -90,8 +90,8 @@ class Ball_Controller : public Behaviour {
 	}
 
 	void Update_Punteggio ( ) {
-		if ( punti_plater1 == 3 ) { _punteggio->Set ( "V Wins", Text::LEFT ); obj->Get_Component < Rigidbody > ( )->velocity = {0,0,0}; _bip->Play (2); return; }
-		if ( punti_plater2 == 3 ) { _punteggio->Set ( "E 2 Wins", Text::RIGHT ); obj->Get_Component < Rigidbody > ( )->velocity = {0,0,0}; _bip->Play (2); return; }
+		if ( punti_plater1 == 3 ) { _punteggio->Set ( "Player 1 Wins", Text::LEFT ); obj->Get_Component < Rigidbody > ( )->velocity = {0,0,0}; _bip->Play (2); return; }
+		if ( punti_plater2 == 3 ) { _punteggio->Set ( "Player 2 Wins", Text::RIGHT ); obj->Get_Component < Rigidbody > ( )->velocity = {0,0,0}; _bip->Play (2); return; }
 
 		_punteggio->Set ( std::to_string ( punti_plater1 ) + std::string ( " - " ) + std::to_string ( punti_plater2 ), Text::CENTER );
 		ReKat::sygnal::SetSignal ( "SCORE", {S_BOOL,true} );
@@ -222,7 +222,7 @@ int main ( ) {
 	auto pun = Punteggio->Add_Component < Text > ( )->Set ( "font", "text", "cam", {0,1,1,1} );
 	Punteggio->Add_Component < Start_Timer > ( );
 
-	Scene->Add_Component < Fps > ( )->MAX_FPS = 120;
+	Scene->Add_Component < Fps > ( )->MAX_FPS = 10;
 
 	Player1->Add_Component < Sprite > ( )->Set ( "skin1", "sprite", "cam", {2,1}, 1 ); // square sprite
 	Player1->Add_Component < Box_Collider > ( )->Set_Size ( Player1->Get_Size ( ) );
@@ -234,7 +234,7 @@ int main ( ) {
 
 	Ball->Add_Component < Sprite > ( )->Set ( "skin1p", "sprite", "cam" ); // circle sprite
 	Ball->Add_Component < Box_Collider > ( )->Set_Size ( Ball->Get_Size().x );
-	Ball->Add_Component < Rigidbody > ( )->time_scale = 1;
+	Ball->Add_Component < Rigidbody > ( )->time_scale = 0.003;
 	Ball->Add_Component < Ball_Controller > ( )->Set ( pun, largezza_campo, bip );
 
 
@@ -253,6 +253,7 @@ int main ( ) {
 		glClearColor(0.0, 0.0, 0.0, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
+		Timer::Update ( );
 		Manager::Update ( );
 		Manager::Get_Active_Scene ( )->Print_Tree ( "" );
 		ReKat::grapik::Update ( );

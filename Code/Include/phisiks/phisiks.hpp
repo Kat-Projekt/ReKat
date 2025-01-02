@@ -13,7 +13,7 @@ struct collision_check {
     Collider * collider1;
     Collider * collider2;
 
-    friend std::ostream& operator << ( std::ostream& os, collision_check& n ) {
+    friend std::ostream& operator << ( std::ostream& os, const collision_check& n ) {
         os << '{';
         os << n.collider1;
         os << ", ";
@@ -272,8 +272,9 @@ namespace phisiks {
         DEBUG ( 5, "Getting Active Colliders" );
         List < Collider *> active_colliders;
         for ( auto C : Colliders ) {
+            if ( C->Get_Active ( ) && C->obj->Get_Active ( ) ) {
             if ( Manager::Objekt_Get ( Active )->Has_Children ( C->obj ) )
-            { active_colliders.append ( C ); }
+            { active_colliders.append ( C ); } }
 		}
 
         DEBUG ( 4, " Colliders to check: ", active_colliders );

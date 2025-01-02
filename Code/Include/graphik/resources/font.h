@@ -17,6 +17,7 @@ private:
 	unsigned int _font_heigth;
 	unsigned int _heigth;
 	unsigned int _width;
+	unsigned int _letters_spacing = 0;
 
 	enum Status {
 		SUCCESS,
@@ -27,8 +28,9 @@ private:
 public:
 	unsigned int  * char_widths;
 
-	Font ( ) { _font_heigth = 30; };
-	Font ( unsigned int font_heigth ) { _font_heigth = font_heigth; }
+	Font ( ) : _font_heigth ( 30 ), _letters_spacing ( 0 ) { }
+	Font ( unsigned int font_heigth, unsigned int letters_spacing ) 
+	{ _font_heigth = font_heigth; _letters_spacing = letters_spacing; }
 	Font ( const char * path, unsigned int font_heigth = 30 ) : _font_heigth(font_heigth) { Make ( path ); }
 	~Font ( ) { End( ); }
 
@@ -62,7 +64,7 @@ int Font::Make ( const char * path ) {
 	_width = ( _font_heigth + _padding ) * 16; // 16 per row with 2 px of padding
 	_heigth = ( _font_heigth + _padding ) * 8; // 8 per collumb
 	unsigned int p = _width*_heigth;
-	unsigned char combined_buffer[p];
+	unsigned char *combined_buffer = (unsigned char*) calloc (p, sizeof(unsigned char));
 	DEBUG (5, "combined size: ", _width * _heigth );
 	char_widths = (unsigned int*) calloc (128, sizeof(unsigned int));
 
@@ -91,7 +93,7 @@ int Font::Make ( const char * path ) {
 		if ( FT_Load_Char(face, c, FT_LOAD_RENDER) ) { continue; }
 
 		// save the character width
-		char_widths[c] = face->glyph->metrics.width/64;
+		char_widths[c] = face->glyph->metrics.width/64 + _letters_spacing;
 
 		// find the tile position where we have to draw the character
 		int x = (c%16)*(_font_heigth+_padding);

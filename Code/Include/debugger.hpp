@@ -1,40 +1,55 @@
 #ifndef COLOR
 #define COLOR
-#if (defined (LINUX) || defined (__linux__) || defined (__APPLE__)) // unix implementation
-#include <iostream>
-#include "utility/printer.h"
-#include <string>
-#define FOREGROUND_RED 1
-#define FOREGROUND_BLUE 2
-#define FOREGROUND_GREEN 4
-#define FOREGROUND_INTENSITY 0
-#define BACKGROUND_RED 8
-#define BACKGROUND_BLUE 16
-#define BACKGROUND_GREEN 32
-#define BACKGROUND_INTENSITY 0
+	#ifdef DIAGNOSTIC
+		#if (defined (LINUX) || defined (__linux__) || defined (__APPLE__)) // unix implementation
+			#include <iostream>
+			#include "utility/printer.h"
+			#include <string>
+			#define FOREGROUND_RED 1
+			#define FOREGROUND_BLUE 2
+			#define FOREGROUND_GREEN 4
+			#define FOREGROUND_INTENSITY 0
+			#define BACKGROUND_RED 8
+			#define BACKGROUND_BLUE 16
+			#define BACKGROUND_GREEN 32
+			#define BACKGROUND_INTENSITY 0
 
-	void color ( std::string string, int color ) {
-		int foreground_color = ( color & 1 ) == 1 ? 31 : ( color & 2 ) == 2 ? 34 : ( color & 4 ) == 4 ? 32 : 0;
-		int background_color = ( color & 8 ) == 8 ? 41 : ( color & 16 ) == 16 ? 44 : ( color & 32 ) == 32 ? 42 : 0;
+			void color ( std::string string, int color ) {
+				int foreground_color = ( color & 1 ) == 1 ? 31 : ( color & 2 ) == 2 ? 34 : ( color & 4 ) == 4 ? 32 : 0;
+				int background_color = ( color & 8 ) == 8 ? 41 : ( color & 16 ) == 16 ? 44 : ( color & 32 ) == 32 ? 42 : 0;
 
-		std::cout << ( (  std::string ( "\033[1;" ) 
-						+ ( foreground_color != 0 ? std::to_string ( foreground_color ) : std::string( ) )
-						+ ( background_color != 0 ? std::string ( ";" ) + std::to_string ( background_color ) : std::string( ) ) + std::string ( "m" )
-						+ string
-						+ std::string ( "\033[0m" ) ).c_str() );
-	}
-#elif (defined (_WIN32) || defined (_WIN64)) // windows implementaion
-	#include <stdio.h>
-	#include <windows.h>
-	#include <iostream>
-	void color ( const char* string, WORD color ) {
-		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleOutputCP(CP_UTF8);
-		SetConsoleTextAttribute(hConsole, color);
-		std::cout << string;
-		SetConsoleTextAttribute( hConsole, FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY );
-	}
-#endif
+				std::cout << ( (  std::string ( "\033[1;" ) 
+								+ ( foreground_color != 0 ? std::to_string ( foreground_color ) : std::string( ) )
+								+ ( background_color != 0 ? std::string ( ";" ) + std::to_string ( background_color ) : std::string( ) ) + std::string ( "m" )
+								+ string
+								+ std::string ( "\033[0m" ) ).c_str() );
+			}
+		#elif (defined (_WIN32) || defined (_WIN64)) // windows implementaion
+			#include <stdio.h>
+			#include <windows.h>
+			#include <iostream>
+			void color ( const char* string, WORD color ) {
+				HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+				SetConsoleOutputCP(CP_UTF8);
+				SetConsoleTextAttribute(hConsole, color);
+				std::cout << string;
+				SetConsoleTextAttribute( hConsole, FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY );
+			}
+		#endif
+	#else
+		#include <iostream>
+		#include "utility/printer.h"
+		#include <string>
+		#define FOREGROUND_RED 1
+		#define FOREGROUND_BLUE 2
+		#define FOREGROUND_GREEN 4
+		#define FOREGROUND_INTENSITY 0
+		#define BACKGROUND_RED 8
+		#define BACKGROUND_BLUE 16
+		#define BACKGROUND_GREEN 32
+		#define BACKGROUND_INTENSITY 0
+		void color ( std::string, int color ) { }
+	#endif
 #endif
 
 #ifndef DEBUG
