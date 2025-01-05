@@ -7,8 +7,8 @@
 
 class Resource {
 public:
-    Resource( void ) { }
-    virtual int Make() { return 0; }
+    Resource ( void ) { }
+    virtual int Make ( ) { return 0; }
     virtual void End ( void ) { }
     virtual void Use ( void ) { }
     virtual void Use ( float ) { }

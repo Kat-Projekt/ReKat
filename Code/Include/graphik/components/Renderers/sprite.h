@@ -8,7 +8,7 @@
 
 class Sprite : public Behaviour {
 private:
-	bool _UI_render = false;
+	bool _UI_render = true;
     unsigned int _quad;
     unsigned int VBO;
     std::string _texture = "";
@@ -94,7 +94,7 @@ public:
 	{ _texture = texture; _shader = shader; _camera = camera;
 	_frames = frames; this->frame = frame; _color = color; _UI_render = UI_sprite; return this; } */
 
-    Sprite* Set ( std::string texture, std::string shader, std::string camera = "", ivec2 frames = {1,1}, int frame = 0, vec4 color = {1,1,1,1}, bool UI_sprite = false ) 
+    Sprite* Set ( std::string texture, std::string shader, std::string camera = "", ivec2 frames = {1,1}, int frame = 0, vec4 color = {1,1,1,1}, bool UI_sprite = true ) 
 	{ _texture = texture; _shader = shader; _camera = camera;
 	_frames = frames; this->frame = frame; _color = color; _UI_render = UI_sprite; return this; }
 

@@ -4,6 +4,7 @@ project ( ReKat )
 
 option ( REKAT_LIBRARY "Compile the Engine as a library, else the headers will be included in the executable" OFF )
 option ( REKAT_TEST "Compile the test suite" OFF )
+option ( REKAT_PROJEKT "Compile the projekts" OFF )
 option ( REKAT_ENGINE "Compile the Engine interpreter" OFF )
 
 list ( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/Cmake" )
@@ -18,8 +19,8 @@ else ( )
 endif ( )
 
 # compile the examples
-set ( TESTS Render_Test Core_Test Collision_Test Pong )
-set ( TESTS Pong )
+set ( TESTS Render_Test Core_Test Collision_Test )
+set ( TESTS )
 
 if ( REKAT_TEST )
     foreach ( TEST ${TESTS} )
@@ -38,6 +39,27 @@ if ( REKAT_TEST )
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Test/${TEST}/Resources $<TARGET_FILE_DIR:${TEST}> )
 
     endforeach ( TEST )
+endif ( )
+
+set ( PROJEKTS Breakout )
+
+if ( REKAT_PROJEKT )
+    foreach ( PROJEKT ${PROJEKTS} )
+    file ( GLOB PROJECT_SOURCES ${CMAKE_SOURCE_DIR}/Projekt/${PROJEKT}/main.cpp )
+    add_executable(${PROJEKT}	    ${PROJECT_SOURCES}  ${PROJECT_HEADERS}
+                                ${PROJECT_CONFIGS}  ${LIBS_SOURCES})
+
+    target_link_libraries ( ${PROJEKT} glfw freetype OpenAL # OpenAL::OpenAL
+                        ${GLFW_LIBRARIES} ${GLAD_LIBRARIES} ${WINSOCK_LIBRARIES} )
+
+    set_target_properties ( ${PROJEKT} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Projekt/${PROJEKT} )
+
+    add_custom_command (
+        TARGET ${PROJEKT} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Projekt/${PROJEKT}/Data $<TARGET_FILE_DIR:${PROJEKT}>/Data )
+
+    endforeach ( PROJEKT )
 endif ( )
 
 if ( REKAT_ENGINE )

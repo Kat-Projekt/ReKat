@@ -42,37 +42,46 @@ public:
 		// {index,width,x,y} {index,width,x,y} {69'E',10,0,0} {32' ',20,10,0}
 		int* instance_buffer = (int*) calloc (_text.size()*4, sizeof(int));
 		
-		int comulative_x = 0;
+		std::vector < int > comulative_x;
+		comulative_x.push_back ( 0 );
+		int new_lines = 0;
 		if ( _text_aligne != RIGHT ) {
 			// calculate comulative_x
 			for ( size_t c = 0; c < _text.size(); c++ )	{
 				if ( _text[c] == 32 ) 
-				{ comulative_x += font-> Get_Heigth ( ) / 2; }
+				{ comulative_x[new_lines] += font-> Get_Heigth ( ) / 2; continue; }
+				if ( _text[c] == '\n' ) 
+				{ new_lines++; DEBUG ( 4, "Fund new line" ); continue; }
 
-				comulative_x += font-> char_widths[(int)_text[c]];
+				comulative_x[new_lines] += font-> char_widths[(int)_text[c]];
+			}
+		}
+		for ( auto i = 0; i <= new_lines; i++ ) {
+			switch ( _text_aligne ) {
+				case CENTER: comulative_x[i] = comulative_x[i] = ( obj->Get_Size ( ).x - comulative_x[i] ) * 0.5; break;
+				case RIGHT: comulative_x[i] = obj->Get_Size ( ).x * 0.5; break;
+				case LEFT: comulative_x[i] = - comulative_x[i] + obj->Get_Size ( ).x * 0.5; break;
 			}
 		}
 
-		switch ( _text_aligne ) {
-			case CENTER: comulative_x = comulative_x = ( obj->Get_Size ( ).x - comulative_x ) * 0.5; break;
-			case RIGHT: comulative_x = obj->Get_Size ( ).x * 0.5; break;
-			case LEFT: comulative_x = - comulative_x + obj->Get_Size ( ).x * 0.5; break;
-		}
-
-
+		int new_lines_counter = 0;
+		int vertical_y = new_lines == 0 ? 0 : font->Get_Heigth ( );
+		int vertical_m = new_lines * font->Get_Heigth ( );
 		for ( size_t c = 0; c < _text.size(); c++ )	{
 			instance_buffer[c*4+0] = _text[c];
-			instance_buffer[c*4+3] = 0;
-
+			instance_buffer[c*4+3] = vertical_m - vertical_y * new_lines_counter;
 			// space 'glyph'
 			if ( _text[c] == 32 ) {
 				instance_buffer[c*4+1] = font-> Get_Heigth ( ) / 2;
-				instance_buffer[c*4+2] = comulative_x;
-				comulative_x += font-> Get_Heigth ( ) / 2;
+				instance_buffer[c*4+2] = comulative_x[new_lines_counter];
+				comulative_x[new_lines_counter] += font-> Get_Heigth ( ) / 2;
+				continue;
 			}
+			if ( _text[c] == '\n' ) { DEBUG ( 4, "new line counted" ); new_lines_counter++; continue; }
+
 			instance_buffer[c*4+1] = font-> char_widths[(int)_text[c]];
-			instance_buffer[c*4+2] = comulative_x;
-			comulative_x += font-> char_widths[(int)_text[c]];
+			instance_buffer[c*4+2] = comulative_x[new_lines_counter];
+			comulative_x[new_lines_counter] += font-> char_widths[(int)_text[c]];
 		}
 		for (size_t c = 0; c < _text.size(); c++) {
 			DEBUG ( 6, "{ ",instance_buffer[c*4+0], ',',

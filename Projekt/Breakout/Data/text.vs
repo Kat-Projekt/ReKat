@@ -12,6 +12,6 @@ void main()
 {
     TexCoords = vertex.zw;
 	frame = instace.x;
-    vec4 tempo = projection * model * vec4(vertex.x + instace.z/100, vertex.y, 0.01, 1.0);
+    vec4 tempo = projection * model * vec4(vertex.x + instace.z/100, vertex.y + instace.w/100, 0.01, 1.0);
     gl_Position = vec4(tempo.x, tempo.y, tempo.z, tempo.w);
 }

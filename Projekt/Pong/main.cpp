@@ -1,9 +1,18 @@
-#define DIAGNOSTIC
+// #define DIAGNOSTIC
 // #define EXPANCE
 #include <engine.hpp>
 
 float speed = 104 * 7;
 float actual_speed = speed;
+
+enum STATE {
+	START,
+	PLAYING,
+	ENDED,
+	CREDITS
+};
+
+STATE current_state = START;
 
 using namespace ReKat::grapik::Input;
 
@@ -29,10 +38,10 @@ public:
 		// 2 secondi fade
 		auto titolo_a = new Animation ( titolo->Expose_Color ( ), ONCE );
 		auto sottot_a = new Animation ( sottot->Expose_Color ( ), ONCE );
-		titolo_a->Add_Frame ( {1,1,1,1}, {1,1,1,1}, 6 );
-		sottot_a->Add_Frame ( {1,1,1,1}, {1,1,1,1}, 6 );
-		titolo_a->Add_Frame ( {1,1,1,1}, {1,1,1,0}, 2 );
-		sottot_a->Add_Frame ( {1,1,1,1}, {1,1,1,0}, 2 );
+		titolo_a->Add_Frame ( {1,1,1,1}, {1,1,1,1}, 3 );
+		sottot_a->Add_Frame ( {1,1,1,1}, {1,1,1,1}, 3 );
+		titolo_a->Add_Frame ( {1,1,1,1}, {1,1,1,0}, 1 );
+		sottot_a->Add_Frame ( {1,1,1,1}, {1,1,1,0}, 1 );
 		DEBUG ( 3, "animations: ", titolo_a, " ", sottot_a );
 		Manager::Animation_Load ( "titolo", titolo_a );
 		Manager::Animation_Load ( "sottot", sottot_a );
@@ -44,7 +53,7 @@ public:
 	}
 
 	void Update ( ) {
-		if ( Timer::current_time > 8 ) {
+		if ( Timer::current_time > 4.5 ) {
 			Manager::Set_Active_Scene ( "scene" );
 			ReKat::phisiks::Set_Active ( "scene" );
 		} 
@@ -79,31 +88,52 @@ public:
 		}
 
 		// stop outof border:
-		auto offset = obj->Get_Size ( ).y * 0.5f;
-		if ( obj->Get_Pos ( ).y > 500 - offset ) 
-		{ obj->Inc_Pos ( {0,-speed * Timer::delta_time,0} ); }
-		
-		if ( obj->Get_Pos ( ).y < - 500 + offset ) 
-		{ obj->Inc_Pos ( {0,speed * Timer::delta_time,0} ); }
-	}
-};
+		const int edge = 490;
 
-class Sounds : public Behaviour {
-	
+		auto offset = obj->Get_Size ( ).y * 0.5f;
+		if ( obj->Get_Pos ( ).y > edge - offset ) 
+		{ obj->Set_Pos ( {obj->Get_Pos ( ).x, edge - offset, 0} ); }
+		
+		if ( obj->Get_Pos ( ).y < - edge + offset ) 
+		{ obj->Set_Pos ( {obj->Get_Pos ( ).x, -edge + offset, 0} ); }
+
+	}
 };
 
 class Points : public Behaviour {
 	Text* _points1;
 	Text* _points2;
+	Text* info;
+
+	float start_time;
 
 	unsigned int p1 = 0;
 	unsigned int p2 = 0;
 
 	unsigned int Win = 11;
 
+	void Start ( ) {
+		auto __info = Manager::Objekt_Load ( "INFOS" );
+		info = __info->Add_Component < Text > ( );
+	}
+
 	void Update ( ) {
 		_points1->Set ( std::to_string( p1 ) );
 		_points2->Set ( std::to_string( p2 ) );
+
+		switch ( current_state ) {
+		case START:
+			info->Set ( "Press Space to Start\nTo Move use:\nPlayer1: W & S\nPlayer1: I & K" )->Set_Active ( true );
+			break;
+		case PLAYING:
+			info->Set_Active ( false );
+			break;
+		case ENDED:
+			info->Set ( std::string ( p1>p2 ? "Player 1 wins" : "Player 2 wins" ) 
+						+ "\nwith time: " 
+						+ std::to_string ( Timer::current_time -  start_time ) )->Set_Active ( true );
+			break;
+		}
 	}
 
 public:

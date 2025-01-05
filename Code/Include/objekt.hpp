@@ -95,8 +95,9 @@ public:
 	}
 	void Rem_Child ( std::string name ) {
 		auto O = Get_Children ( name );
+		if ( O == nullptr ) { DEBUG ( 3, "child", name, "not found"); return; }
 		_childrens.remove ( O );
-		DEBUG ( 3,"\tremoving child: ", O->Get_Name (), " from: ", _name );
+		DEBUG ( 4, "removing child: ", O->Get_Name (), " from: ", _name );
 	}
 	void Rem_Child ( Objekt* O ) {
 		_childrens.remove ( O );
@@ -151,8 +152,13 @@ public:
 	void Set_Rot_Pivot ( vec3 rot_pivot = {0,0,0} ) { _rot_pivot = rot_pivot; }
 	vec3 Get_Rot_Pivot ( ) { return _rot_pivot; }
 
-    void Set_Active ( bool active ) 
-	{ _active = active; if ( !_started ) { Start( ); } }
+    void Set_Active ( bool active ) {
+		_active = active;
+		if ( !_started && active == true )
+		{ Start( ); }
+		for ( auto child : _childrens ) 
+		{ child->Set_Active ( active ); }
+	}
     bool Get_Active ( ) { return _active; }
 
     void Set_Name ( std::string name ) { _name = name; }

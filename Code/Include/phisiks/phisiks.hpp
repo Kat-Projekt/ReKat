@@ -224,6 +224,8 @@ public:
         List < collision_check > cheks;
 
         for ( auto col : _colliders ) {
+            // have at least one movable collider
+            if ( col->Is_Static ( ) ) { continue; }
             for ( auto coll : _colliders ) {
                 if ( coll == col ) { continue; }
                 cheks.append ( {col,coll} );
