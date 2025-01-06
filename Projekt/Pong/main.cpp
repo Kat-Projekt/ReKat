@@ -87,7 +87,7 @@ public:
 		break;
 		}
 
-		// stop outof border:
+		// stop out of border:
 		const int edge = 490;
 
 		auto offset = obj->Get_Size ( ).y * 0.5f;
@@ -114,7 +114,8 @@ class Points : public Behaviour {
 
 	void Start ( ) {
 		auto __info = Manager::Objekt_Load ( "INFOS" );
-		info = __info->Add_Component < Text > ( );
+		info = __info->Add_Component < Text > ( )->Set ( "font", "text" );
+		obj->Add_Child ( __info );	
 	}
 
 	void Update ( ) {
@@ -123,7 +124,7 @@ class Points : public Behaviour {
 
 		switch ( current_state ) {
 		case START:
-			info->Set ( "Press Space to Start\nTo Move use:\nPlayer1: W & S\nPlayer1: I & K" )->Set_Active ( true );
+			info->Set ( "Press Space to Start\nTo Move use:\nPlayer 1: W & S\nPlayer 2: I & K" )->Set_Active ( true );
 			break;
 		case PLAYING:
 			info->Set_Active ( false );
@@ -131,7 +132,9 @@ class Points : public Behaviour {
 		case ENDED:
 			info->Set ( std::string ( p1>p2 ? "Player 1 wins" : "Player 2 wins" ) 
 						+ "\nwith time: " 
-						+ std::to_string ( Timer::current_time -  start_time ) )->Set_Active ( true );
+						+ std::to_string ( Timer::current_time -  start_time )
+						+ std::string("\nPress Space to remach") )->Set_Active ( true );
+			current_state = CREDITS;
 			break;
 		}
 	}
@@ -140,7 +143,7 @@ public:
 	Points * Set ( Text* point1, Text* point2 ) 
 	{ _points1 = point1; _points2 = point2; return this; }
 
-	void Reset ( ) { p1 = 0; p2 = 0; }
+	void Reset ( ) { p1 = 0; p2 = 0; start_time = Timer::current_time; }
 
 	void Score ( Player P ) {
 		switch ( P ) {
@@ -148,6 +151,8 @@ public:
 			case PLAYER2: p2++; break;
 			default: break;
 		}
+		if ( Won ( ) ) 
+		{ current_state = ENDED; }
 	}
 
 	inline bool Won ( ) { return ( p1 >= Win || p2 >= Win ) && ( p1 >= p2 + 2 || p2 >= p1 + 2); }
@@ -167,7 +172,7 @@ class Ball_Controller : public Behaviour {
 	void Start ( ) {
 		obj->Add_Component < Rigidbody > ( );
 		obj->Add_Component < Box_Collider > ( )->Set_Size ( obj->Get_Size ( ) );
-		obj->Add_Component < Sprite > ( )->Set ( "sprite", "sprite", "cam" );
+		obj->Add_Component < Sprite > ( )->Set ( "sprite", "sprite", "cam" )->Set_Active ( false );
 
 		srand ( time(0) );
 		if ( rand ( ) % 2 ) 
@@ -230,8 +235,13 @@ class Ball_Controller : public Behaviour {
 				rigi->velocity = { -vel.x, vel.y, 0 };
 			}
 			
-			if ( Key_Down ( " " ) )
-			{ Begin ( ); _points->Reset ( ); started = true; }
+			if ( Key_Down ( " " ) ) {
+				Begin ( );
+				_points->Reset ( );
+				started = true;
+				current_state = PLAYING;
+				obj->Get_Component < Sprite > ( )->Set_Active ( true );
+			}
 		}
 	}
 
@@ -265,6 +275,7 @@ class Ball_Controller : public Behaviour {
 int main ( ) {
 	ReKat::phisiks::Start ( 120 );
 	ReKat::grapik::Start ( "Pong", 800, 600,false,false,true );
+	ReKat::grapik::SetIcon ( "Data/favicon.png" );
 	ReKat::synth::Start ( );
 
 	int largezza_campo = 1300;

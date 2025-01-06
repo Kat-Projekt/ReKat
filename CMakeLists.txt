@@ -6,6 +6,7 @@ option ( REKAT_LIBRARY "Compile the Engine as a library, else the headers will b
 option ( REKAT_TEST "Compile the test suite" OFF )
 option ( REKAT_PROJEKT "Compile the projekts" OFF )
 option ( REKAT_ENGINE "Compile the Engine interpreter" OFF )
+option ( REKAT_LAUNCH "Removes the console window" ON )
 
 list ( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/Cmake" )
 
@@ -41,16 +42,28 @@ if ( REKAT_TEST )
     endforeach ( TEST )
 endif ( )
 
-set ( PROJEKTS Breakout )
+set ( PROJEKTS Breakout Pong )
 
 if ( REKAT_PROJEKT )
+
     foreach ( PROJEKT ${PROJEKTS} )
     file ( GLOB PROJECT_SOURCES ${CMAKE_SOURCE_DIR}/Projekt/${PROJEKT}/main.cpp )
-    add_executable(${PROJEKT}	    ${PROJECT_SOURCES}  ${PROJECT_HEADERS}
-                                ${PROJECT_CONFIGS}  ${LIBS_SOURCES})
+    add_executable(${PROJEKT}   ${PROJECT_SOURCES}  ${PROJECT_HEADERS}
+                                ${PROJECT_CONFIGS}  ${LIBS_SOURCES} ${CMAKE_SOURCE_DIR}/Projekt/${PROJEKT}/favicon.rc)
 
     target_link_libraries ( ${PROJEKT} glfw freetype OpenAL # OpenAL::OpenAL
                         ${GLFW_LIBRARIES} ${GLAD_LIBRARIES} ${WINSOCK_LIBRARIES} )
+
+# removes console
+if(WIN32)
+    set_target_properties(${PROJEKT}  
+    PROPERTIES
+        LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE"
+        LINK_FLAGS_RELEASE "/SUBSYSTEM:windows /ENTRY:mainCRTStartup"
+        LINK_FLAGS_RELWITHDEBINFO "/SUBSYSTEM:windows /ENTRY:mainCRTStartup"
+        LINK_FLAGS_MINSIZEREL "/SUBSYSTEM:windows /ENTRY:mainCRTStartup"
+    )
+endif(WIN32)
 
     set_target_properties ( ${PROJEKT} PROPERTIES
         RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Projekt/${PROJEKT} )

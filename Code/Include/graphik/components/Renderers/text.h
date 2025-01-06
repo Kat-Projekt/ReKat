@@ -4,12 +4,22 @@
 #include "../camera.h"
 #include "../../resources/manager.hpp"
 
+#define HORIZONTAL_LEFT 0x1
+#define HORIZONTAL_CENTER 0x2
+#define HORIZONTAL_RIGTH 0x4
+#define VERTICAL_LEFT 0x10
+#define VERTICAL_CENTER 0x20
+#define VERTICAL_RIGTH 0x40
+
+
 class Text : public Behaviour {
 public:
 	enum ALIGNMENT {
 		RIGHT,
 		CENTER,
-		LEFT
+		LEFT,
+		BOTTOM,
+		TOP
 	};
 private:
     unsigned int _quad;
@@ -17,7 +27,8 @@ private:
 	
 	std::string _text = "";
 	std::string _new_text = "";
-	ALIGNMENT _text_aligne;
+	ALIGNMENT _text_align_h;
+	ALIGNMENT _text_align_v;
 	bool _x_warp = false;
 	int instances = 0;
 
@@ -45,28 +56,35 @@ public:
 		std::vector < int > comulative_x;
 		comulative_x.push_back ( 0 );
 		int new_lines = 0;
-		if ( _text_aligne != RIGHT ) {
+		if ( _text_align_h != RIGHT ) {
 			// calculate comulative_x
 			for ( size_t c = 0; c < _text.size(); c++ )	{
 				if ( _text[c] == 32 ) 
 				{ comulative_x[new_lines] += font-> Get_Heigth ( ) / 2; continue; }
 				if ( _text[c] == '\n' ) 
-				{ new_lines++; DEBUG ( 4, "Fund new line" ); continue; }
+				{ new_lines++; comulative_x.push_back ( 0 ); DEBUG ( 4, "Fund new line" ); continue; }
 
 				comulative_x[new_lines] += font-> char_widths[(int)_text[c]];
 			}
 		}
 		for ( auto i = 0; i <= new_lines; i++ ) {
-			switch ( _text_aligne ) {
+			switch ( _text_align_h ) {
 				case CENTER: comulative_x[i] = comulative_x[i] = ( obj->Get_Size ( ).x - comulative_x[i] ) * 0.5; break;
 				case RIGHT: comulative_x[i] = obj->Get_Size ( ).x * 0.5; break;
 				case LEFT: comulative_x[i] = - comulative_x[i] + obj->Get_Size ( ).x * 0.5; break;
 			}
 		}
+		int vertical_m = new_lines * font->Get_Heigth ( );
+		if ( new_lines != 0 ) {
+			switch ( _text_align_h ) {
+				case CENTER: vertical_m *= 0.5; break;
+				case TOP: vertical_m = 0; break;
+				case BOTTOM: break;
+			}
+		}
 
 		int new_lines_counter = 0;
-		int vertical_y = new_lines == 0 ? 0 : font->Get_Heigth ( );
-		int vertical_m = new_lines * font->Get_Heigth ( );
+		int vertical_y = font->Get_Heigth ( );
 		for ( size_t c = 0; c < _text.size(); c++ )	{
 			instance_buffer[c*4+0] = _text[c];
 			instance_buffer[c*4+3] = vertical_m - vertical_y * new_lines_counter;
@@ -203,9 +221,10 @@ public:
 	{ _font = font; _shader = shader; _camera = camera; 
 	_color = color; return this; }
 
-	Text * Set ( std::string text, ALIGNMENT al = CENTER, bool x_warp = false ) {
+	Text * Set ( std::string text, ALIGNMENT al_horizontal = CENTER, ALIGNMENT al_vertical = CENTER, bool x_warp = false ) {
 		_new_text = text;
-		_text_aligne = al;
+		_text_align_h = al_horizontal;
+		_text_align_v = al_vertical;
 		_x_warp = x_warp;
 		DEBUG (3, "Text changed: ", text );
 		return this;

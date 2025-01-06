@@ -50,7 +50,7 @@ class Level : public Resource {
             while ( getline ( sData_stream, intermediate, '\n' ) ) 
             { heigth++; Data.push_back(intermediate); }
         }
-        catch(const std::exception& e) { DEBUG ( 1, e.what ( ) ); }
+        catch(const std::exception& e) { DEBUG ( 2, e.what ( ) ); }
         
 		std::vector < int > D;
 		D.reserve ( Data.size( ) );
@@ -223,10 +223,12 @@ class Ball_Controller : public Behaviour {
     void Update ( ) {
         if ( Key_Down ( " " ) && ( current_state == START || current_state == WIN || current_state == LIFELOST ) ) 
         { Begin ( ); current_state = PLAYING; }
+        if ( current_state == START ) { obj->Get_Component < Sprite > ( )->Set_Active ( false ); }
+        if ( current_state == PLAYING ) { obj->Get_Component < Sprite > ( )->Set_Active ( true ); }
         if ( current_state == LOSE && Key_Down ( " " ) ) 
         { _display->_lives = 5; _display->_points = 0; current_state = REBOOT; }
 
-        if ( Key_Down ( "P" ) ) { _display->_blocks_left = 0; }
+        // if ( Key_Down ( "P" ) ) { _display->_blocks_left = 0; }
 
         auto rigi = obj->Get_Component < Rigidbody > ( );
 
@@ -248,7 +250,7 @@ class Ball_Controller : public Behaviour {
             rigi->velocity = {rigi->velocity.x, -rigi->velocity.y, 0 };
         }
 
-        if ( current_state == COMPLETED ) {
+        if ( current_state == COMPLETED || current_state == WIN ) {
             if ( obj->Get_Pos ( ).y < -480 ) {
                 obj->Set_Pos ( {obj->Get_Pos ( ).x, -480, 0} );
                 rigi->velocity = {rigi->velocity.x, -rigi->velocity.y, 0 };
@@ -318,7 +320,7 @@ public:
 
 class Scene_Display : public Behaviour {
     Display * _display;
-    int padding = 50;
+    int padding = 150;
     int thickness = 2;
     int blocks = 0;
 
@@ -382,7 +384,7 @@ class Scene_Display : public Behaviour {
 
 public:
     Scene_Display * Set ( Display * display ) 
-    { _display = display; }
+    { _display = display; return this; }
 };
 
 int main ( ) {
@@ -420,7 +422,7 @@ int main ( ) {
         display
     );
 
-    Manager::Set_Active_Scene ( "scene" );
+    Manager::Set_Active_Scene ( "splash" );
 	ReKat::phisiks::Set_Active ( "scene" );
 
 	while ( ReKat::grapik::IsEnd ( ) ) {
