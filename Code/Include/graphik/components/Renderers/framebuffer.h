@@ -24,44 +24,43 @@ private:
 	// risolution
 	int _width = 0;
 	int _heigth = 0;
+	bool resize = false;
 
 	// sprite part
-	Shader * _shader;
-	Camera * _camera;
-	bool _UI_render = false;
+	std::string _shader = "";
+	std::string _camera = "";
+
+	bool _UI_render = true;
 
 	// render links
-	unsigned int FBO;
-	unsigned int TEX;
-	unsigned int VAO;
-	unsigned int VBO;
+	unsigned int FBO = -1;
+	unsigned int TEX = -1;
+	unsigned int VAO = -1;
+	unsigned int VBO = -1;
 public:
-    void Start ( ) {
-		// STARTING TO RENDER OBJEKT
-		// VERY IMPORTANT LINE OF MADNESS
-		_to_render->Start ( );
-
-		if ( _width == 0 || _heigth == 0 ) 
-		{ DEBUG ( 2, "zero dimension framebuffer" ); return; }
+	float _aspect_ratio = 1;
+	void Create_Frame_Buffer ( ) {
+		// clear evetual memeory
+		if ( FBO != -1 ) {
+			glDeleteFramebuffers(1, &FBO); GL_CHECK_ERROR;
+			glDeleteTextures(1, &TEX); GL_CHECK_ERROR;
+		}
 
 		unsigned int RBO;
 		// generation of buffers
         glGenFramebuffers(1, &FBO); GL_CHECK_ERROR;
 		glGenRenderbuffers(1, &RBO); GL_CHECK_ERROR;
 		glGenTextures(1, &TEX); GL_CHECK_ERROR;
-		glGenVertexArrays(1, &VAO); GL_CHECK_ERROR;
-		glGenBuffers(1, &VBO); GL_CHECK_ERROR;
 		DEBUG ( 4, "generating buffers" );
 
 		// binding buffers
 		glBindFramebuffer(GL_FRAMEBUFFER, FBO); GL_CHECK_ERROR;
 		glBindRenderbuffer(GL_RENDERBUFFER, RBO); GL_CHECK_ERROR;
 		glBindTexture(GL_TEXTURE_2D, TEX); GL_CHECK_ERROR;
-		glBindVertexArray(VAO); GL_CHECK_ERROR;
-		glBindBuffer(GL_ARRAY_BUFFER, VBO); GL_CHECK_ERROR;
 		DEBUG ( 5, "binding buffers" );
 
 		// creating texture
+		_aspect_ratio = (float)_width / (float)_heigth;
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _heigth, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); GL_CHECK_ERROR;
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); GL_CHECK_ERROR;
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); GL_CHECK_ERROR;
@@ -80,10 +79,14 @@ public:
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
 		{ DEBUG ( 2, "Framebuffer is not complete" ); return; }
 
-		DEBUG ( 4, "succesfuly created framebuffer" );
+		// unbinding
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 
-		if ( _shader == nullptr ) { DEBUG ( 3, "Skipping sprite genreation" ); return; }
-		
+		DEBUG ( 4, "succesfuly created framebuffer" );
+	}
+
+	void Create_Sprite ( ) {
 		float vertices[] = { 
             // pos      // tex
             0.0f, 1.0f, 0.0f, 0.0f,
@@ -94,6 +97,11 @@ public:
             1.0f, 0.0f, 1.0f, 1.0f,
             1.0f, 1.0f, 1.0f, 0.0f
         };
+		glGenVertexArrays(1, &VAO); GL_CHECK_ERROR;
+		glGenBuffers(1, &VBO); GL_CHECK_ERROR;
+
+		glBindVertexArray(VAO); GL_CHECK_ERROR;
+		glBindBuffer(GL_ARRAY_BUFFER, VBO); GL_CHECK_ERROR;
 		
 		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices, GL_STATIC_DRAW);
 		glEnableVertexAttribArray(0);  GL_CHECK_ERROR;// for position
@@ -101,23 +109,46 @@ public:
 		glEnableVertexAttribArray(1);  GL_CHECK_ERROR;// for texture
 		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(float), (void*)(2 * sizeof(float))); GL_CHECK_ERROR;
 
-		DEBUG ( 4, "succesfuly created sprite" );
-
 		// unbinding
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		glBindTexture(GL_TEXTURE_2D, 0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0); // first VBO then VAO
 		glBindVertexArray(0);
 
+		DEBUG ( 4, "succesfuly created sprite" );
+	}
+
+    void Start ( ) {
+		// STARTING TO RENDER OBJEKT
+		// VERY IMPORTANT LINE OF MADNESS
+		_to_render->Start ( );
+
+		if ( _width == 0 || _heigth == 0 ) 
+		{ DEBUG ( 2, "zero dimension framebuffer" ); return; }
+
+		_aspect_ratio = (float)_width / (float)_heigth;
+
+		Create_Frame_Buffer ( );
+
+		if ( _shader == "" ) { DEBUG ( 3, "Skipping sprite genreation" ); return; }
+		
+		Create_Sprite ( );
+
+		resize = false; 
     }
 
 	void Update ( ) {
+		if ( resize ) {
+			Create_Frame_Buffer ( );
+			auto S = obj->Get_Size ( );
+			obj->Set_Size ( { 2 * S.y / _aspect_ratio , S.y, S.z } );
+			resize = false;
+		}
 		// set render buffer
 		glBindFramebuffer(GL_FRAMEBUFFER, FBO); GL_CHECK_ERROR;
-        glClearColor(0.0, 0.0, 0.0, 0.0f); GL_CHECK_ERROR;
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); GL_CHECK_ERROR;
+        glClearColor(1.0f, 1.0f, 1.0f, 1.0f); GL_CHECK_ERROR;
 		glEnable(GL_DEPTH_TEST); GL_CHECK_ERROR;
 		DEBUG (4, "set render framebuffer");
+		
 		// do the rendering
 		_to_render->Update ( );
 		DEBUG (4, "all objekts rendered to framebuffer");
@@ -129,11 +160,11 @@ public:
 		// glEnable(GL_DEPTH_TEST); GL_CHECK_ERROR;
 
 		// render frame buffer as sprite
-		if ( _shader == nullptr || ( _camera == nullptr && !_UI_render ) ) { DEBUG ( 3, "FrameBuffer Sprite not set Correctly" ); return; }
+		if ( _shader == "" || ( _camera == "" && !_UI_render ) ) { DEBUG ( 3, "FrameBuffer Sprite not set Correctly" ); return; }
 		
-		_shader->setMat4  ( "projection", ( _UI_render ? Camera::UI_Projkection ( ) : _camera->Projkection ( )) );
+		Manager::Shader_Get ( _shader )->setMat4  ( "projection", ( _UI_render ? Camera::UI_Projkection ( ) : Manager::Camera_Get ( _camera )->Projkection ( ) ) );
         DEBUG ( 6, "Updated Camera uniform");
-		_shader->setMat4 ( "model", obj->Get_Model_Mat ( ) );
+		Manager::Shader_Get ( _shader )->setMat4 ( "model", obj->Get_Model_Mat ( ) );
 
         glBindVertexArray(VAO); GL_CHECK_ERROR;
         glBindTexture(GL_TEXTURE_2D, TEX); GL_CHECK_ERROR;
@@ -145,18 +176,31 @@ public:
 
 	// set resolution of the buffer
 	Framebuffer* Set ( int width, int heigth )
-	{ _width = width; _heigth = heigth; return this; }
+	{ _width = width; _heigth = heigth; resize = true; return this; }
 
 	// set parametes for the sprite part
 	// if left empty it behaves like a texture
-	Framebuffer* Set ( std::string shader, Camera* camera = nullptr, bool UI_sprite = true ) 
-	{ _shader = Manager::Shader_Get ( shader ); _camera = camera; _UI_render = UI_sprite; return this; }
-	Framebuffer* Set ( Shader* shader, Camera* camera = nullptr, bool UI_sprite = true ) 
+	Framebuffer* Set ( std::string shader, std::string camera = "", bool UI_sprite = true ) 
 	{ _shader = shader; _camera = camera; _UI_render = UI_sprite; return this; }
+	// Framebuffer* Set ( Shader* shader, Camera* camera = nullptr, bool UI_sprite = true ) 
+	// { _shader = shader; _camera = camera; _UI_render = UI_sprite; return this; }
 
 	// sender render target
 	Framebuffer* Set ( Objekt* to_render )
 	{ _to_render = to_render; return this; }
 };
+
+
+namespace Manager {
+	static int Camera_Load ( std::string name, Objekt* pointer, Framebuffer* fb ) {
+		auto C = pointer->Add_Component < Camera > ( );
+		if ( pointer == nullptr ) 
+		{ DEBUG ( 1, "Invalid camera pointer" ); return 1; }
+		if ( fb != nullptr ) 
+		{ C->fb_scale = &fb->_aspect_ratio; }
+		cameras.insert ( {name, C} );
+		return 0;
+	}
+}
 
 #endif

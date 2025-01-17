@@ -53,8 +53,8 @@ public:
 	}
 
 	void Update ( ) {
-		if ( Timer::current_time > 4.5 ) {
-			Manager::Set_Active_Scene ( "scene" );
+		if ( Timer::current_time > .5 ) {
+			Manager::Set_Active_Scene ( "post processor" );
 			ReKat::phisiks::Set_Active ( "scene" );
 		} 
 	}
@@ -271,11 +271,15 @@ class Ball_Controller : public Behaviour {
 	}
 };
 
+void __FreamBufferResize (GLFWwindow* window, int width, int heigth ) {
+	Manager::Objekt_Get ( "post processor" )->Get_Component < Framebuffer > ( )->Set ( width, heigth );
+}
+
 // classic pong game with local multi player
 int main ( ) {
 	ReKat::phisiks::Start ( 120 );
-	ReKat::grapik::Start ( "Pong", 800, 600,false,false,true );
-	ReKat::grapik::SetIcon ( "Data/favicon.png" );
+	ReKat::grapik::Start ( "Pong", 800, 600,false,false,true, "Data/favicon.png");
+	Bound_Input_Handler->_FreamBufferResize = __FreamBufferResize;
 	ReKat::synth::Start ( );
 
 	int largezza_campo = 1300;
@@ -284,6 +288,8 @@ int main ( ) {
 	auto Splash		= Manager::Objekt_Load ( "splash" );
 
 	Splash->Add_Component < Splash_Screen > ( );
+
+	auto PostProcessor = Manager::Objekt_Load ( "post processor", {0,0,0}, { 1400, 1000, 100 } );
 
 	auto Scene		= Manager::Objekt_Load ( "scene" );
 	auto Punteggio1	= Manager::Objekt_Load ( "Punteggio2", { -200,400,0 } );
@@ -318,11 +324,14 @@ int main ( ) {
 	Scene->Add_Child ( Edge1 );
 	Scene->Add_Child ( Edge2 );
 
+	PostProcessor->Add_Component < Framebuffer > ( )->Set ( Scene )->Set ( "framebuffer" )->Set ( 800, 600 );
+
     Manager::Texture_Load ( "sprite", "Data/empty.png" );
 
     Manager::Font_Load ( "font", "Data/Font.ttf", 90, 13 );
 
     Manager::Shader_Load ( "sprite", "Data/sprite.vs", "Data/sprite.fs" );
+    Manager::Shader_Load ( "framebuffer", "Data/framebuffer.vs", "Data/framebuffer.fs" );
     Manager::Shader_Load ( "text", "Data/text.vs", "Data/text.fs" );
 
 	Manager::Source_Load ( "bip" );
@@ -331,7 +340,7 @@ int main ( ) {
 	Manager::Buffer_Load ( "bup", "Data/bup.wav" );
 	Manager::Buffer_Load ( "badun", "Data/badun.wav" );
 
-	Manager::Camera_Load ( "cam", Scene );
+	Manager::Camera_Load ( "cam", Scene, PostProcessor->Get_Component < Framebuffer > ( ) );
 
 	Player1->Add_Component < Controller > ( )->P = PLAYER1;
 	Player2->Add_Component < Controller > ( )->P = PLAYER2;

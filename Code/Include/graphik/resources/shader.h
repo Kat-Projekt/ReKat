@@ -40,7 +40,14 @@ public:
     int Make ( const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr, const char* tessControlPath = nullptr, const char* tessEvalPath = nullptr );
     // activate the shader
     // -------------------
-    void Use() { glUseProgram(ID); GL_CHECK_ERROR; }
+    void Use() {
+		if ( !glIsProgram(ID) ) {
+			DEBUG ( 1, "not a opengl program in this context" );
+			return;
+		}
+		
+		glUseProgram(ID); GL_CHECK_ERROR;
+	}
 	// deletes the shader
 	// ------------------
 	void End ( ) { glDeleteProgram (ID); }

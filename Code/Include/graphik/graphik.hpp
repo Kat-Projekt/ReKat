@@ -147,8 +147,8 @@ public:
 		glBlendFunc ( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
 		glFrontFace ( GL_CCW );
 
+		Bound_Input_Handler = &input;
 		DEBUG ( 3, "Inizialized Graphik Window" );
-
 		return 0;
 	}
 
@@ -169,6 +169,7 @@ public:
 	{ glfwMakeContextCurrent ( window ); Bound_Input_Handler = &input; }
 
 	void Pool ( ) {
+		input.Update ( );
 		glfwSwapBuffers ( window ); GL_CHECK_ERROR;
 		glfwPollEvents ( ); GL_CHECK_ERROR;
 	}
@@ -283,19 +284,22 @@ namespace Input {
 		Bound_Window_Handler = t;
         return (*t).Make( name, SCR_WIDTH, SCR_HEIGTH, icon_path, transparent, fullscreen, resizable );
 	}
-	static int Update ( ) {
+	static void Update ( ) {
 		for ( auto W : _windows ) 
 		{ W.second->Pool ( ); }
 	}
-	static int Bound_Window ( std::string name ) 
-	{ Bound_Window_Handler = _windows [ name ]; }
-	static int End ( std::string window = "" ) 
+	static void Bound_Window ( std::string name ) {
+		Bound_Window_Handler = _windows [ name ];
+		Bound_Window_Handler->Use ( );
+	}
+	static void End ( std::string window = "" ) 
 	{ if ( window == "" ) { Bound_Window_Handler->End ( ); } }
 	static int IsEnd ( std::string window = "" ) {
 		DEBUG ( 4, "Getting is End of window ",
 		( window == "" ? "DEFAULT" : window ) );
 		DEBUG ( 4, Bound_Window_Handler->name );
-		if ( window == "" ) { Bound_Window_Handler->IsEnd ( ); }
+		if ( window == "" ) { return Bound_Window_Handler->IsEnd ( ); }
+		return true;
 	}
 	static void Terminate ( ) {
 		for ( auto W : _windows ) 

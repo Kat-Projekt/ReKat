@@ -7,6 +7,7 @@
 #include "texture.h"
 #include "font.h"
 #include "tilemap_map.h"
+#include "../components/camera.h"
 
 namespace Manager {
 	// Gets a Font
@@ -64,7 +65,29 @@ namespace Manager {
         _resources.insert( { (name + std::string(typeid(Texture).name())) , t} );
         return (*t).Make(path);
     }
-}; // namespace Manager
 
+    static std::unordered_map < std::string, Camera* > cameras;
+    static int Camera_Load ( std::string name, std::string pointer ) {
+		if ( pointer == "" ) 
+		{ DEBUG ( 1, "Invalid camera pointer" ); return 1; }
+		auto C = Manager::Objekt_Get ( pointer )->Add_Component < Camera > ( );
+		cameras.insert ( {name, C} );
+		return 0;
+	}
+	static int Camera_Load ( std::string name, Objekt* pointer ) {
+		if ( pointer == nullptr ) 
+		{ DEBUG ( 1, "Invalid camera pointer" ); return 1; }
+		auto C = pointer->Add_Component < Camera > ( );
+		cameras.insert ( {name, C} );
+		return 0;
+	}
+	static Camera * Camera_Get ( std::string name ) {
+		if ( name == "" ) { return nullptr; }
+		auto findit = cameras.find(name);
+		if ( findit != cameras.end() ) {
+			return findit->second;
+		} else { return nullptr; }
+	}
+}; // namespace Manager
 
 #endif
