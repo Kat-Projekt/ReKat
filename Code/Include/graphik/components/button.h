@@ -35,8 +35,8 @@ public:
 		// calculate hover
 		vec2 Pos = obj->Get_Pos ( );
 		vec2 Size = obj->Get_Size ( ) * 0.5f;
-		if ( ( mouse_pos.x - Pos.x > -Size.x && mouse_pos.x - Pos.x < Size.x ) && 
-             ( mouse_pos.y - Pos.y > -Size.y && mouse_pos.y - Pos.y < Size.y ) ) 
+		if ( ( Bound_Window_Handler->input.mouse_pos.x - Pos.x > -Size.x && Bound_Window_Handler->input.mouse_pos.x - Pos.x < Size.x ) && 
+             ( Bound_Window_Handler->input.mouse_pos.y - Pos.y > -Size.y && Bound_Window_Handler->input.mouse_pos.y - Pos.y < Size.y ) ) 
         { hover = true; } else { hover = false; }
 
 		if ( hover ) {

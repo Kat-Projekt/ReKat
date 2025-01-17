@@ -21,7 +21,7 @@ endif ( )
 
 # compile the examples
 set ( TESTS Render_Test Core_Test Collision_Test )
-set ( TESTS )
+set ( TESTS Multi_Window_Test )
 
 if ( REKAT_TEST )
     foreach ( TEST ${TESTS} )

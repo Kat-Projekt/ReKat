@@ -2,13 +2,16 @@
 projekt = Test;
 
 graphik = true;
+phisiks = 120;
 synth = true;
 katwork = true;
+
+entry_point = "giovanni muciaccia";
 
 // reasurces
 .resources {
 	texture { 
-		"texture 1" [ "Path\to\texture" ],
+		"texture 1" [ "Path\to\texture" ] ,
 		"texture 2" [ "antorher\path\to\text" ] ,
 		"texture 2" [ "antorher\path\to\text" ] ,
 		"texture 2" [ "antorher\path\to\text" ] 
@@ -16,7 +19,7 @@ katwork = true;
 
 	shader {
 		"shader 1" [ "vertex.vs", "fragment.fs" ],
-		"shader 2" [ "vertex.vs", "fragment.fs", "geometry.gs", "tessControl.tcs", "tessEval.tes" ],
+		"shader 2" [ "vertex.vs", "fragment.fs", "geometry.gs", "tessControl.tcs", "tessEval.tes" ]
 	},
 
 	type_of_reaurce {
@@ -28,7 +31,6 @@ katwork = true;
 	"Path \to\component.cpp",
 	"second\file"
 }
-
 // objekts
 .objekts {
 	"pippo franco" { //ciccio
@@ -40,5 +42,3 @@ katwork = true;
 		childs [ "pippo franco"]
 	} 
 }
-
-entry_point = "giovanni muciaccia";

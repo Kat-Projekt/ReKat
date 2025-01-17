@@ -8,6 +8,65 @@
 #define DIAGNOSTIC
 #include <debugger.hpp>
 
+/* SINTAX
+-----------
+
+Every command must be divided by one separator
+form the list { ';', '{', '[', '=' }
+
+comments are begined with // and are ignored
+"""
+// this is a comment
+"""
+	--------------
+	-- VARABLES --
+	--------------
+
+variables types there are 5 supported types:
+1. 'strings' delimentated by '"'
+2. 'integers' just the number
+3. 'floats' / doubles represented using a .
+4. 'booleans' just true or false
+5. 'vectors' rappresented by { <value>, <value>, ... <value> } the <value>s have to have the varable type
+
+Examples
+"""
+"this is a string"
+1234 // this is an integer aka. int
+1234.5678 // 1234 is the integer part and 5678 is the fractionary part
+true // this is a boolean
+false // this two
+{1,3,5,6} // this is a vector with 4 integers
+{123,"hello",12.56} // is not a valid vector
+"""
+
+from now on i will refer to varibles as <type> and vectors as <vector<type>> like cpp templates
+whe you find that simbol substitute it with a varible of that type
+
+	-------------
+	-- HEADERS --
+	-------------
+
+each header shoud be unique and will throw an error if duplicated
+
+there are 6 heades: 
+1. 'projekt' is used to set the projekt name 
+	'''projekt = <string>'''
+2. 'graphik' is used to set up the graphik renderer
+	'''graphik = [ <int> ]'''
+3. 'phisiks'
+4. 'synth'
+5. 'katwork'
+6. 'entry_point'
+
+	----------------
+	-- PARAGRAPHS --
+	----------------
+
+
+
+*/
+
 class Reader {
 private:
 	std::string caracters;
@@ -17,6 +76,7 @@ public:
 	Reader ( std::string file ) {
         DEBUG ( 4, "Reading file" );
 		std::ifstream in ( file, std::ios_base::in );
+		// do sintax check
 
 		std::string line;
 		while ( std::getline ( in, line ) ) {
@@ -146,9 +206,14 @@ public:
 
 class Parser {
 private:
+	// Abstract tree
 	struct node {
 		std::string token;
-		int child_type = -1; // -1 = "no indentation" ; 0 = '{' ; 1 = '[' ; 2 = '='
+		//-1: "no indentation"
+		// 0: '{'
+		// 1: '['
+		// 2: '='
+		int child_type = -1; 
 		std::vector < node > childrens;
 	};
 
@@ -247,9 +312,24 @@ public:
 
 class Projekt {
 	public:
+
+	struct _Graphik_Interface {
+		bool active = false;
+		unsigned int width = 0;
+		unsigned int heigth = 0;
+		bool resizable = false;
+		bool fullscreen = false;
+		bool transaprent = false;
+	};
+
+	struct _Phisiks_Interface {
+		bool active = false;
+		unsigned int frames = 60;
+	};
 	
 	struct _Interface {
-		bool graphik = false;
+		_Graphik_Interface graphik;
+		_Phisiks_Interface phisiks;
 		bool synth = false;
 		bool katwork = false;
 	};
@@ -319,12 +399,17 @@ class Projekt {
 		// find modules node: graphik, synth, katwork,
 		for ( auto n : p.root ) {
             if ( n.token == "graphik" || n.token == "synth" || n.token == "katwork" ) {
+				if ( n.childrens.size ( ) == 0 ) { DEBUG ( 1, "Interface sub value not defined" ); }
+
+                if ( n.token == "graphik" ) { Interface.graphik.active = true; continue; }
+                if ( n.token == "phisiks" ) { Interface.phisiks.active = true; 
+											  Interface.phisiks.frames = std::stoi ( n.childrens [0].token ); continue; }
+
                 bool valore = false;
-                if ( n.childrens[0].token == "true" ) { valore == true; }
-                else if ( n.childrens[0].token == "false" ) { valore == false; }
+                if ( n.childrens[0].token == "true" ) { valore = true; }
+                else if ( n.childrens[0].token == "false" ) { valore = false; }
                 else { DEBUG ( 1, "erroneus boolean type after token: ", n.token ); }
 
-                if ( n.token == "graphik" ) { Interface.graphik = valore; }
                 if ( n.token == "synth"   ) { Interface.synth = valore;   }
                 if ( n.token == "katwork" ) { Interface.katwork = valore; }
                 DEBUG ( 5, n.token, " engine activated" );

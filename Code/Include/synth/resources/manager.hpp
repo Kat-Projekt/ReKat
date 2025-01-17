@@ -27,6 +27,7 @@ namespace Manager {
 
 	// Gets a source
 	// -------------
+	// the source should be a component that a audio emmiter has by default not a recource
 	static Source* Source_Get  ( std::string name )
 	{ return Get < Source > ( name ); }
 	static int Source_Load ( std::string name, glm::vec3 pos = {0,0,0} ) {
