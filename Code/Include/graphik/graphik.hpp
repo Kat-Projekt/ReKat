@@ -108,6 +108,10 @@ public:
 		glfwWindowHint ( GLFW_CONTEXT_VERSION_MAJOR, 3 );
 		glfwWindowHint ( GLFW_CONTEXT_VERSION_MINOR, 3 );
 		glfwWindowHint ( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+
+		// anti aliasing
+		// glfwWindowHint(GLFW_SAMPLES, 4);
+		// glEnable(GL_MULTISAMPLE); 
 	#ifdef __APPLE__
 		glfwWindowHint ( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
 	#endif
@@ -148,6 +152,16 @@ public:
 		glFrontFace ( GL_CCW );
 
 		Bound_Input_Handler = &input;
+
+		// icon
+		if ( icon_path != "" ) {
+			GLFWimage images[1]; 
+			images[0].pixels = stbi_load ( icon_path.c_str () , &images[0].width, &images[0].height, 0, 4 ); //rgba channels 
+			glfwSetWindowIcon ( window, 1, images ); 
+			stbi_image_free ( images[0].pixels );
+		}
+		
+
 		DEBUG ( 3, "Inizialized Graphik Window" );
 		return 0;
 	}
@@ -246,7 +260,7 @@ void Input::FreamBufferResize ( GLFWwindow* window, int width, int height ) {
 	DEBUG ( 3, "Updating Framebuffer" );
 	Bound_Window_Handler->Heigth = height;
 	Bound_Window_Handler->Width = width;
-	screen_ration = (float)Bound_Window_Handler->Width / (float)Bound_Window_Handler->Heigth;
+	Bound_Window_Handler->Screen_Ratio = (float)Bound_Window_Handler->Width / (float)Bound_Window_Handler->Heigth;
 	glViewport ( 0, 0, Bound_Window_Handler->Width = width, Bound_Window_Handler->Heigth = height );
 	if ( _FreamBufferResize != nullptr ) 
 	{ _FreamBufferResize ( window, width, height ); }

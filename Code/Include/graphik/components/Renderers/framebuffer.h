@@ -22,8 +22,8 @@ private:
 	Objekt * _to_render;
 
 	// risolution
-	int _width = 0;
-	int _heigth = 0;
+	unsigned int _width = 0;
+	unsigned int _heigth = 0;
 	bool resize = false;
 
 	// sprite part
@@ -38,7 +38,7 @@ private:
 	unsigned int VAO = -1;
 	unsigned int VBO = -1;
 public:
-	float _aspect_ratio = 1;
+	float _aspect_ratio = -1;
 	void Create_Frame_Buffer ( ) {
 		// clear evetual memeory
 		if ( FBO != -1 ) {
@@ -60,7 +60,7 @@ public:
 		DEBUG ( 5, "binding buffers" );
 
 		// creating texture
-		_aspect_ratio = (float)_width / (float)_heigth;
+		// _aspect_ratio = (float)_width / (float)_heigth;
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, _width, _heigth, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); GL_CHECK_ERROR;
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR); GL_CHECK_ERROR;
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR); GL_CHECK_ERROR;
@@ -124,8 +124,6 @@ public:
 		if ( _width == 0 || _heigth == 0 ) 
 		{ DEBUG ( 2, "zero dimension framebuffer" ); return; }
 
-		_aspect_ratio = (float)_width / (float)_heigth;
-
 		Create_Frame_Buffer ( );
 
 		if ( _shader == "" ) { DEBUG ( 3, "Skipping sprite genreation" ); return; }
@@ -138,8 +136,8 @@ public:
 	void Update ( ) {
 		if ( resize ) {
 			Create_Frame_Buffer ( );
-			auto S = obj->Get_Size ( );
-			obj->Set_Size ( { 2 * S.y / _aspect_ratio , S.y, S.z } );
+			// auto S = obj->Get_Size ( );
+			// obj->Set_Size ( { S.x , S.y, S.z } );
 			resize = false;
 		}
 		// set render buffer
@@ -175,8 +173,13 @@ public:
 	}
 
 	// set resolution of the buffer
-	Framebuffer* Set ( int width, int heigth )
-	{ _width = width; _heigth = heigth; resize = true; return this; }
+	Framebuffer* Set ( unsigned int width, unsigned int heigth ) {
+		_width = width; _heigth = heigth; 
+		resize = true; 
+		if ( _aspect_ratio == -1 ) 
+		{ _aspect_ratio = (float)_width / (float)_heigth; }
+		return this;
+	}
 
 	// set parametes for the sprite part
 	// if left empty it behaves like a texture

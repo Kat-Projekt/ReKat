@@ -53,7 +53,7 @@ public:
 	}
 
 	void Update ( ) {
-		if ( Timer::current_time > .5 ) {
+		if ( Timer::current_time > 4.5 ) {
 			Manager::Set_Active_Scene ( "post processor" );
 			ReKat::phisiks::Set_Active ( "scene" );
 		} 
@@ -114,7 +114,7 @@ class Points : public Behaviour {
 
 	void Start ( ) {
 		auto __info = Manager::Objekt_Load ( "INFOS" );
-		info = __info->Add_Component < Text > ( )->Set ( "font", "text" );
+		info = __info->Add_Component < Text > ( )->Set ( "font", "text", "cam" );
 		obj->Add_Child ( __info );	
 	}
 
@@ -278,7 +278,7 @@ void __FreamBufferResize (GLFWwindow* window, int width, int heigth ) {
 // classic pong game with local multi player
 int main ( ) {
 	ReKat::phisiks::Start ( 120 );
-	ReKat::grapik::Start ( "Pong", 800, 600,false,false,true, "Data/favicon.png");
+	ReKat::grapik::Start ( "Pong", 800, 600,false,false,true, "Data/Textures/favicon.png");
 	Bound_Input_Handler->_FreamBufferResize = __FreamBufferResize;
 	ReKat::synth::Start ( );
 
@@ -289,7 +289,7 @@ int main ( ) {
 
 	Splash->Add_Component < Splash_Screen > ( );
 
-	auto PostProcessor = Manager::Objekt_Load ( "post processor", {0,0,0}, { 1400, 1000, 100 } );
+	auto PostProcessor = Manager::Objekt_Load ( "post processor", {0,0,0}, { 1200, 900, 100 } );
 
 	auto Scene		= Manager::Objekt_Load ( "scene" );
 	auto Punteggio1	= Manager::Objekt_Load ( "Punteggio2", { -200,400,0 } );
@@ -326,19 +326,21 @@ int main ( ) {
 
 	PostProcessor->Add_Component < Framebuffer > ( )->Set ( Scene )->Set ( "framebuffer" )->Set ( 800, 600 );
 
-    Manager::Texture_Load ( "sprite", "Data/empty.png" );
+    Manager::Texture_Load ( "sprite", "Data/Textures/empty.png" );
+    Manager::Texture_Load ( "noise", "Data/Textures/noise.png", 1 );
 
     Manager::Font_Load ( "font", "Data/Font.ttf", 90, 13 );
 
-    Manager::Shader_Load ( "sprite", "Data/sprite.vs", "Data/sprite.fs" );
-    Manager::Shader_Load ( "framebuffer", "Data/framebuffer.vs", "Data/framebuffer.fs" );
-    Manager::Shader_Load ( "text", "Data/text.vs", "Data/text.fs" );
+    Manager::Shader_Load ( "sprite", "Data/Shaders/sprite.vs", "Data/Shaders/sprite.fs" );
+    Manager::Shader_Load ( "framebuffer", "Data/Shaders/PostProcessing/framebuffer.vs", "Data/Shaders/PostProcessing/framebuffer.fs" );
+    Manager::Shader_Load ( "crt_effect", "Data/Shaders/PostProcessing/crt_effect.vs", "Data/Shaders/PostProcessing/crt_effect.fs" );
+    Manager::Shader_Load ( "text", "Data/Shaders/text.vs", "Data/Shaders/text.fs" );
 
 	Manager::Source_Load ( "bip" );
 
-	Manager::Buffer_Load ( "bip", "Data/bip.wav" );
-	Manager::Buffer_Load ( "bup", "Data/bup.wav" );
-	Manager::Buffer_Load ( "badun", "Data/badun.wav" );
+	Manager::Buffer_Load ( "bip", "Data/Sounds/bip.wav" );
+	Manager::Buffer_Load ( "bup", "Data/Sounds/bup.wav" );
+	Manager::Buffer_Load ( "badun", "Data/Sounds/badun.wav" );
 
 	Manager::Camera_Load ( "cam", Scene, PostProcessor->Get_Component < Framebuffer > ( ) );
 
@@ -356,10 +358,17 @@ int main ( ) {
 	Manager::Set_Active_Scene ( "splash" );
 	ReKat::phisiks::Set_Active ( "splash" );
 
+	// add noise texture to framebuffer shader
+	Manager::Shader_Get ( "crt_effect" )->setInt ( "screenTexture", 0 );
+	Manager::Shader_Get ( "crt_effect" )->setInt ( "noiseTexture", 1 );
+	Manager::Shader_Get ( "crt_effect" )->setFloat ( "time", 0 );
+
 	while ( ReKat::grapik::IsEnd ( ) ) {
 		glClearColor(0.0, 0.0, 0.0, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
+	Manager::Texture_Get ( "noise" )->Use ( );
+	Manager::Shader_Get ( "crt_effect" )->setFloat ( "time", Timer::current_time );
 		Manager::Update ( );
 		ReKat::grapik::Update ( );
 		ReKat::phisiks::Update ( );

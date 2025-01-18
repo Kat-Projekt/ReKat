@@ -20,6 +20,7 @@ public:
     };
 
     unsigned int ID;
+    unsigned int Texture_Number = 0;
     unsigned int Width, Height;
     unsigned int Format;
     unsigned int Wrap_S;
@@ -27,10 +28,12 @@ public:
     unsigned int Filter_Min;
     unsigned int Filter_Max;
 
-    Texture ( ) : Width(0), Height(0), Format(GL_RGB), Wrap_S(GL_REPEAT), Wrap_T(GL_REPEAT), Filter_Min(GL_NEAREST), Filter_Max(GL_NEAREST) { }
-    Texture ( int ID ) : Width(0), Height(0), Format(GL_RGB), Wrap_S(GL_REPEAT), Wrap_T(GL_REPEAT), Filter_Min(GL_NEAREST), Filter_Max(GL_NEAREST) { this->ID = ID; }
-	Texture ( const char * file ) : Width(0), Height(0), Format(GL_RGB), Wrap_S(GL_REPEAT), Wrap_T(GL_REPEAT), Filter_Min(GL_NEAREST), Filter_Max(GL_NEAREST) 
-	{ Make ( file ); }
+    Texture ( ) : Width(0), Height(0), Format(GL_RGB), Wrap_S(GL_REPEAT), Wrap_T(GL_REPEAT), Filter_Min(GL_NEAREST), Filter_Max(GL_NEAREST)
+    { }
+    Texture ( unsigned int ID, unsigned int Texture_Number = 0 ) : Width(0), Height(0), Format(GL_RGB), Wrap_S(GL_REPEAT), Wrap_T(GL_REPEAT), Filter_Min(GL_NEAREST), Filter_Max(GL_NEAREST) 
+    { this->ID = ID; this->Texture_Number = Texture_Number; }
+	Texture ( const char * file, unsigned int Texture_Number = 0 ) : Width(0), Height(0), Format(GL_RGB), Wrap_S(GL_REPEAT), Wrap_T(GL_REPEAT), Filter_Min(GL_NEAREST), Filter_Max(GL_NEAREST) 
+	{ Make ( file ); this->Texture_Number = Texture_Number; }
     ~Texture ( ) { End ( ); }
 
     // loads the texture
@@ -42,7 +45,7 @@ public:
     // activate the texture
 	// --------------------
     inline void Use ( ) { 
-        glActiveTexture(GL_TEXTURE0); GL_CHECK_ERROR; 
+        glActiveTexture(GL_TEXTURE0 + Texture_Number); GL_CHECK_ERROR; 
         glBindTexture(GL_TEXTURE_2D, this->ID); GL_CHECK_ERROR; 
     }
 	// deletes the texture

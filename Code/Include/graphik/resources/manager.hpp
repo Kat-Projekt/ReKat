@@ -44,8 +44,8 @@ namespace Manager {
 			return (Texture*)findit->second;
 		} else { return nullptr; }
 	}
-    static int Texture_Load ( std::string name, const char* path ) {
-        Texture *t = new Texture ( );
+    static int Texture_Load ( std::string name, const char* path, unsigned int Texture_Number = 0 ) {
+        Texture *t = new Texture ( (unsigned int)0, Texture_Number );
         _resources.insert( { (name + std::string(typeid(Texture).name())) , t} );
         return (*t).Make(path);
     }

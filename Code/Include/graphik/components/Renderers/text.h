@@ -189,7 +189,6 @@ public:
 		else
 		{ shader->setMat4  ( "projection", Manager::Camera_Get( _camera )->Projkection ( ) ); }
 		
-		shader->setMat4  ( "projection", Manager::Camera_Get( _camera )->UI_Projkection ( ) );
 		DEBUG ( 6, "Updated Camera uniform");
 
         shader->setFloat ( "SPRITE_COLUMNS", 16 );

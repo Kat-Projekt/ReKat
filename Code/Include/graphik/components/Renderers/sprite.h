@@ -94,7 +94,7 @@ public:
 	{ _texture = texture; _shader = shader; _camera = camera;
 	_frames = frames; this->frame = frame; _color = color; _UI_render = UI_sprite; return this; } */
 
-    Sprite* Set ( std::string texture, std::string shader, std::string camera = "", ivec2 frames = {1,1}, int frame = 0, vec4 color = {1,1,1,1}, bool UI_sprite = true ) 
+    Sprite* Set ( std::string texture, std::string shader, std::string camera = "", ivec2 frames = {1,1}, int frame = 0, vec4 color = {1,1,1,1}, bool UI_sprite = false ) 
 	{ _texture = texture; _shader = shader; _camera = camera;
 	_frames = frames; this->frame = frame; _color = color; _UI_render = UI_sprite; return this; }
 
