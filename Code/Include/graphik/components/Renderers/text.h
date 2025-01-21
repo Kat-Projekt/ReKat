@@ -24,6 +24,7 @@ public:
 private:
     unsigned int _quad;
 	unsigned int _inst;
+	unsigned int VBO;
 	
 	std::string _text = "";
 	std::string _new_text = "";
@@ -130,7 +131,6 @@ public:
 
     void Start ( ) {
         DEBUG ( 5, "Staring Text");
-		unsigned int VBO;
         float vertices[] = { 
             // pos      // tex
             0.0f, 1.0f, 0.0f, 0.0f,
@@ -211,6 +211,12 @@ public:
 		
         DEBUG (5, "Drawn Text");
 	}
+
+    void Delete ( ) {
+        glDeleteVertexArrays(1, &_quad);
+        glDeleteBuffers(1, &_inst);
+        glDeleteBuffers(1, &VBO);
+    }
 
 	/* Text * Set ( Font* font, Shader* shader, Camera* camera = nullptr, vec4 color = {1,1,1,1} ) 
 	{ _font = font; _shader = shader; _camera = camera; 

@@ -58,6 +58,8 @@ private:
 	Element* _last = nullptr;
 public:
 	List ( ) { _last = new Element; };
+	// ~List ( ) { Deallocate ( ); };
+	
 	void Deallocate ( ) {
 		auto C = _first;
 		while ( C != nullptr ) {
@@ -148,17 +150,25 @@ public:
 
 	// removes every istance of and element equal to data from list
 	List* remove ( T data ) {
-		auto C = _first;
+		// empty list
+		if ( _last->prev == nullptr ) { return this; }
+
+		// find element
+		auto C = _last->prev;
 		while ( C != nullptr ) {
 			if ( C->data == data ) { break; }
-			C = C->next;
+			C = C->prev;
 		}
-		// not found
+		// item no found
 		if ( C == nullptr ) { return this; }
-		if ( C->next != nullptr ) { C->next->prev = C->prev; }
+
+		// relink
+		C->next->prev = C->prev; // next is always not null
 		if ( C->prev != nullptr ) { C->prev->next = C->next; }
-		if ( C->next == nullptr && C->prev == nullptr ) { _first = nullptr; }
-		_size--;
+		if ( C == _first ) { _first = nullptr; }
+
+		// free
+		delete C;
 		return this;
 	}
 	// removes indexed element

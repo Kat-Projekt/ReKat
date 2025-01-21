@@ -397,6 +397,16 @@ namespace phisiks {
 		DEBUG ( 2, "Wrong Collider type" );
     }
 
+    template < class C >
+    static void Rem_Collider ( C* collider ) {
+        DEBUG ( 4,"Removing Colider: ", std::string(typeid(*collider).name()), " from ", collider->obj->Get_Name () );
+		if ( std::is_base_of<Collider, C>::value ) {
+			Colliders.remove ( ( Collider * ) ( collider ) );
+        	return;
+		}
+		DEBUG ( 2, "Wrong Collider type" );
+    }
+
     static void Set_Active ( Objekt& new_Active ) 
     { Active = new_Active.Get_Name ( ); }
     static void Set_Active (std::string new_Active ) 
@@ -405,5 +415,6 @@ namespace phisiks {
 } // namespace ReKat 
 
 void Collider::_Start ( ) { ReKat::phisiks::Add_Collider ( this ); }
+void Collider::Delete ( ) { ReKat::phisiks::Rem_Collider ( this ); }
 
 #endif

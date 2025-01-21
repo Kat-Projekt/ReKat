@@ -34,6 +34,8 @@ public:
 	Collider* Set_Offset ( vec3 offset ) { _offset = offset; return this; }
 
 	virtual int Collider_Type ( ) { return 0; }
+
+	virtual void Delete ( );
 };
 
 // ------------------------------- Collider Types -----------------------------------

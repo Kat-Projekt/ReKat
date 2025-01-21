@@ -8,7 +8,7 @@ uniform mat4 model;
 uniform mat4 projection;
 
 void main() {
-    TexCoords = vec2 ( aTexCoords.x, 1-aTexCoords.y );
+    TexCoords = vec2 ( aTexCoords.x, -aTexCoords.y );
     vec4 tempo = projection * model * vec4(aPos.xy, 0.0, 1.0);
     gl_Position = vec4(tempo.x, tempo.y, 0, 1);
 }  

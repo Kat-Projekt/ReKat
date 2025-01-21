@@ -37,16 +37,17 @@ private:
 	unsigned int TEX = -1;
 	unsigned int VAO = -1;
 	unsigned int VBO = -1;
+	unsigned int RBO = -1;
 public:
 	float _aspect_ratio = -1;
 	void Create_Frame_Buffer ( ) {
 		// clear evetual memeory
 		if ( FBO != -1 ) {
+			glDeleteRenderbuffers(1, &RBO); GL_CHECK_ERROR;
 			glDeleteFramebuffers(1, &FBO); GL_CHECK_ERROR;
 			glDeleteTextures(1, &TEX); GL_CHECK_ERROR;
 		}
 
-		unsigned int RBO;
 		// generation of buffers
         glGenFramebuffers(1, &FBO); GL_CHECK_ERROR;
 		glGenRenderbuffers(1, &RBO); GL_CHECK_ERROR;
@@ -172,6 +173,14 @@ public:
 		DEBUG (4, "framebuffer rendered to main context");
 	}
 
+	void Delete ( ) {
+		glDeleteRenderbuffers(1, &RBO);
+		glDeleteFramebuffers(1, &FBO);
+        glDeleteVertexArrays(1, &VAO);
+		glDeleteTextures(1, &TEX);
+        glDeleteBuffers(1, &VBO);
+    }
+
 	// set resolution of the buffer
 	Framebuffer* Set ( unsigned int width, unsigned int heigth ) {
 		_width = width; _heigth = heigth; 
@@ -201,7 +210,11 @@ namespace Manager {
 		{ DEBUG ( 1, "Invalid camera pointer" ); return 1; }
 		if ( fb != nullptr ) 
 		{ C->fb_scale = &fb->_aspect_ratio; }
-		cameras.insert ( {name, C} );
+		if ( cameras.find ( name ) == cameras.end ( ) ) 
+		{ cameras.insert ( {name, C} ); }
+		else 
+		{ cameras [name] = C; }
+		
 		return 0;
 	}
 }

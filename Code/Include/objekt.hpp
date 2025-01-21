@@ -67,15 +67,19 @@ public:
     Objekt ( std::string name, vec3 pos = {0,0,0}, vec3 size = {100,100,100}, vec3 rot = {0,0,0}, vec3 rot_pivot = {0,0,0} ) 
 	: _name(name), _pos(pos), _size(size), _rot(rot), _rot_pivot(rot_pivot) 
 	{ DEBUG ( 4,"Inizializing Objekt: ", name, ", pos: ", pos, ", size: ", size, ", rot: ", rot, ", rot_pivot: ", rot_pivot ); }
-	void Free ( ) {
-		for ( auto C : _components ) 
+	void Free ( std::string p = "" ) {
+		DEBUG ( 4, p + "Deleting components of: ", _name );
+		for ( auto C : _components )
 		{ C->Delete ( ); }
-
-		DEBUG ( 4,"Freeing Objekt: ", _name );
-		for ( auto C : _childrens ) 
-		{ C->Free ( ); }
-
-		DEBUG ( 4, _name, " is Free" );
+		// _components.Deallocate ( );
+		_components = List < _behaviour < Objekt >* > ( );
+		DEBUG ( 4, p + _name, " is Free - Deleting childrens" );
+		for ( auto C : _childrens ) {
+			C->Free ( p + "\t" );
+			delete C;
+		}
+		// _childrens.Deallocate ( );
+		_childrens = List < Objekt* > ( );
 	}
 	~Objekt ( ) {
 		Free ( );
@@ -107,9 +111,9 @@ public:
 		if ( _father != nullptr ) { _father->Rem_Child ( this ); }
 		_active = false;
 		DEBUG ( 3, p + "Deleting Objekt: ", _name );
-		for ( auto C : _childrens ) 
-		{ C->Delete( p + "\t"); }
 		Free ( );
+		Print_Tree ( p );
+		_started = false;
 	}
     Objekt* Get_Children ( std::string name ) {
 		for ( auto C : _childrens )  {
@@ -292,7 +296,7 @@ public:
 		return model;
 	}
 
-	void Print_Tree ( std::string level ) {
+	void Print_Tree ( std::string level = "" ) {
 		DEBUG ( 4, level, _name, " ", _pos, " ", _size, ( _active ? " v" : " x") );
 		for ( auto C : _components ) 
 		{ DEBUG ( 5, level, "+ ", typeid(*C).name(), ( C->Get_Active () ? " v" : " x") ); }
@@ -327,7 +331,7 @@ namespace Manager {
 	static void Update ( ) { if ( _current_scene != nullptr ) { 
 		color ( "UPDATING\n", BACKGROUND_BLUE | FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY );
 		_current_scene->Update();
-		color ( "UPDATED\n", BACKGROUND_BLUE | FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY );
+		// color ( "UPDATED\n", BACKGROUND_BLUE | FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY );
 	} };
 
 	static Objekt* Objekt_Get ( std::string name ) {
@@ -367,6 +371,13 @@ namespace Manager {
 		
 		for ( auto C : objekts ) 
 		{ DEBUG ( 4,*C ); }
+	}
+
+	static void Free_Objekt ( std::string name ) {
+		auto D = Objekt_Get ( name );
+		D->Delete ( );
+		objekts.remove ( D );
+		delete D;
 	}
 }
 

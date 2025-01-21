@@ -36,17 +36,44 @@ int sgn ( float t ) {
     return -1;
 }
 
+vec4 blend ( vec4 a, vec4 b, float time ) {
+    return a * ( 1-time ) + b * time;
+}
+
 void main() {
     // aut frame
-    
+    float transizione = ( time - 4.5 -1.5 ) / 1.5;
+    if ( transizione < 0 ) {
+        vec2 TC = TexCoords;
+        TC.x = 2*(TexCoords.x-0.5);
+        TC.y = -2*(TexCoords.y-0.5);
+        
+        TC.x *= 1.1;
+        TC.y *= 1.1;
+
+        if ( abs(TC.x) > 1 || abs(TC.y) > 1 ) 
+        { FragColor = vec4(0); return; }
+
+        TC.x = (TC.x+1) * 0.5;
+        TC.y = (TC.y+1) * 0.5;
+
+        FragColor = blend ( texture( screenTexture, TC ), vec4(0), - transizione );
+        return;
+    }
+    transizione -= 1;
+    if ( transizione < 0 ) { transizione = 0; }
+    if ( transizione > 1 ) { transizione = 1; }
 
     // bend coordiantes
     vec2 TC = TexCoords;
     TC.x = 2*(TexCoords.x-0.5);
     TC.y = -2*(TexCoords.y-0.5);
+    
+    TC.x *= 1.1;
+    TC.y *= 1.1;
 
-    TC.x = ( TC.x + TC.x * pow(abs(TC.y/4),2) );
-    TC.y = ( TC.y + TC.y * pow(abs(TC.x/4),2) );
+    TC.x = ( TC.x + TC.x * pow(abs(TC.y/4) * transizione,2) );
+    TC.y = ( TC.y + TC.y * pow(abs(TC.x/4) * transizione,2) );
     
     if ( abs(TC.x) > 1 || abs(TC.y) > 1 ) 
     { FragColor = vec4(0); return; }
@@ -61,7 +88,7 @@ void main() {
         if ( int( ( TC.y + offsets[i].y )* 1000 + time*4) % 9 < 1 )
         { sampleTex[i] = vec4(0); } 
         else 
-        { sampleTex[i] = texture(screenTexture, TC + offsets[i]); }
+        { sampleTex[i] = texture(screenTexture, TC + offsets[i] * transizione); }
         
     }
 
@@ -83,6 +110,8 @@ void main() {
     { FragColor = LGreen; }
     else 
     { FragColor = LLGreen; }
+
+    FragColor = blend ( texture( screenTexture, TC ), FragColor, transizione );
     
     // add scann error
     float start = TC.y + time/3;

@@ -90,6 +90,11 @@ public:
         DEBUG (5, "Drawn Sprite");
 	}
 
+    void Delete ( ) {
+        glDeleteVertexArrays(1, &_quad);
+        glDeleteBuffers(1, &VBO);
+    }
+
 	/* Sprite* Set ( Texture* texture, Shader* shader, Camera* camera = nullptr, ivec2 frames = {1,1}, int frame = 0, vec4 color = {1,1,1,1}, bool UI_sprite = false ) 
 	{ _texture = texture; _shader = shader; _camera = camera;
 	_frames = frames; this->frame = frame; _color = color; _UI_render = UI_sprite; return this; } */

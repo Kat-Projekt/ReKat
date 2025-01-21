@@ -8,6 +8,9 @@ option ( REKAT_PROJEKT "Compile the projekts" OFF )
 option ( REKAT_ENGINE "Compile the Engine interpreter" OFF )
 option ( REKAT_LAUNCH "Removes the console window" ON )
 
+# unicode text
+add_definitions(-DUNICODE -D_UNICODE)
+
 list ( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/Cmake" )
 
 # compile the libray

@@ -69,7 +69,7 @@
 
 #define DEBUG_0(...) ( color ( "MESSAGE TO TERMINATE", FOREGROUND_RED | FOREGROUND_INTENSITY ), throw )
 #define DEBUG_1(...) ( color ( "FATAL", FOREGROUND_RED | FOREGROUND_INTENSITY ), __DEBUG( "", __VA_ARGS__ ), throw )
-#define DEBUG_2(...) ( color ( "ERROR", FOREGROUND_RED | FOREGROUND_INTENSITY ), __DEBUG( "", __VA_ARGS__ ) )
+#define DEBUG_2(...) ( color ( "ERROR", FOREGROUND_RED | FOREGROUND_INTENSITY ), __DEBUG( "", __VA_ARGS__ ), throw )
 #define DEBUG_3(...) ( color ( "WARN", FOREGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY ), __DEBUG( "", __VA_ARGS__ ) )
 #define DEBUG_4(...) ( color ( "NOTICE", FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY ), __DEBUG( "", __VA_ARGS__ ) ) 
 #define DEBUG_5(...) ( color ( "INFO", FOREGROUND_GREEN | FOREGROUND_INTENSITY ), __DEBUG( "", __VA_ARGS__ ) )
