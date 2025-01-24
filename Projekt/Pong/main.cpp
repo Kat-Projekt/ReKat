@@ -461,7 +461,7 @@ int main ( ) {
 	auto Scene			= Manager::Objekt_Load ( "scene0" );
 	
 	Splash->Add_Component < Splash_Screen > ( );
-	auto processor = PostProcessor->Add_Component < Framebuffer > ( )->Set ( Scene )->Set ( "default" )->Set ( 400, 300 );
+	auto processor = PostProcessor->Add_Component < Framebuffer > ( )->Set ( Scene )->Set ( "default" )->Set ( 800, 600 );
 	Scene->Add_Component < Inizilize_Scene > ( )->post = processor;
 
 	if ( load ( custom_path ) != 0 ) { DEBUG ( 1, "RESOURCES NOT LOADED" ); }

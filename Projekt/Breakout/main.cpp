@@ -1,4 +1,4 @@
-#define DIAGNOSTIC
+// #define DIAGNOSTIC
 #include <engine.hpp>
 
 int largezza_campo = 1300;
@@ -98,7 +98,9 @@ class Splash_Screen : public Behaviour {
 public:
 	void Start ( ) {
 		obj->Set_Pos ( {0,60,0} );
-		titolo = obj->Add_Component < Text > ( );
+
+        auto Titolo = Manager::Objekt_Load ( "totolo" );
+		titolo = Titolo->Add_Component < Text > ( );
 		titolo->Set ( "BreakOut", Text::CENTER );
 		titolo->Set ( "font", "text" );
 
@@ -107,6 +109,11 @@ public:
 		sottot->Set ( "made with 4RealEngine5", Text::CENTER );
 		sottot->Set ( "font", "text" );
 
+        auto Color = Manager::Objekt_Load ( "colors bg", {0,0,-0.1}, {690,690,500} );
+        auto colors = Color->Add_Component < Sprite > ( )->Set ( "color", "sprite", "spash cam" );
+
+        obj->Add_Child ( Color );
+        obj->Add_Child ( Titolo );
 		obj->Add_Child ( Sottot );
 
 		// animation
@@ -114,22 +121,29 @@ public:
 		// 2 secondi fade
 		auto titolo_a = new Animation ( titolo->Expose_Color ( ), ONCE );
 		auto sottot_a = new Animation ( sottot->Expose_Color ( ), ONCE );
-		titolo_a->Add_Frame ( {1,1,1,1}, {1,1,1,1}, 3 );
+		auto colors_a = new Animation ( colors->Expose_Color ( ), ONCE );
+		titolo_a->Add_Frame ( {0,0,0,1}, {0,0,0,1}, 3 );
 		sottot_a->Add_Frame ( {1,1,1,1}, {1,1,1,1}, 3 );
-		titolo_a->Add_Frame ( {1,1,1,1}, {1,1,1,0}, 1 );
+		colors_a->Add_Frame ( {1,1,1,1}, {1,1,1,1}, 3 );
+		titolo_a->Add_Frame ( {0,0,0,1}, {1,1,1,1}, 1 );
 		sottot_a->Add_Frame ( {1,1,1,1}, {1,1,1,0}, 1 );
+		colors_a->Add_Frame ( {1,1,1,1}, {1,1,1,0}, 1 );
+		titolo_a->Add_Frame ( {1,1,1,1}, {1,1,1,1}, 1 );
+		titolo_a->Add_Frame ( {1,1,1,1}, {0,0,0,1}, 1 );
 		DEBUG ( 3, "animations: ", titolo_a, " ", sottot_a );
 		Manager::Animation_Load ( "titolo", titolo_a );
 		Manager::Animation_Load ( "sottot", sottot_a );
+		Manager::Animation_Load ( "colors", colors_a );
 		obj->Add_Component < Animator > ( )
 		->New_Node ( "splash" )
 		->Change_Animation ( "splash" )
 		->Add_Animation ( "splash", titolo_a )
-		->Add_Animation ( "splash", sottot_a );
+		->Add_Animation ( "splash", sottot_a )
+		->Add_Animation ( "splash", colors_a );
 	}
 
 	void Update ( ) {
-		if ( Timer::current_time > 4.5 ) {
+		if ( Timer::current_time > 6.5 ) {
 			Manager::Set_Active_Scene ( "scene" );
 			ReKat::phisiks::Set_Active ( "scene" );
 		} 
@@ -181,7 +195,7 @@ class Paddle : public Behaviour {
         obj->Set_Size ( { 100,10,10 } );
         obj->Set_Pos ( {0,-400,0} );
 
-        obj->Add_Component < Sprite > ( )->Set ( "sprite", "sprite" );
+        obj->Add_Component < Sprite > ( )->Set ( "sprite", "sprite", "cam" );
         obj->Add_Component < Box_Collider > ( )->Set_Size ( { 100,10,10 } );
     }
 
@@ -215,7 +229,7 @@ class Ball_Controller : public Behaviour {
         obj->Set_Size ( {15,15,15} );
         obj->Set_Pos ( {0,-300,0} );
 
-        obj->Add_Component < Sprite > ( )->Set ( "sprite", "sprite" );
+        obj->Add_Component < Sprite > ( )->Set ( "sprite", "sprite", "cam" );
         obj->Add_Component < Box_Collider > ( )->Set_Size ( 15 );
         obj->Add_Component < Rigidbody > ( );
     }
@@ -228,7 +242,7 @@ class Ball_Controller : public Behaviour {
         if ( current_state == LOSE && Key_Down ( " " ) ) 
         { _display->_lives = 5; _display->_points = 0; current_state = REBOOT; }
 
-        // if ( Key_Down ( "P" ) ) { _display->_blocks_left = 0; }
+        if ( Key_Down ( "P" ) ) { _display->_blocks_left = 0; }
 
         auto rigi = obj->Get_Component < Rigidbody > ( );
 
@@ -304,7 +318,7 @@ public:
     int _type = 0;
     void Start ( ) {
         obj->Set_Size ( {block_width-2,block_heigth-2,10} );
-        obj->Add_Component < Sprite > ( )->Set ( "sprite", "sprite", "", {1,1}, 0, 
+        obj->Add_Component < Sprite > ( )->Set ( "sprite", "sprite", "cam", {1,1}, 0, 
             ( _type == 2 ? unbrekable_color :  colors[_level] ) );
         obj->Add_Component < Box_Collider > ( )->Set_Size ( obj->Get_Size ( ) );
     }
@@ -355,9 +369,9 @@ class Scene_Display : public Behaviour {
         auto Left_Bar   = Manager::Objekt_Load ( "Left_Bar", { -largezza_campo>>1,(heigth-500)/2,0 }, {thickness,500+heigth,10} );
         auto Rigth_Bar  = Manager::Objekt_Load ( "Rigth_Bar", { largezza_campo>>1,(heigth-500)/2,0 }, {thickness,500+heigth,10} );
 
-        Top_Bar->Add_Component < Sprite > ( )->Set ( "sprite", "sprite" );
-        Left_Bar->Add_Component < Sprite > ( )->Set ( "sprite", "sprite" );
-        Rigth_Bar->Add_Component < Sprite > ( )->Set ( "sprite", "sprite" );
+        Top_Bar->Add_Component < Sprite > ( )->Set ( "sprite", "sprite", "cam" );
+        Left_Bar->Add_Component < Sprite > ( )->Set ( "sprite", "sprite", "cam" );
+        Rigth_Bar->Add_Component < Sprite > ( )->Set ( "sprite", "sprite", "cam" );
 
         obj->Add_Child ( Top_Bar );
         obj->Add_Child ( Left_Bar );
@@ -387,27 +401,69 @@ public:
     { _display = display; return this; }
 };
 
+int load ( std::string base_dir ) {
+    int loadresult = 0;
+    loadresult += Manager::Texture_Load ( "sprite", ( base_dir + ( "Data/Textures/empty.png" ) ).c_str ( ) );
+    loadresult += Manager::Texture_Load ( "noise", ( base_dir + ( "Data/Textures/noise.png" ) ).c_str ( ), 1 );
+    loadresult += Manager::Texture_Load ( "color", ( base_dir + "Data/colors.png" ).c_str ( ) );
+    loadresult += Manager::Font_Load ( "font", ( base_dir + "Data/Font.ttf" ).c_str ( ), 90, 13 );
+    
+    loadresult += Manager::Shader_Load ( "sprite", ( base_dir + "Data/Shaders/sprite.vs" ).c_str( ), ( base_dir + "Data/Shaders/sprite.fs" ).c_str( ) );
+    loadresult += Manager::Shader_Load ( "default", ( base_dir + "Data/Shaders/PostProcessing/default.vs" ).c_str( ), ( base_dir + "Data/Shaders/PostProcessing/default.fs" ).c_str( ) );
+    loadresult += Manager::Shader_Load ( "crt_effect", ( base_dir + "Data/Shaders/PostProcessing/crt_effect.vs" ).c_str( ), ( base_dir + "Data/Shaders/PostProcessing/crt_effect.fs" ).c_str( ) );
+    loadresult += Manager::Shader_Load ( "trace", ( base_dir + "Data/Shaders/PostProcessing/trace.vs" ).c_str( ), ( base_dir + "Data/Shaders/PostProcessing/trace.fs" ).c_str( ) );
+    loadresult += Manager::Shader_Load ( "glitch", ( base_dir + "Data/Shaders/PostProcessing/glitch.vs" ).c_str( ), ( base_dir + "Data/Shaders/PostProcessing/glitch.fs" ).c_str( ) );
+    loadresult += Manager::Shader_Load ( "text", ( base_dir + "Data/Shaders/text.vs" ).c_str( ), ( base_dir + "Data/Shaders/text.fs" ).c_str( ) );
+
+    loadresult += Manager::Level_Load ( "level1", ( base_dir + "Data/Levels/Level1.kat" ).c_str ( ) );
+    loadresult += Manager::Level_Load ( "level2", ( base_dir + "Data/Levels/Level2.kat" ).c_str ( ) );
+    loadresult += Manager::Level_Load ( "level3", ( base_dir + "Data/Levels/Level3.kat" ).c_str ( ) );
+    loadresult += Manager::Level_Load ( "level4", ( base_dir + "Data/Levels/Level4.kat" ).c_str ( ) );
+    loadresult += Manager::Level_Load ( "level5", ( base_dir + "Data/Levels/Level5.kat" ).c_str ( ) );
+    loadresult += Manager::Level_Load ( "level6", ( base_dir + "Data/Levels/Level6.kat" ).c_str ( ) );
+
+    return loadresult;
+}
+
+#ifdef __APPLE__
+#include <CoreFoundation/CoreFoundation.h>
+#endif
+
 int main ( ) {
+    std::string custom_path = "";
+
+#ifdef __APPLE__
+	CFURLRef appUrlRef = CFBundleCopyResourceURL(CFBundleGetMainBundle(), CFSTR("Font"), CFSTR("ttf"), CFSTR("Data"));
+	CFStringRef filePathRef = CFURLCopyPath(appUrlRef);
+	const char* filePath = CFStringGetCStringPtr(filePathRef, kCFStringEncodingUTF8);
+	custom_path = filePath;
+
+	for ( int i = 0; i < 13; i++) 
+	{ custom_path.pop_back ( ); }
+	custom_path.push_back ( '/' );
+
+	// Release references
+	CFRelease(filePathRef);
+	CFRelease(appUrlRef);
+#endif
+
 	ReKat::phisiks::Start ( 120 );
-	ReKat::grapik::Start ( "Pong", 800, 600,false,false,true );
+	ReKat::grapik::Start ( "Beakout", 800, 600,false,false,true, custom_path + "Data/favicon.ico" );
 	ReKat::synth::Start ( );
 
-    Manager::Texture_Load ( "sprite", "Data/empty.png" );
-    Manager::Font_Load ( "font", "Data/Font.ttf", 90, 13 );
-    Manager::Shader_Load ( "sprite", "Data/sprite.vs", "Data/sprite.fs" );
-    Manager::Shader_Load ( "text", "Data/text.vs", "Data/text.fs" );
-
-    Manager::Level_Load ( "level1", "Data/Levels/Level1.kat" );
-    Manager::Level_Load ( "level2", "Data/Levels/Level2.kat" );
-    Manager::Level_Load ( "level3", "Data/Levels/Level3.kat" );
-    Manager::Level_Load ( "level4", "Data/Levels/Level4.kat" );
-    Manager::Level_Load ( "level5", "Data/Levels/Level5.kat" );
-    Manager::Level_Load ( "level6", "Data/Levels/Level6.kat" );
+    if ( load ( custom_path ) != 0 ) { DEBUG ( 1, "RESOURCES NOT LOADED" ); }
 
     auto Splash = Manager::Objekt_Load ( "splash" );
+    auto PostPr = Manager::Objekt_Load ( "Processor", {0,0,0}, { 1333, 1000, 100 } );
     auto Scene  = Manager::Objekt_Load ( "scene" );
     auto Player = Manager::Objekt_Load ( "player" );
     auto Ball   = Manager::Objekt_Load ( "Ball" );
+
+    auto processor = PostPr->Add_Component < Framebuffer > ( )
+    ->Set ( Scene )->Set ( 800, 600 )->Set ( "crt_effect" );
+
+    Manager::Camera_Load ( "spash cam", Splash );
+    Manager::Camera_Load ( "cam", Scene, processor );
 
     Scene->Add_Child ( Player );
     Scene->Add_Child ( Ball );
@@ -425,10 +481,18 @@ int main ( ) {
     Manager::Set_Active_Scene ( "splash" );
 	ReKat::phisiks::Set_Active ( "scene" );
 
+	Manager::Shader_Get ( "crt_effect" )->setInt ( "screenTexture", 0 );
+	Manager::Shader_Get ( "crt_effect" )->setInt ( "noiseTexture", 1 );
+	Manager::Shader_Get ( "crt_effect" )->setFloat ( "time", 0 );
+
 	while ( ReKat::grapik::IsEnd ( ) ) {
 		glClearColor(0.0, 0.0, 0.0, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glEnable(GL_DEPTH_TEST);
+    
+	Manager::Texture_Get ( "noise" )->Use ( );
+	Manager::Shader_Get ( "crt_effect" )->setFloat ( "time", Timer::current_time );
+
 		Manager::Update ( );
 		ReKat::grapik::Update ( );
 		ReKat::phisiks::Update ( );

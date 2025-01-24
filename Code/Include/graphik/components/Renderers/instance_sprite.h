@@ -1,12 +1,13 @@
-#ifndef TILEMAP_H
-#define TILEMAP_H
-
-#include "../camera.h"
-#include "../../resources/manager.hpp"
+#ifndef INSTANCE_H
+#define INSTANCE_H
 
 #include "../../graphik_debugger.hpp"
 
-class Tilemap : public Behaviour {
+// instances a series of objekts with Data as the instance data
+// in partivular it manages a buffer of type Data from where you can instance objekts
+// by default it renders Quads
+template < typename Data >
+class Instance : public Behaviour {
 private:
 	std::string _path;
 
@@ -18,8 +19,15 @@ private:
     std::string _camera = "";
 
 	vec4 _color = {1,1,1,1};
+    struct Memeory_
+    {
+        /* data */
+    };
+    
+
     // every istance is {pos.xyz}{size.xyz}{rot.xyz}
-    std::vector < vec3 > istances_data;
+    std::vector < Data > istances_data;
+    std::vector <
 public:
     void Add_Data ( vec3 pos, vec3 size, vec3 rot ) { }
     void Update_Data ( int index, vec3 pos, vec3 size, vec3 rot ) { }

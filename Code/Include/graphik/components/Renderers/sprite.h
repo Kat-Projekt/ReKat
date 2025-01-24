@@ -104,6 +104,8 @@ public:
 	_frames = frames; this->frame = frame; _color = color; _UI_render = UI_sprite; return this; }
 
 	Sprite* Set ( bool UI_sprite ) { _UI_render = UI_sprite; return this; }
+
+	vec4 * Expose_Color ( ) { return &_color; }
 };
 
 #endif
