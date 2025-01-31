@@ -5,6 +5,7 @@
 
 template < typename T >
 class _behaviour {
+protected:
 	bool _active = true;
 	bool _started = false;
 public:
@@ -127,7 +128,6 @@ public:
 			if ( C == child ) 
 			{ return true; }
 			if ( C->Has_Children ( child ) ) { return true; }
-			C = C;
 		}
 		return false;
 	}
@@ -145,6 +145,7 @@ public:
 	void Set_Pos ( float z = 0 ) { _pos.z = z; }
 	void Inc_Pos ( vec3 pos = {0,0,0} ) { _pos += pos; }
 	vec3 Get_Pos ( ) { return _pos + ( _father != nullptr ? _father->Get_Pos() : vec3{0,0,0}); }
+	vec3 * Expose_Pos ( ) { return &_pos; }
 
 	void Set_Rot ( vec3 rot = {0,0,0} ) { _rot = rot; }
 	void Set_2D_Rot ( float rot ) { _rot.z = rot; }
@@ -239,19 +240,19 @@ public:
 		_started = true;
     }
 
-    virtual void Update ( ) {
+    virtual void Update ( std::string ind = "" ) {
 		if ( !_active ) { return; }
-		DEBUG ( 4,"Updating Objekt: ", Get_Name() );
+		DEBUG ( 4,ind,"Updating Objekt: ", Get_Name() );
         for ( auto &&C : _components ) {
-			DEBUG ( 6,"Updating Componenet: ", std::string(typeid(*C).name()));
+			DEBUG ( 6,ind,"+ Updating Componenet: ", std::string(typeid(*C).name()));
 			C->_Update ( );
-			DEBUG ( 6,"Done" );
+			DEBUG ( 6,ind,"+ Done" );
 		}
-		DEBUG ( 6,"Updating Childrens" );
+		DEBUG ( 6,ind,"Updating Childrens" );
 		for ( auto &&O : _childrens ) 
-		{ O->Update ( ); }
-		DEBUG ( 6,"Childrens Updated" );
-		DEBUG ( 5,"Updated Objekt: ", Get_Name() );
+		{ O->Update ( ind + "- " ); }
+		DEBUG ( 6,ind,"Childrens Updated" );
+		DEBUG ( 5,ind,"Updated Objekt: ", Get_Name() );
     }
 
     virtual void Fixed_Update ( ) {

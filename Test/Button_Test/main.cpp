@@ -1,31 +1,26 @@
-#define DIAGNOSTIC
+// #define DIAGNOSTIC
 #define DEBUG_LEVEL 5
 #include <graphik/components.hpp>
 
-class Interupt : public Behaviour {
-private:
-    /* data */
-public:
-    void Terminate ( ) { std::cout <<  3, "hello maremma hane"	; }
-};
+int count = 0;
+void Terminate ( ) { std::cout << count ++ << " TERMINATE \n"; }
 
 int main ( ) {
-    ReKat::grapik::Start ( "Button_Test", 800, 600 );
+    ReKat::grapik::Start ( "Button_Test", 800, 600, false, false, true );
 
     Manager::Texture_Load ( "logo", "Logo.png" );
     Manager::Shader_Load ( "sprite", "sprite.vs", "sprite.fs" );
-    Camera camera;
 
-    Objekt main ( "giov" );
-    Objekt butt ( "pier", {0,0,0},{500,500,500} );
-    main.Add_Child ( &butt );
+    auto main = Manager::Objekt_Load ( "giov" );
+    auto butt = Manager::Objekt_Load ( "pier", { 0,- 200,0 }, { 200,100,1 } );
 
-    Interupt ii;
-    main.Add_Component ( &camera );
-    butt.Add_Component < Button > ( )->OnHover ( &ii, &Interupt::Terminate );
-	butt.Add_Component < Sprite > ( )->Set ( "logo", "sprite", &camera );
+    Manager::Camera_Load ( "cam", main );
+
+    butt->Add_Component < Button > ( )->OnClick ( Terminate );
+	butt->Add_Component < Sprite > ( )->Set ( "logo", "sprite", "cam" );
     
-    Manager::Set_Active_Scene ( &main );
+    main->Add_Child ( butt );
+    Manager::Set_Active_Scene ( "giov" );
 
     while ( ReKat::grapik::IsEnd ( ) ) {
         glClearColor(0.0, 1.0, 1.0, 1.0f);
@@ -35,8 +30,7 @@ int main ( ) {
         Manager::Update ( );
         ReKat::grapik::Update ( );
     }
-    
-    
+
     ReKat::grapik::Terminate ( );
 }
 

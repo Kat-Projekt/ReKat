@@ -173,6 +173,10 @@ public:
 		DEBUG (4, "framebuffer rendered to main context");
 	}
 
+	void Fixed_Update ( ) {
+		_to_render->Fixed_Update ( );
+	}
+
 	void Delete ( ) {
 		glDeleteRenderbuffers(1, &RBO);
 		glDeleteFramebuffers(1, &FBO);
@@ -198,8 +202,11 @@ public:
 	// { _shader = shader; _camera = camera; _UI_render = UI_sprite; return this; }
 
 	// sender render target
-	Framebuffer* Set ( Objekt* to_render )
-	{ _to_render = to_render; return this; }
+	Framebuffer* Set ( Objekt* to_render ) {
+		if ( _started ) { to_render->Start ( ); }
+		DEBUG ( 3, "Added ne context scene " );
+		_to_render = to_render; return this;
+	}
 };
 
 

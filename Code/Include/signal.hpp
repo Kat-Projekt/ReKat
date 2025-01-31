@@ -33,7 +33,7 @@ namespace sygnal {
     
     signal GetSignal ( std::string name ) {
         if ( signals.find ( name ) == signals.end() ) 
-        { return {S_ERROR,0}; }
+        { return {S_ERROR,{0}}; }
         return signals[name];
     }
 

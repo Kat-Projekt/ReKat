@@ -245,12 +245,13 @@ namespace phisiks {
     static List < Rigidbody* > Rigidbodys;
     static std::string Active;
 
-    static void Start ( int phisik_fps ) {
+    static int Start ( int phisik_fps ) {
         _phisik_fps = phisik_fps; 
         _phisik_update_ratio = 1 / _phisik_fps;
 
         Timer::Update ( );
         _last_phisik_update = Timer::Get_Time ( ) - _phisik_update_ratio;
+        return 0;
     }
 
     static void Update ( ) {

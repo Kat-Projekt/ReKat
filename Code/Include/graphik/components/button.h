@@ -30,6 +30,10 @@ private:
     void ( *_hover_call ) ( ) = nullptr;
 	Behaviour* _b_hover_class = nullptr;
 	Behaviour_Fun _b_hover_call = nullptr;
+
+    void ( *_not_hover_call ) ( ) = nullptr;
+	Behaviour* _b_not_hover_class = nullptr;
+	Behaviour_Fun _b_not_hover_call = nullptr;
 public:
 	void Update ( ) {
 		// calculate hover
@@ -58,6 +62,10 @@ public:
 				if ( _release_call != nullptr )	{ _release_call ( ); }
 				if ( _b_release_call != nullptr )	{ std::invoke ( _b_release_call, _b_release_class ); }
 			}
+		} else {
+			// call not hover functions
+			if ( _not_hover_call != nullptr )	{ _not_hover_call ( ); }
+			if ( _b_not_hover_call != nullptr )	{ std::invoke ( _b_not_hover_call, _b_not_hover_class ); }
 		}
 	}
 
@@ -112,6 +120,19 @@ public:
 	}
 	Button* OnHover ( void ( *call ) ( ) ) 
 	{ _hover_call = call; return this; }
+
+	template < class C >
+	Button* NotHover ( C* objekt_class, void ( C::*b_call ) ( void ) ) {
+		DEBUG ( 4,"Adding Function from class: ", std::string(typeid(*objekt_class).name()) );
+		if ( std::is_base_of<Behaviour, C>::value ) {
+			_b_not_hover_class = ( Behaviour* ) objekt_class;
+			_b_not_hover_call = ( Behaviour_Fun ) b_call;
+			return this;
+		}
+		DEBUG ( 2, "Wrong component Behaviour" );
+	}
+	Button* NotHover ( void ( *call ) ( ) ) 
+	{ _not_hover_call = call; return this; }
 
 	Button* Set ( std::string click_is )
 	{ _click_is = click_is; return this; }

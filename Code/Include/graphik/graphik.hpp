@@ -26,6 +26,7 @@ enum Mode {
 
 struct Input {
 	std::map < std::string, Mode > keys;
+	std::string typed;
 	glm::vec2 mouse_pos = {0,0};
 	glm::vec2 old_mouse_pos;
 	float screen_ration = 1;
@@ -50,6 +51,7 @@ struct Input {
 			if ( k->second == PRESSED ) { k->second = HELD; }
 			if ( k->second == RELEASED ) { k->second = NONE; }
 		}
+		typed = "";
 	}
 	bool Key_Down ( std::string key ) 
 	{ return ( keys[key] == PRESSED ? true : false ); }
@@ -144,6 +146,12 @@ public:
 		if ( !gladLoadGLLoader ( (GLADloadproc)glfwGetProcAddress ) ) 
 		{ return 1; }
 
+		#ifdef __APPLE__
+			// count on the internal resize for macos
+			Width *= 2;
+			Heigth *= 2;
+		#endif
+
 		glViewport ( 0, 0, Width, Heigth );
 		glEnable ( GL_CULL_FACE ); 
 		glEnable ( GL_BLEND ); 
@@ -161,15 +169,14 @@ public:
 			stbi_image_free ( images[0].pixels );
 		}
 		
-
 		DEBUG ( 3, "Inizialized Graphik Window" );
 		return 0;
 	}
 
 	int IsEnd ( ) {
-		DEBUG ( 5, "Is End? ", name );
+		// DEBUG ( 5, "Is End? ", name );
 		Use ( );
-		DEBUG ( 5, !glfwWindowShouldClose( window ) ? "YES" : "NO" );
+		// DEBUG ( 5, !glfwWindowShouldClose( window ) ? "YES" : "NO" );
 		GL_CHECK_ERROR;
 		return !glfwWindowShouldClose( window );
 	}
@@ -258,14 +265,22 @@ void Input::ScrollWell ( GLFWwindow* window, double xoffset, double yoffset ) {
 void Input::FreamBufferResize ( GLFWwindow* window, int width, int height ) {
 	if ( Bound_Window_Handler == nullptr ) { return; }
 	DEBUG ( 3, "Updating Framebuffer" );
-	Bound_Window_Handler->Heigth = height;
-	Bound_Window_Handler->Width = width;
-	Bound_Window_Handler->Screen_Ratio = (float)Bound_Window_Handler->Width / (float)Bound_Window_Handler->Heigth;
 	glViewport ( 0, 0, Bound_Window_Handler->Width = width, Bound_Window_Handler->Heigth = height );
 	if ( _FreamBufferResize != nullptr ) 
 	{ _FreamBufferResize ( window, width, height ); }
+
+#ifdef __APPLE__
+	// count on the internal resize for macos
+	width /= 2;
+	height /= 2;
+#endif
+
+	Bound_Window_Handler->Heigth = height;
+	Bound_Window_Handler->Width = width;
+	Bound_Window_Handler->Screen_Ratio = (float)Bound_Window_Handler->Width / (float)Bound_Window_Handler->Heigth;
 }
 void Input::Caracters ( GLFWwindow* window, unsigned int codepoint ) {
+	typed.push_back ( (char)codepoint );
 	if ( _Caracters != nullptr ) 
 	{ _Caracters ( window, codepoint ); }
 }
@@ -309,9 +324,9 @@ namespace Input {
 	static void End ( std::string window = "" ) 
 	{ if ( window == "" ) { Bound_Window_Handler->End ( ); } }
 	static int IsEnd ( std::string window = "" ) {
-		DEBUG ( 4, "Getting is End of window ",
-		( window == "" ? "DEFAULT" : window ) );
-		DEBUG ( 4, Bound_Window_Handler->name );
+		// DEBUG ( 4, "Getting is End of window ",
+		// ( window == "" ? "DEFAULT" : window ) );
+		// DEBUG ( 4, Bound_Window_Handler->name );
 		if ( window == "" ) { return Bound_Window_Handler->IsEnd ( ); }
 		return true;
 	}

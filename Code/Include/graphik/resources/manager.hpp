@@ -7,6 +7,7 @@
 #include "texture.h"
 #include "font.h"
 #include "tilemap_map.h"
+#include "instance.h"
 #include "../components/camera.h"
 
 namespace Manager {
@@ -53,6 +54,8 @@ namespace Manager {
         _resources.insert( { (name + std::string(typeid(Texture).name())) , texture} );
     }
 
+	// Gets a Tilemap
+	// --------------
     static Tilemap_Map* Tilemap_Get  ( std::string name ) { 
 		if ( name == "" ) { return nullptr; }
 		auto findit = _resources.find(name + std::string(typeid(Tilemap_Map).name()));
@@ -66,6 +69,19 @@ namespace Manager {
         return (*t).Make(path);
     }
 
+	// Gets a Instance
+	// ---------------
+    static int Instance_Load ( std::string name, int data_size, int chunk_size = 16 ) {
+        Instance *t = new Instance;
+        _resources.insert( { (name + std::string(typeid(Instance).name())) , t} );
+        return (*t).Make(data_size, chunk_size);
+    }
+	static void Instance_Load ( std::string name, Instance * Jonh ) {
+        _resources.insert( { (name + std::string(typeid(Instance).name())) , Jonh} );
+    }
+
+	// Gets a Camera
+	// -------------
     static std::unordered_map < std::string, Camera* > cameras;
     static int Camera_Load ( std::string name, std::string pointer ) {
 		if ( pointer == "" ) 

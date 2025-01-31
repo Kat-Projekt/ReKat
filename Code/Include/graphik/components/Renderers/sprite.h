@@ -11,6 +11,7 @@ private:
 	bool _UI_render = true;
     unsigned int _quad;
     unsigned int VBO;
+    std::string _instacer = "";
     std::string _texture = "";
     std::string _shader = ""; 
     std::string _camera = "";
@@ -58,7 +59,7 @@ public:
 		// prepare transformations
         DEBUG ( 5, "Staring Updating Sprite");
         DEBUG ( 6, _shader, " ", _texture, " ", _camera, " ", _UI_render );
-		if ( _shader == "" || _texture == "" || ( _camera == "" && !_UI_render ) ) 
+		if ( _shader == "" || ( _camera == "" && !_UI_render ) ) 
         { DEBUG ( 2, "Component not set Correctly" ); return; }
 
         auto shader = Manager::Shader_Get ( _shader );
@@ -82,9 +83,18 @@ public:
 
 		glBindVertexArray(_quad); GL_CHECK_ERROR;
         glBindBuffer(GL_ARRAY_BUFFER, VBO); GL_CHECK_ERROR;
-		Manager::Texture_Get( _texture )->Use();
-        DEBUG ( 5, "VBO: ",VBO, " VAO: ", _quad );
-        glDrawArrays(GL_TRIANGLES, 0, 6); GL_CHECK_ERROR;
+        if ( _texture != "" ) 
+        { Manager::Texture_Get( _texture )->Use(); }
+		
+        if ( _instacer != "" ) {
+            auto I = Manager::Get < Instance > ( _instacer );
+            I->Use ( );
+            glDrawArraysInstanced(GL_TRIANGLES, 0, 6, I->Instances ( ) ); GL_CHECK_ERROR;
+            DEBUG ( 4,"Drawing ", I->Instances( ), " instances");
+        } else {
+            glDrawArrays(GL_TRIANGLES, 0, 6); GL_CHECK_ERROR;
+        }
+
         glBindVertexArray(0); GL_CHECK_ERROR;
         
         DEBUG (5, "Drawn Sprite");
@@ -99,11 +109,15 @@ public:
 	{ _texture = texture; _shader = shader; _camera = camera;
 	_frames = frames; this->frame = frame; _color = color; _UI_render = UI_sprite; return this; } */
 
-    Sprite* Set ( std::string texture, std::string shader, std::string camera = "", ivec2 frames = {1,1}, int frame = 0, vec4 color = {1,1,1,1}, bool UI_sprite = false ) 
-	{ _texture = texture; _shader = shader; _camera = camera;
+    Sprite* Set ( std::string texture, std::string shader, std::string camera = "", ivec2 frames = {1,1}, int frame = 0, vec4 color = {1,1,1,1}, bool UI_sprite = false, std::string instancer = "" ) 
+	{ _texture = texture; _shader = shader; _camera = camera; _instacer = instancer;
 	_frames = frames; this->frame = frame; _color = color; _UI_render = UI_sprite; return this; }
 
 	Sprite* Set ( bool UI_sprite ) { _UI_render = UI_sprite; return this; }
+	Sprite* Set ( int frame ) { this->frame = frame; return this; }
+
+    Sprite* Set ( vec4 color = {1,1,1,1} ) 
+	{ _color = color; return this; }
 
 	vec4 * Expose_Color ( ) { return &_color; }
 };

@@ -4,7 +4,7 @@
 #define integer unsigned long long int
 #include <iostream>
 
-#define Error(msg) std::cout << "error: " << msg << " at line: " << __LINE__ << " of file: " << __FILE__; throw
+#define Error(msg) std::cout << "\nerror: " << msg << " at line: " << __LINE__ << " of file: " << __FILE__ << '\n'; throw
 
 template < typename T >
 class List {
@@ -23,8 +23,10 @@ public:
 		Element * ele;
 
 		Iterator& operator++() {
-			if ( ele->next == nullptr ) 
-			{ DEBUG ( 1, "Continuing with a nullptr"); }
+			if ( ele->next == nullptr ) {
+				std::cout << '\n' << *ele;
+				Error ( "Continuing with a nullptr" );
+			}
 			ele = ele->next;
 			return *this;
 		}
@@ -113,18 +115,17 @@ public:
 			e->next = _last;
 			_last->prev = e;
 			_first = e;
-			_last = e;
 			_size = 1;
 			return this;
 		}
 
 		Element* e = new Element;
 		e->data = data;
-		e->prev = _last;
-		e->next = _last->next;
+		e->next = _last;
+		e->prev = _last->prev;
 
-		_last->next = e;
-		_last = e;
+		_last->prev->next = e;
+		_last->prev = e;
 
 		_size++;
 		return this;
@@ -154,7 +155,7 @@ public:
 		if ( _last->prev == nullptr ) { return this; }
 
 		// find element
-		auto C = _last->prev;
+		auto C = _last;
 		while ( C != nullptr ) {
 			if ( C->data == data ) { break; }
 			C = C->prev;
@@ -165,10 +166,12 @@ public:
 		// relink
 		C->next->prev = C->prev; // next is always not null
 		if ( C->prev != nullptr ) { C->prev->next = C->next; }
-		if ( C == _first ) { _first = nullptr; }
+		if ( C == _first ) { _first = C->next; }
+		if ( _first == _last ) { _first = nullptr; }
 
 		// free
-		delete C;
+		// delete C;
+		_size --;
 		return this;
 	}
 	// removes indexed element
@@ -187,11 +190,12 @@ public:
 	Iterator begin ( ) {
 		Iterator pippo;
 		pippo.ele = _first;
+		if ( _first == nullptr ) { pippo.ele = _last; }
 		return pippo;
 	}
 	Iterator end ( ) {
 		Iterator pippo;
-		pippo.ele = _last->next;
+		pippo.ele = _last;
 		return pippo;
 	}
 
@@ -207,11 +211,11 @@ public:
 		// std::cout << "B: " << list.Get_Begin ( ) << " E: " << E << " S: " << list.size( ) << '\t';
 		os << "S: " << list.size () << " { ";
 		if ( list.size ( ) == 0 ) { os << "}"; return os; }
-		os << C->data;
-		C = C->next;
+		// os << C->data;
+		// C = C->next;
 		while ( C != nullptr ) {
-			// os << C << " {" << C->data << " p: " << C->prev << " n: " << C->next << ( C != E ? "} : " : "}");
-			os << ", " << C->data;
+			os << "\n" << C << "{" << C->data << " p: " << C->prev << " n: " << C->next << ( C != E ? "} : " : "}");
+			// os << ", " << C->data;
 			C = C->next;
 		}
 		os << " }";

@@ -24,7 +24,8 @@ endif ( )
 
 # compile the examples
 set ( TESTS Render_Test Core_Test Collision_Test )
-set ( TESTS Multi_Window_Test )
+set ( TESTS Multi_Window_Test Button_Test )
+set ( TESTS Save_Test )
 
 if ( REKAT_TEST )
     foreach ( TEST ${TESTS} )
@@ -45,7 +46,7 @@ if ( REKAT_TEST )
     endforeach ( TEST )
 endif ( )
 
-set ( PROJEKTS Breakout Pong )
+set ( PROJEKTS Snake )
 
 if ( REKAT_PROJEKT )
 
