@@ -23,6 +23,14 @@ struct collision_check {
 	}
 	friend std::ostream& operator,(std::ostream& out, collision_check& n )
 	{ out << n; return out; }
+
+    bool operator== ( collision_check& _lf ) {
+        return ( collider1 == _lf.collider1 && collider2 == _lf.collider2 ) &&
+               ( collider1 == _lf.collider2 && collider2 == _lf.collider1 );
+    }
+    bool operator!= ( collision_check& _lf ) {
+        return ! (*this == _lf);
+    }
 };
 
 class Collision_Narrower {
@@ -244,6 +252,8 @@ namespace phisiks {
     static List < Collider* > Colliders;
     static List < Rigidbody* > Rigidbodys;
     static std::string Active;
+    // trace old collision for specific interactions like exit and enter
+    static std::unordered_map < collision_check, Collision_Result > Collision_History;
 
     static int Start ( int phisik_fps ) {
         _phisik_fps = phisik_fps; 
@@ -340,8 +350,26 @@ namespace phisiks {
             }
 
             DEBUG ( 5, "Collison Result: ", result );
-
-            // inside collision
+/*
+            // Collision type == Enter
+            if ( result.triggered ) {
+                // check if of type enter
+                if ( auto C_poisiton = Collision_History.find ( C );
+                    C_poisiton == Collision_History.end ( ) || // new pointer
+                    (*C_poisiton).second.triggered == false // old collision was not triggered
+            ) {
+            // collision category
+            if ( C.collider1->Is_Trigger( ) || C.collider2->Is_Trigger( ) ) {
+                // trigger
+                C.collider1->obj->Andle_Collsions ( C.collider2->obj, true, 1 );
+                C.collider2->obj->Andle_Collsions ( C.collider1->obj, true, 1 );
+            } else {
+                // not trigger
+                C.collider1->obj->Andle_Collsions ( C.collider2->obj, false, 1 );
+                C.collider2->obj->Andle_Collsions ( C.collider1->obj, false, 1 );
+            } } }
+*/
+            // inside collision => trigger stay collision always
             if ( result.triggered ) {
                 if ( ! C.collider1->Is_Trigger( ) && ! C.collider2->Is_Trigger( ) ) { // reaction
                     if ( ! C.collider1->Is_Static ( ) ) { // first dinamic
@@ -382,6 +410,27 @@ namespace phisiks {
                     C.collider2->obj->Andle_Collsions ( C.collider1->obj, true );
                 }
             }
+/*
+            // Collision type == Exit
+            if ( result.triggered = false ) {
+                // check if of type exit
+                if ( auto C_poisiton = Collision_History.find ( C );
+                    ! ( C_poisiton == Collision_History.end ( ) ) || // not a new collision
+                    (*C_poisiton).second.triggered == true // old collision was triggered
+            ) {
+            // collision category
+            if ( C.collider1->Is_Trigger( ) || C.collider2->Is_Trigger( ) ) {
+                // trigger
+                C.collider1->obj->Andle_Collsions ( C.collider2->obj, true, 2 );
+                C.collider2->obj->Andle_Collsions ( C.collider1->obj, true, 2 );
+            } else {
+                // not trigger
+                C.collider1->obj->Andle_Collsions ( C.collider2->obj, false, 2 );
+                C.collider2->obj->Andle_Collsions ( C.collider1->obj, false, 2 );
+            } } }
+*/
+            // add collision to pool
+            // Collision_History[C] = result;
         }
 
         // rigidbodies are rendered by the objekt

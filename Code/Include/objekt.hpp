@@ -18,12 +18,21 @@ public:
 	void _Collision ( T* _obj ) { if ( _active ) { Collision ( _obj ); } }
 	void _Collision_Trigger ( T* _obj ) { if ( _active ) { Collision_Trigger ( _obj ); } }
 
+	// Called only once Before every other function
     virtual void Start ( ) { }
+	// Called every Time Update is called on the parent objekt
     virtual void Update ( ) { }
+	// Called every Time Fixed Update is called on the parent objekt
 	virtual void Fixed_Update ( ) { }
 
-    virtual void Collision ( T* _obj ) { _obj; }
-    virtual void Collision_Trigger ( T* _obj ) { _obj; }
+	// Collision handleing
+	virtual void Collision ( T* _obj ) { }
+	virtual void Collision_Exit ( T* _obj ) { }
+	virtual void Collision_Enter ( T* _obj ) { }
+
+    virtual void Collision_Trigger ( T* _obj ) { }
+	virtual void Collision_Trigger_Exit ( T* _obj ) { }
+	virtual void Collision_Trigger_Enter ( T* _obj ) { }
 
 	void Set_Active ( bool active ) 
 	{ _active = active; if ( !_started ) { Start( ); } }
@@ -270,14 +279,24 @@ public:
 		DEBUG ( 5,"Updated Fixed Objekt: " + Get_Name() );
     }
 
-	virtual void Andle_Collsions ( Objekt * collider, float trigger = false ) {
-		if ( trigger ) { // the collision is of thigger type
-			for ( auto C : _components ) 
-			{ C->_Collision_Trigger ( collider ); }
-		} else {
-			for ( auto C : _components )
-			{ C->_Collision ( collider ); }
+	virtual void Andle_Collsions ( Objekt * collider, float trigger = false, int Type = 0 ) {
+		for ( auto C : _components ) {
+	if ( !trigger ) {
+		switch ( Type ) {
+			case 0: C->Collision ( collider ); break; // Stay 
+			case 1: C->Collision_Enter ( collider ); break; // Enter 
+			case 2: C->Collision_Exit ( collider ); break; // Exit
 		}
+		std::cout << "calling " << typeid ( *C ).name ( ) << '\n';
+	} else {
+		switch ( Type ) {
+			case 0: C->Collision_Trigger ( collider ); break; // Stay 
+			case 1: C->Collision_Trigger_Enter ( collider ); break; // Enter 
+			case 2: C->Collision_Trigger_Exit ( collider ); break; // Exit
+		}
+	}
+		}
+		std::cout << "andling collision of type: " << Type << " triggered " << trigger << '\n';
 	} 
 
 	mat4 Get_Model_Mat ( ) {
@@ -326,11 +345,11 @@ namespace Manager {
 	static Objekt* _current_scene = nullptr;
 
 	static void Start ( ) { if ( _current_scene != nullptr ) { 
-		color ( "STARTING\n", BACKGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY ); 
+		// color ( "STARTING\n", BACKGROUND_GREEN | FOREGROUND_RED | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY ); 
 		_current_scene->Start(); 
 	} };
 	static void Update ( ) { if ( _current_scene != nullptr ) { 
-		color ( "UPDATING\n", BACKGROUND_BLUE | FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY );
+		// color ( "UPDATING\n", BACKGROUND_BLUE | FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY );
 		_current_scene->Update();
 		// color ( "UPDATED\n", BACKGROUND_BLUE | FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_INTENSITY | BACKGROUND_INTENSITY );
 	} };

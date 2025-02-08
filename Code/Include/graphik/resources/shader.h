@@ -125,7 +125,7 @@ int Shader::Make ( const char* vertexPath, const char* fragmentPath, const char*
 			teShaderFile.close();
 			tessEvalCode = teShaderStream.str();
 		}
-	} catch ( std::ifstream::failure& e ) { DEBUG ( 2, "Shader loading error ", e.code() ); return FAILED_LOADING_SHADER; }
+	} catch ( std::ifstream::failure& e ) { DEBUG ( 2, "Shader loading error ", vertexPath, " code: ", e.code() ); return FAILED_LOADING_SHADER; }
 	const char* vShaderCode = vertexCode.c_str();
 	const char * fShaderCode = fragmentCode.c_str();
 	// 2. compile shaders

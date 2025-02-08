@@ -5,7 +5,9 @@
 
 #define integer unsigned long long int
 
+#ifndef Error
 #define Error(msg) std::cout << "error: " << msg << " at line: " << __LINE__ << " of file: " << __FILE__; throw
+#endif
 
 template < typename K, typename T >
 class Map {

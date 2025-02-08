@@ -4,7 +4,9 @@
 #define integer unsigned long long int
 #include <iostream>
 
-#define Error(msg) std::cout << "\nerror: " << msg << " at line: " << __LINE__ << " of file: " << __FILE__ << '\n'; throw
+#ifndef Error
+#define Error(msg) std::cout << "error: " << msg << " at line: " << __LINE__ << " of file: " << __FILE__; throw
+#endif
 
 template < typename T >
 class List {

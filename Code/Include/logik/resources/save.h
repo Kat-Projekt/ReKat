@@ -15,7 +15,7 @@ namespace Manager {
     };
     static std::unordered_map < std::string, data > _logged_data;
 
-    int Free_Save ( ) 
+    void Free_Save ( ) 
     { _logged_data.clear ( ); }
 
     // save a pointer to a value that will be saved
