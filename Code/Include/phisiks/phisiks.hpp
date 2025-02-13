@@ -251,12 +251,17 @@ public:
     void Set_Colliders ( List < Collider* > &colliders ) { _colliders = colliders; }
 	List < collision_check > Get_Collisions_To_Check ( ) {
         List < collision_check > cheks;
-
+        DEBUG (4 ,"BRUTE COLLS: ",_colliders);
         for ( auto col : _colliders ) {
             // have at least one movable collider
-            if ( col->Is_Static ( ) ) { continue; }
+            DEBUG ( 5, "- C1 ", col );
+            DEBUG ( 6, "- C1 O ", col->obj->Get_Name ( ) );
+            if ( !col->obj->Has_Component < Rigidbody > ( ) ) { DEBUG ( 5, "- C1 IS STATIC"); continue; }
             for ( auto coll : _colliders ) {
+                DEBUG ( 5, "- C2 ", coll );
                 if ( coll == col ) { continue; }
+                
+                DEBUG (6 ,"- - BRUTE COLL: ", collision_check{col,coll} );
                 cheks.append ( {col,coll} );
             }
         }
@@ -455,7 +460,7 @@ namespace phisiks {
 
             // add collision to pool
         prereturn: // sorry for goto crime
-            // std::cout << "R: " << result << '\n';
+            std::cout << "R: " << result << '\n';
             Collision_History[C] = result;
         }
 

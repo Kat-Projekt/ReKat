@@ -41,7 +41,7 @@ namespace Manager {
         if ( ! file ) { DEBUG(1, "cannot open save file"); return 1; }
 
         for ( auto d : _logged_data ) {
-            std::cout << "Saving: \"" << d.first << "\" " << d.second.len << '\n';
+            DEBUG ( 4, "Saving: \"", d.first, "\" ", d.second.len, '\n' );
             file << '"' << d.first << "\" ";
             file.write ( (char*) d.second.point, d.second.len );
             file << '\n';
@@ -85,17 +85,16 @@ namespace Manager {
                 if ( Quotation_Mark ) { name += current; }
                 else if ( name != "" ) { break; }
             }
-            std::cout << "Loading variable: " << name << '\n';
-            std::cout << "point: " << data_point.size ( ) << " i: " << i << '\n';
+            DEBUG ( 4, "Loading variable: ", name );
+            DEBUG ( 5, "point: ", data_point.size ( ), " i: ", i );
             _data.len = data_point.size ( ) - i - 1;
             _data.point = ( unsigned char * ) calloc ( _data.len, 1 );
 
-            std::cout << "Data len: " << _data.len << " : '";
+            DEBUG ( 5, "Data len: ", _data.len, " : '" );
             for ( int x = 0; x < _data.len; x++ ) {
                 _data.point [ x ] = data_point [ i + x + 1];
-                std::cout.put ( _data.point [x] );
+                // DEBUG ( 6, _data.point [x] );
             }
-            std::cout << "'\n";
 
             // insert
             auto where = _logged_data[name].point;
