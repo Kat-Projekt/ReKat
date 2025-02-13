@@ -59,13 +59,6 @@ struct Input {
 	{ return ( keys[key] != NONE ? true : false ); }
 	bool Key_Up ( std::string key ) 
 	{ return ( keys[key] == RELEASED ? true : false ); }
-
-	bool Key_Down ( int key ) 
-	{ return ( keys[std::to_string(key)] == PRESSED ? true : false ); }
-	bool Key_Pressed ( int key ) 
-	{ return ( keys[std::to_string(key)] != NONE ? true : false ); }
-	bool Key_Up ( int key ) 
-	{ return ( keys[std::to_string(key)] == RELEASED ? true : false ); }
 };
 
 Input* Bound_Input_Handler = nullptr;
@@ -233,13 +226,6 @@ void Input::Keyboard ( GLFWwindow* window, int key, int scancode, int action, in
 		if ( action == GLFW_PRESS ) { keys[std::string(1,(char)key)] = PRESSED; }
 		if ( action == GLFW_RELEASE ) { keys[std::string(1,(char)key)] = RELEASED; }
 	}
-
-	// default
-	switch ( action ) {
-		case GLFW_RELEASE: keys[std::to_string(key)] = RELEASED; break;
-		case GLFW_PRESS:  keys[std::to_string(key)] = PRESSED; break;
-	}
-	
 }
 void Input::Mouse_pos ( GLFWwindow* window, double xpos, double ypos ) {
 	if ( Bound_Window_Handler == nullptr ) { return; }
@@ -306,16 +292,13 @@ namespace Input {
 	static void Update ( ) {
 		if ( Bound_Input_Handler == nullptr ) { return; }
 		Bound_Input_Handler->Update ( ); }
-	template < typename T >
-	static bool Key_Down ( T key ) {
+	static bool Key_Down ( std::string key ) {
 		if ( Bound_Input_Handler == nullptr ) { return false; }
 		return Bound_Input_Handler->Key_Down ( key ); }
-	template < typename T >
-	static bool Key_Pressed ( T key ) {
+	static bool Key_Pressed ( std::string key ) {
 		if ( Bound_Input_Handler == nullptr ) { return false; }
 		return Bound_Input_Handler->Key_Pressed ( key ); }
-	template < typename T >
-	static bool Key_Up ( T key ) {
+	static bool Key_Up ( std::string key ) {
 		if ( Bound_Input_Handler == nullptr ) { return false; }
 		return Bound_Input_Handler->Key_Up ( key ); }
 }
