@@ -287,7 +287,7 @@ public:
 			case 1: C->Collision_Enter ( collider ); break; // Enter 
 			case 2: C->Collision_Exit ( collider ); break; // Exit
 		}
-		std::cout << "calling " << typeid ( *C ).name ( ) << '\n';
+		DEBUG ( 4, "calling ", typeid ( *C ).name ( ) );
 	} else {
 		switch ( Type ) {
 			case 0: C->Collision_Trigger ( collider ); break; // Stay 
@@ -296,7 +296,7 @@ public:
 		}
 	}
 		}
-		std::cout << "andling collision of type: " << Type << " triggered " << trigger << '\n';
+		DEBUG ( 4, "andling collision of type: ", Type, " triggered ", trigger );
 	} 
 
 	mat4 Get_Model_Mat ( ) {

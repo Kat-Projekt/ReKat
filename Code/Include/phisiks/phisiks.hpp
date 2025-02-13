@@ -25,13 +25,34 @@ struct collision_check {
 	{ out << n; return out; }
 
     bool operator== ( collision_check& _lf ) {
-        return ( collider1 == _lf.collider1 && collider2 == _lf.collider2 ) &&
+        return ( collider1 == _lf.collider1 && collider2 == _lf.collider2 ) ||
                ( collider1 == _lf.collider2 && collider2 == _lf.collider1 );
     }
     bool operator!= ( collision_check& _lf ) {
-        return ! (*this == _lf);
+        return ! ( collider1 == _lf.collider1 && collider2 == _lf.collider2 ) && !
+               ( collider1 == _lf.collider2 && collider2 == _lf.collider1 );
     }
 };
+
+bool operator== ( const collision_check&_lt, const collision_check&_rt) {
+    return ( _rt.collider1 == _lt.collider1 && _rt.collider2 == _lt.collider2 ) ||
+           ( _rt.collider1 == _lt.collider2 && _rt.collider2 == _lt.collider1 );
+}
+
+struct collision_hash {
+    size_t operator ( ) ( const collision_check& c ) const {
+        // Combine hashes of x and y using the bitwise XOR
+        return std::hash<size_t>()((size_t)c.collider1) ^ (std::hash<size_t>()((size_t)c.collider2) << 1);
+    }
+};
+
+std::ostream& operator << ( std::ostream& os, 
+    std::unordered_map < collision_check, Collision_Result, collision_hash > m ) {
+    for ( auto e : m ) {
+        os << e.first << " " << e.second << '\n';
+    }
+    return os;
+}
 
 class Collision_Narrower {
     void Set_Colliders ( List < Collider* > &colliders ) { }
@@ -244,6 +265,8 @@ public:
     }
 };
 
+
+
 namespace ReKat {
 namespace phisiks {
     static float _last_phisik_update;
@@ -253,7 +276,7 @@ namespace phisiks {
     static List < Rigidbody* > Rigidbodys;
     static std::string Active;
     // trace old collision for specific interactions like exit and enter
-    static std::unordered_map < collision_check, Collision_Result > Collision_History;
+    static std::unordered_map < collision_check, Collision_Result, collision_hash > Collision_History;
 
     static int Start ( int phisik_fps ) {
         _phisik_fps = phisik_fps; 
@@ -350,7 +373,8 @@ namespace phisiks {
             }
 
             DEBUG ( 5, "Collison Result: ", result );
-/*
+            // std::cout << Collision_History;
+
             // Collision type == Enter
             if ( result.triggered ) {
                 // check if of type enter
@@ -368,7 +392,7 @@ namespace phisiks {
                 C.collider1->obj->Andle_Collsions ( C.collider2->obj, false, 1 );
                 C.collider2->obj->Andle_Collsions ( C.collider1->obj, false, 1 );
             } } }
-*/
+
             // inside collision => trigger stay collision always
             if ( result.triggered ) {
                 if ( ! C.collider1->Is_Trigger( ) && ! C.collider2->Is_Trigger( ) ) { // reaction
@@ -384,21 +408,21 @@ namespace phisiks {
                             C.collider2->obj->Inc_Pos ( - result.exit_direction * ( 1 - M2 ) );
 
                             // vincolar reaction
-                            if ( result.exit_direction == vec3{0,0,0} ) { return; }
+                            if ( result.exit_direction == vec3{0,0,0} ) { goto prereturn; }
                             vec3 normalize_exit = normalize(result.exit_direction);
 
                             C.collider1->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction( normalize_exit );
                             C.collider2->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction( -normalize_exit );
-                            return;
+                            goto prereturn;
                         }
                         C.collider1->obj->Inc_Pos ( result.exit_direction );
-                        if ( result.exit_direction == vec3{0,0,0} ) { return; }
+                        if ( result.exit_direction == vec3{0,0,0} ) { goto prereturn; }
                         vec3 normalize_exit = normalize(result.exit_direction);
                         C.collider1->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction(normalize_exit);
                     }
                     if ( ! C.collider2->Is_Static ( ) ){ // second dinamic 
                         C.collider2->obj->Inc_Pos ( -result.exit_direction );
-                        if ( result.exit_direction == vec3{0,0,0} ) { return; }
+                        if ( result.exit_direction == vec3{0,0,0} ) { goto prereturn; }
                         vec3 normalize_exit = normalize(result.exit_direction);
                         C.collider2->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction(-normalize_exit);
                     }
@@ -410,12 +434,12 @@ namespace phisiks {
                     C.collider2->obj->Andle_Collsions ( C.collider1->obj, true );
                 }
             }
-/*
+
             // Collision type == Exit
-            if ( result.triggered = false ) {
+            if ( result.triggered == false ) {
                 // check if of type exit
                 if ( auto C_poisiton = Collision_History.find ( C );
-                    ! ( C_poisiton == Collision_History.end ( ) ) || // not a new collision
+                    ! ( C_poisiton == Collision_History.end ( ) ) && // not a new collision
                     (*C_poisiton).second.triggered == true // old collision was triggered
             ) {
             // collision category
@@ -428,9 +452,11 @@ namespace phisiks {
                 C.collider1->obj->Andle_Collsions ( C.collider2->obj, false, 2 );
                 C.collider2->obj->Andle_Collsions ( C.collider1->obj, false, 2 );
             } } }
-*/
+
             // add collision to pool
-            // Collision_History[C] = result;
+        prereturn: // sorry for goto crime
+            // std::cout << "R: " << result << '\n';
+            Collision_History[C] = result;
         }
 
         // rigidbodies are rendered by the objekt

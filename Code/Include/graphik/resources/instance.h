@@ -105,6 +105,7 @@ public:
         unsigned int pointer = 0;
         unsigned int index = _index;
         for ( auto Att : _attributes ) {
+            DEBUG ( 5, "configuring attrib set: ", index, " size ", Att.size, " point ", pointer );
             glEnableVertexAttribArray(index); GL_CHECK_ERROR;
             // confiugre memory layout
             glVertexAttribPointer(index, Att.size, Att.type, Att.normalized, _data_size, (void*)pointer); GL_CHECK_ERROR;

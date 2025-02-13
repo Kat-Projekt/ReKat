@@ -85,6 +85,9 @@ public:
         glBindBuffer(GL_ARRAY_BUFFER, VBO); GL_CHECK_ERROR;
         if ( _texture != "" ) 
         { Manager::Texture_Get( _texture )->Use(); }
+        else { 
+        glActiveTexture(GL_TEXTURE0); GL_CHECK_ERROR; 
+        glBindTexture(GL_TEXTURE_2D, 0); GL_CHECK_ERROR; }
 		
         if ( _instacer != "" ) {
             auto I = Manager::Get < Instance > ( _instacer );
