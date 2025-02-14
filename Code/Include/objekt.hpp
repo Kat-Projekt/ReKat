@@ -11,9 +11,9 @@ protected:
 public:
     T* obj;
 
-	virtual void _Start ( ) { if ( _active && !_started ) { Start ( ); } _started = true; }
-	virtual void _Update ( ) { if ( _active ) { Update ( ); } }
-	virtual void _Fixed_Update ( ) { if ( _active ) { Fixed_Update ( ); } }
+	void _Start ( ) { if ( _active && !_started ) { Start ( ); } _started = true; }
+	void _Update ( ) { if ( _active ) { Update ( ); } }
+	void _Fixed_Update ( ) { if ( _active ) { Fixed_Update ( ); } }
 
 	void _Collision ( T* _obj ) { if ( _active ) { Collision ( _obj ); } }
 	void _Collision_Trigger ( T* _obj ) { if ( _active ) { Collision_Trigger ( _obj ); } }
@@ -287,7 +287,7 @@ public:
 			case 1: C->Collision_Enter ( collider ); break; // Enter 
 			case 2: C->Collision_Exit ( collider ); break; // Exit
 		}
-		std::cout << "calling " << typeid ( *C ).name ( ) << '\n';
+		DEBUG ( 4, "calling ", typeid ( *C ).name ( ) );
 	} else {
 		switch ( Type ) {
 			case 0: C->Collision_Trigger ( collider ); break; // Stay 
@@ -296,7 +296,7 @@ public:
 		}
 	}
 		}
-		std::cout << "andling collision of type: " << Type << " triggered " << trigger << '\n';
+		DEBUG ( 4, "andling collision of type: ", Type, " triggered ", trigger );
 	} 
 
 	mat4 Get_Model_Mat ( ) {
@@ -323,15 +323,6 @@ public:
 		level += "- ";
 		for ( auto C : _childrens )
 		{ C->Print_Tree ( level ); }
-	}
-	void Print_Direct_Tree ( std::string level = "" ) {
-		std::cout << level << _name << " " << _pos << " " << _size << ( _active ? " v" : " x") << '\n';
-		for ( auto C : _components ) 
-		{ std::cout << level << "+ " << typeid(*C).name() << ( C->Get_Active () ? " v" : " x") << '\n'; }
-		level += "- ";
-		std::cout << level << " Childs " << _childrens.size ( ) << '\n'; 
-		for ( auto C : _childrens )
-		{ C->Print_Direct_Tree ( level ); }
 	}
 	
 	friend std::ostream& operator << ( std::ostream& os, Objekt& n ) {

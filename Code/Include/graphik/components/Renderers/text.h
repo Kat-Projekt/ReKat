@@ -28,8 +28,8 @@ private:
 	
 	std::string _text = "";
 	std::string _new_text = "";
-	ALIGNMENT _text_align_h;
-	ALIGNMENT _text_align_v;
+	ALIGNMENT _text_align_h = CENTER;
+	ALIGNMENT _text_align_v = CENTER;
 	bool _x_warp = false;
 	int instances = 0;
 
@@ -226,7 +226,7 @@ public:
 	{ _font = font; _shader = shader; _camera = camera; 
 	_color = color; return this; }
 
-	Text * Set ( std::string text, ALIGNMENT al_horizontal = CENTER, ALIGNMENT al_vertical = CENTER, bool x_warp = false ) {
+	Text * Set ( std::string text, ALIGNMENT al_horizontal, ALIGNMENT al_vertical = CENTER, bool x_warp = false ) {
 		_new_text = text;
 		_text_align_h = al_horizontal;
 		_text_align_v = al_vertical;
@@ -237,6 +237,8 @@ public:
 
 	Text * Set ( vec4 color ) 
 	{ _color = color; return this; }
+
+	Text * Set ( std::string text ) { _new_text = text; return this; }
 
 	vec4 * Expose_Color ( ) { return &_color; }
 };
