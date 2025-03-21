@@ -67,6 +67,24 @@
 #define DEBUG(level, ...) ( ( level < DEBUG_LEVEL ) ? ( DEBUG_##level(__VA_ARGS__) ) : ( std::cout ) )
 #endif
 
+const char* strip_root_path(const char* file) {
+	if(!file) {
+		return NULL;
+	}
+
+	const char* saved = file;
+	if(*file == '.') { // relative path detected
+		while(*(++file) == '.' || *file == '/' || *file == '\\');
+		if(*file == '\0') { // weird case: purely relative path without file
+			return saved;
+		}
+
+		return file;
+	}
+
+	return file;
+}
+
 #define DEBUG_0(...) ( color ( "MESSAGE TO TERMINATE", FOREGROUND_RED | FOREGROUND_INTENSITY ), throw )
 #define DEBUG_1(...) ( color ( "FATAL", FOREGROUND_RED | FOREGROUND_INTENSITY ), __DEBUG( "", __VA_ARGS__ ), throw )
 #define DEBUG_2(...) ( color ( "ERROR", FOREGROUND_RED | FOREGROUND_INTENSITY ), __DEBUG( "", __VA_ARGS__ ), throw )
@@ -88,7 +106,7 @@
 */
 
 #if ( defined (EXPANCE) || defined (EXTEND) )
-#define __DEBUG(error_type,...) ( std::cout , error_type, "\t[" , time(0) , "]: " __FILE__ , " at " , __LINE__ , "\t: " , __VA_ARGS__ , std::endl )
+#define __DEBUG(error_type,...) ( std::cout , error_type, "\t[" , time(0) , "]: ", strip_root_path(__FILE__) , " : " , __LINE__ , "\t: " , __VA_ARGS__ , std::endl )
 #else
 #define __DEBUG(error_type,...) ( std::cout , error_type, "\t: " , __VA_ARGS__ , std::endl )
 #endif

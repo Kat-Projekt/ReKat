@@ -257,6 +257,8 @@ int Shader::Make ( bool skip, const char* vertexCode, const char* fragmentCode, 
 	if ( geometryCode != nullptr ) { glDeleteShader ( geometry ); }
 	if ( tessControlCode != nullptr ) { glDeleteShader ( tessControl ); }
 	if ( tessEvalCode != nullptr ) { glDeleteShader ( tessEval ); }
+
+	return 0;
 }
 
 int Shader::checkCompileErrors ( GLuint shader, std::string type ) {

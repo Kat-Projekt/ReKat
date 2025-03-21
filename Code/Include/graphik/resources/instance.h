@@ -79,7 +79,7 @@ public:
         glBindBuffer(GL_ARRAY_BUFFER, 0); GL_CHECK_ERROR;
     }
     void Update_Data ( unsigned int start, unsigned int size, void * data ) {
-        assert ( size > 0 && end < _buffer_size );
+        assert ( size > 0 && start + size < _buffer_size );
         glBindBuffer(GL_ARRAY_BUFFER, _buffer); GL_CHECK_ERROR;
         char *ptr = (char*) glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY); GL_CHECK_ERROR;
         // now copy data into memory

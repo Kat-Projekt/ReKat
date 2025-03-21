@@ -119,7 +119,7 @@ public:
     Sprite* Set ( std::string texture, std::string shader, std::string camera = "", ivec2 frames = {1,1}, int frame = 0, vec4 color = {1,1,1,1}, bool UI_sprite = false, std::string instancer = "" ) 
 	{ _texture = texture; _shader = shader; _camera = camera; _instacer = instancer;
 	_frames = frames; this->frame = frame; _color = color; _UI_render = UI_sprite; return this; }
-	Sprite* Set ( const char* texture ) { _texture = (std::string) texture; }
+    Sprite* Set(const char* texture) { _texture = (std::string)texture; return this; }
 
 	Sprite* Set ( bool UI_sprite ) { _UI_render = UI_sprite; return this; }
 	Sprite* Set ( int frame ) { this->frame = frame; return this; }
