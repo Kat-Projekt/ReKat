@@ -3,8 +3,10 @@
 
 #include "../camera.h"
 #include "../../resources/manager.hpp"
-
 #include "../../graphik_debugger.hpp"
+
+// default shaders
+#include "default_shaders/sprite/sprite.s.h"
 
 class Sprite : public Behaviour {
 private:
@@ -50,6 +52,7 @@ public:
         // glBindVertexArray(0); GL_CHECK_ERROR;
 		
         DEBUG ( 6,"setting shader");
+		if ( _shader == "" ) { _shader = "sprite_shader_default"; }
 		Manager::Shader_Get ( _shader )->setInt ( "image", 0 );
         DEBUG ( 5,"Started Sprite");
         DEBUG ( 5, "VBO: ",VBO, " VAO: ", _quad );
@@ -58,7 +61,11 @@ public:
 	void Update ( ) {
 		// prepare transformations
         DEBUG ( 5, "Staring Updating Sprite");
-        DEBUG ( 6, _shader, " ", _texture, " ", _camera, " ", _UI_render );
+        DEBUG ( 6,	"Shader: '", _shader, 
+					"' Texture: '", _texture, 
+					"' Camera: '", _camera, 
+					"' UI rendered '", (_UI_render?"true":"false"), 
+					"' 'Insancer: '", _instacer, '\'' );
 		if ( _shader == "" || ( _camera == "" && !_UI_render ) ) 
         { DEBUG ( 2, "Component not set Correctly" ); return; }
 
@@ -112,6 +119,7 @@ public:
     Sprite* Set ( std::string texture, std::string shader, std::string camera = "", ivec2 frames = {1,1}, int frame = 0, vec4 color = {1,1,1,1}, bool UI_sprite = false, std::string instancer = "" ) 
 	{ _texture = texture; _shader = shader; _camera = camera; _instacer = instancer;
 	_frames = frames; this->frame = frame; _color = color; _UI_render = UI_sprite; return this; }
+	Sprite* Set ( const char* texture ) { _texture = (std::string) texture; }
 
 	Sprite* Set ( bool UI_sprite ) { _UI_render = UI_sprite; return this; }
 	Sprite* Set ( int frame ) { this->frame = frame; return this; }

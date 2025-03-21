@@ -13,6 +13,9 @@ than it behaves like a sprite Behaviour
 #include "../../resources/shader.h"
 #include "../../graphik.hpp"
 
+// default shaders
+#include "default_shaders/framebuffer/frambuffer.s.h"
+
 int gl_error;
 #define GL_ERRORS(msg) gl_error = glGetError( ); if ( gl_error != GL_NO_ERROR) { std::cout << "gl_error: '" << gl_error << "' error: '" << msg << "' at line: " << __LINE__ << " of file: " << __FILE__ << '\n'; } 
 
@@ -25,6 +28,7 @@ private:
 	unsigned int _width = 0;
 	unsigned int _heigth = 0;
 	bool resize = false;
+	bool ready_to_render = false;
 
 	// sprite part
 	std::string _shader = "";
@@ -120,18 +124,19 @@ public:
     void Start ( ) {
 		// STARTING TO RENDER OBJEKT
 		// VERY IMPORTANT LINE OF MADNESS
-		_to_render->Start ( );
+		if ( _to_render != nullptr ) { _to_render->Start ( ); }
 
 		if ( _width == 0 || _heigth == 0 ) 
-		{ DEBUG ( 2, "zero dimension framebuffer" ); return; }
+		{ DEBUG ( 3, "zero dimension framebuffer" ); return; }
 
 		Create_Frame_Buffer ( );
 
-		if ( _shader == "" ) { DEBUG ( 3, "Skipping sprite genreation" ); return; }
+		if ( _shader == "" ) { _shader = "framebuffer_shader_default"; }
 		
 		Create_Sprite ( );
 
 		resize = false; 
+		ready_to_render = true;
     }
 
 	void Update ( ) {
@@ -140,7 +145,9 @@ public:
 			// auto S = obj->Get_Size ( );
 			// obj->Set_Size ( { S.x , S.y, S.z } );
 			resize = false;
+			ready_to_render = true;
 		}
+		if ( !ready_to_render ) { return; }
 		// set render buffer
 		glBindFramebuffer(GL_FRAMEBUFFER, FBO); GL_CHECK_ERROR;
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); GL_CHECK_ERROR;

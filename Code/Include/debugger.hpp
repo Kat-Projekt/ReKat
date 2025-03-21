@@ -48,7 +48,7 @@
 		#define BACKGROUND_BLUE 16
 		#define BACKGROUND_GREEN 32
 		#define BACKGROUND_INTENSITY 0
-		void color ( std::string, int color ) { }
+		void color ( std::string, int ) { }
 	#endif
 #endif
 

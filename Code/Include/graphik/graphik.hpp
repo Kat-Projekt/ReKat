@@ -59,6 +59,13 @@ struct Input {
 	{ return ( keys[key] != NONE ? true : false ); }
 	bool Key_Up ( std::string key ) 
 	{ return ( keys[key] == RELEASED ? true : false ); }
+
+	bool Key_Down ( int key ) 
+	{ return ( keys[std::to_string(key)] == PRESSED ? true : false ); }
+	bool Key_Pressed ( int key ) 
+	{ return ( keys[std::to_string(key)] != NONE ? true : false ); }
+	bool Key_Up ( int key ) 
+	{ return ( keys[std::to_string(key)] == RELEASED ? true : false ); }
 };
 
 Input* Bound_Input_Handler = nullptr;
@@ -226,6 +233,14 @@ void Input::Keyboard ( GLFWwindow* window, int key, int scancode, int action, in
 		if ( action == GLFW_PRESS ) { keys[std::string(1,(char)key)] = PRESSED; }
 		if ( action == GLFW_RELEASE ) { keys[std::string(1,(char)key)] = RELEASED; }
 	}
+
+	// default
+	switch ( action ) {
+		case GLFW_RELEASE: keys[std::to_string(key)] = RELEASED; break;
+		case GLFW_PRESS:  keys[std::to_string(key)] = PRESSED; break;
+	}
+	
+	DEBUG ( 5, "Key ", key );
 }
 void Input::Mouse_pos ( GLFWwindow* window, double xpos, double ypos ) {
 	if ( Bound_Window_Handler == nullptr ) { return; }
@@ -292,13 +307,16 @@ namespace Input {
 	static void Update ( ) {
 		if ( Bound_Input_Handler == nullptr ) { return; }
 		Bound_Input_Handler->Update ( ); }
-	static bool Key_Down ( std::string key ) {
+	template < typename T >
+	static bool Key_Down ( T key ) {
 		if ( Bound_Input_Handler == nullptr ) { return false; }
 		return Bound_Input_Handler->Key_Down ( key ); }
-	static bool Key_Pressed ( std::string key ) {
+	template < typename T >
+	static bool Key_Pressed ( T key ) {
 		if ( Bound_Input_Handler == nullptr ) { return false; }
 		return Bound_Input_Handler->Key_Pressed ( key ); }
-	static bool Key_Up ( std::string key ) {
+	template < typename T >
+	static bool Key_Up ( T key ) {
 		if ( Bound_Input_Handler == nullptr ) { return false; }
 		return Bound_Input_Handler->Key_Up ( key ); }
 }
@@ -313,6 +331,17 @@ namespace Input {
 		Bound_Window_Handler = t;
         return (*t).Make( name, SCR_WIDTH, SCR_HEIGTH, icon_path, transparent, fullscreen, resizable );
 	}
+	static void Clear_Screen ( float r = 0.0f, float g = 0.0f, float b = 0.0f, float a = 1.0f ) {
+		glClearColor(r, g, b, a);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+	}
+	static void Clear_Screen ( unsigned char r = 0, unsigned char g = 0, unsigned char b = 0, unsigned char a = -1 ) {
+		glClearColor( (float)r/256.0f, (float)g/256.0f, (float)b/256.0f, (float)a/256.0f );
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glEnable(GL_DEPTH_TEST);
+	}
+
 	static void Update ( ) {
 		for ( auto W : _windows ) 
 		{ W.second->Pool ( ); }

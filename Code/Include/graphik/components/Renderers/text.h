@@ -4,6 +4,9 @@
 #include "../camera.h"
 #include "../../resources/manager.hpp"
 
+// default shaders
+#include "default_shaders/text/text.s.h"
+
 #define HORIZONTAL_LEFT 0x1
 #define HORIZONTAL_CENTER 0x2
 #define HORIZONTAL_RIGTH 0x4
@@ -50,6 +53,7 @@ public:
 
 		if ( _font == "" ) { return; }
 		auto font = Manager::Font_Get ( _font );
+		DEBUG ( 6, "font getted ", font );
 		// contains glyph texure index width and pos in pixels
 		// {index,width,x,y} {index,width,x,y} {69'E',10,0,0} {32' ',20,10,0}
 		int* instance_buffer = (int*) calloc (_text.size()*4, sizeof(int));
@@ -68,6 +72,7 @@ public:
 				comulative_x[new_lines] += font-> char_widths[(int)_text[c]];
 			}
 		}
+		DEBUG ( 6, "new linse counterd" );
 		for ( auto i = 0; i <= new_lines; i++ ) {
 			switch ( _text_align_h ) {
 				case CENTER: comulative_x[i] = comulative_x[i] = ( obj->Get_Size ( ).x - comulative_x[i] ) * 0.5; break;
@@ -75,6 +80,7 @@ public:
 				case LEFT: comulative_x[i] = - comulative_x[i] + obj->Get_Size ( ).x * 0.5; break;
 			}
 		}
+		DEBUG ( 6, "alignement setted" );
 		int vertical_m = new_lines * font->Get_Heigth ( );
 		if ( new_lines != 0 ) {
 			switch ( _text_align_h ) {
@@ -83,6 +89,7 @@ public:
 				case BOTTOM: break;
 			}
 		}
+		DEBUG ( 6, "vertical alignement setted" );
 
 		int new_lines_counter = 0;
 		int vertical_y = font->Get_Heigth ( );
@@ -96,7 +103,7 @@ public:
 				comulative_x[new_lines_counter] += font-> Get_Heigth ( ) / 2;
 				continue;
 			}
-			if ( _text[c] == '\n' ) { DEBUG ( 4, "new line counted" ); new_lines_counter++; continue; }
+			if ( _text[c] == '\n' ) { DEBUG ( 4, "new line counted" ); new_lines_counter++; instance_buffer[c*4+0] = 32; continue; }
 
 			instance_buffer[c*4+1] = font-> char_widths[(int)_text[c]];
 			instance_buffer[c*4+2] = comulative_x[new_lines_counter];
@@ -167,7 +174,9 @@ public:
         glBindBuffer(GL_ARRAY_BUFFER, 0); GL_CHECK_ERROR;
         glBindVertexArray(0); GL_CHECK_ERROR;
 
-		Manager::Shader_Get( _shader ) ->setInt ( "image", 0 );
+		if ( _shader == "" ) 
+		{ _shader = "text_shader_default"; }
+		Manager::Shader_Get( _shader ) -> setInt ( "image", 0 );
 
 		Update_Instance_Buffer ( );
 	}
@@ -239,6 +248,8 @@ public:
 	{ _color = color; return this; }
 
 	Text * Set ( std::string text ) { _new_text = text; return this; }
+
+	std::string * Get ( ) { return &_new_text; }
 
 	vec4 * Expose_Color ( ) { return &_color; }
 };

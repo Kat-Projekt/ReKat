@@ -78,12 +78,12 @@ public:
         glBufferSubData(GL_ARRAY_BUFFER, index * _data_size, _data_size, data); GL_CHECK_ERROR;
         glBindBuffer(GL_ARRAY_BUFFER, 0); GL_CHECK_ERROR;
     }
-    void Update_Data ( unsigned int start, unsigned int end, void * data ) {
-        assert ( end > start && end < _buffer_size );
+    void Update_Data ( unsigned int start, unsigned int size, void * data ) {
+        assert ( size > 0 && end < _buffer_size );
         glBindBuffer(GL_ARRAY_BUFFER, _buffer); GL_CHECK_ERROR;
         char *ptr = (char*) glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY); GL_CHECK_ERROR;
         // now copy data into memory
-        memcpy(ptr + start, data, _data_size * ( end - start ));
+        memcpy(ptr + start*_data_size, data, _data_size * ( size ));
         // make sure to tell OpenGL we're done with the pointer
         glUnmapBuffer(GL_ARRAY_BUFFER); GL_CHECK_ERROR;
     }
@@ -110,12 +110,66 @@ public:
             glVertexAttribPointer(index, Att.size, Att.type, Att.normalized, _data_size, (void*)pointer); GL_CHECK_ERROR;
             glVertexAttribDivisor(index, 1); GL_CHECK_ERROR; // say it is an instance buffer
             DEBUG ( 5, "attrubte set: ", index, " size ", Att.size, " point ", pointer );
-            pointer += Att.size;
+            pointer += Att.stride;
             index++;
         }
         glBindBuffer(GL_ARRAY_BUFFER, 0);
     } }
 
     unsigned int Instances ( ) { return _instances; }
+
+    friend std::ostream& operator << ( std::ostream& os, const Instance& ele ) {
+        for ( int i = 0; i < ele._attributes.size ( ); i++ ) {
+            auto Att = ele._attributes [ i ];
+            os << "Att: " << i << " of size " << Att.size << " type ";
+
+            switch ( Att.type ) {
+            case GL_INT: os << "INT"; break;
+            case GL_FLOAT: os << "FLOAT"; break;
+            case GL_UNSIGNED_INT: os << "UNSIGNED_INT"; break;
+            case GL_DOUBLE: os << "DOUBLE"; break;
+            
+            default:
+                os << Att.type;
+                break;
+            }
+               
+            os << " stride " << Att.stride << '\n';
+        }
+        os << "instances: " << ele._instances << '\n';
+        os << "data size: " << ele._data_size << '\n';
+        os << "buff size: " << ele._buffer_size << '\n';
+
+        os << "data: \n";
+        glBindBuffer(GL_ARRAY_BUFFER, ele._buffer); GL_CHECK_ERROR;
+        char *ptr = (char*) glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY); GL_CHECK_ERROR;
+        for (size_t i = 0; i < ele._instances; i++) {
+            os << "I: " << i;
+
+            for ( int x = 0; x < ele._attributes.size ( ); x++ ) {
+                auto Att = ele._attributes [ x ];
+                os << " Atr: " << x << ": ";
+                for (size_t i = 0; i < Att.size; i++) {
+                    switch ( Att.type ) {
+                    case GL_INT: os << *(int*)(ptr + i*sizeof(int)); break;
+                    case GL_FLOAT: os << *(float*)(ptr + i*sizeof(float)); break;
+                    case GL_UNSIGNED_INT: os << "UNSIGNED_INT"; break;
+                    case GL_DOUBLE: os << "DOUBLE"; break;
+                    }
+                    os << " ";
+                }
+                os << '\n';
+                ptr += Att.stride;
+            }
+            
+        }
+        
+        
+        // make sure to tell OpenGL we're done with the pointer
+        glUnmapBuffer(GL_ARRAY_BUFFER); GL_CHECK_ERROR;
+        
+
+        return os;
+    }
 };
 #endif

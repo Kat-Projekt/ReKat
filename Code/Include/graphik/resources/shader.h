@@ -38,6 +38,7 @@ public:
 	// creates the shader
 	// ------------------
     int Make ( const char* vertexPath, const char* fragmentPath, const char* geometryPath = nullptr, const char* tessControlPath = nullptr, const char* tessEvalPath = nullptr );
+    int Make ( bool skip, const char* vertexCode, const char* fragmentCode, const char* geometryCode = nullptr, const char* tessControlCode = nullptr, const char* tessEvalCode = nullptr );
     // activate the shader
     // -------------------
     void Use() {
@@ -126,7 +127,7 @@ int Shader::Make ( const char* vertexPath, const char* fragmentPath, const char*
 			tessEvalCode = teShaderStream.str();
 		}
 	} catch ( std::ifstream::failure& e ) { DEBUG ( 2, "Shader loading error ", vertexPath, " code: ", e.code() ); return FAILED_LOADING_SHADER; }
-	const char* vShaderCode = vertexCode.c_str();
+	const char * vShaderCode = vertexCode.c_str();
 	const char * fShaderCode = fragmentCode.c_str();
 	// 2. compile shaders
 	unsigned int vertex, fragment;
@@ -191,37 +192,89 @@ int Shader::Make ( const char* vertexPath, const char* fragmentPath, const char*
 	glDeleteShader(vertex);
 	glDeleteShader(fragment);
 	if ( geometryPath != nullptr ) { glDeleteShader ( geometry ); }
-	if ( geometryPath != nullptr ) { glDeleteShader ( tessControl ); }
-	if ( geometryPath != nullptr ) { glDeleteShader ( tessEval ); }
+	if ( tessControlPath != nullptr ) { glDeleteShader ( tessControl ); }
+	if ( tessEvalPath != nullptr ) { glDeleteShader ( tessEval ); }
 
 	return SUCCESS;
+}
+
+int Shader::Make ( bool skip, const char* vertexCode, const char* fragmentCode, const char* geometryCode, const char* tessControlCode, const char* tessEvalCode ) {
+	unsigned int vertex = 0, fragment = 0, geometry = 0, tessControl = 0, tessEval = 0;
+	// compile
+	// vertex shader
+	vertex = glCreateShader(GL_VERTEX_SHADER);
+	glShaderSource(vertex, 1, &vertexCode, NULL);
+	glCompileShader(vertex);
+	if ( checkCompileErrors(vertex, "VERTEX") != SUCCESS ) 
+	{ return FAILED_COMPILING_VERTEX; }
+	
+	// fragment Shader
+	fragment = glCreateShader(GL_FRAGMENT_SHADER);
+	glShaderSource(fragment, 1, &fragmentCode, NULL);
+	glCompileShader(fragment);
+	if ( checkCompileErrors ( fragment, "FRAGMENT" ) != SUCCESS ) 
+	{ return FAILED_COMPILING_FRAGMENT; }
+
+	if ( geometryCode != nullptr ) {
+		geometry = glCreateShader(GL_GEOMETRY_SHADER);
+		glShaderSource(geometry, 1, &geometryCode, NULL);
+		glCompileShader(geometry);
+		if ( checkCompileErrors ( geometry, "GEOMETRY" ) != SUCCESS ) 
+		{ return FAILED_COMPILING_GEOMETRY; }
+	}
+	
+	if ( tessControlCode != nullptr ) {
+		tessControl = glCreateShader(GL_TESS_CONTROL_SHADER);
+		glShaderSource(tessControl, 1, &tessControlCode, NULL);
+		glCompileShader(tessControl);
+		if ( checkCompileErrors(tessControl, "TESS_CONTROL") != SUCCESS ) 
+		{ return FAILED_COMPILING_TESSCONTROL; }
+
+	}
+
+	if ( tessEvalCode != nullptr ) {
+		tessEval = glCreateShader(GL_TESS_EVALUATION_SHADER);
+		glShaderSource(tessEval, 1, &tessEvalCode, NULL);
+		glCompileShader(tessEval);
+		if ( checkCompileErrors(tessEval, "TESS_EVALUATION") != SUCCESS ) 
+		{ return FAILED_COMPILING_TESSEVAL; }
+	}
+	
+	// create and link shader Program
+	ID = glCreateProgram();
+	glAttachShader(ID, vertex);
+	glAttachShader(ID, fragment);
+	if ( geometryCode != nullptr ) { glAttachShader(ID, geometry); }
+	if ( tessControlCode != nullptr ) { glAttachShader ( ID, tessControl ); }
+	if ( tessEvalCode != nullptr ) { glAttachShader ( ID, tessEval ); }
+
+	glLinkProgram(ID);
+	if ( int error = checkCompileErrors(ID, "PROGRAM") != SUCCESS ) { return error; }
+
+	// delete the shaders
+	glDeleteShader(vertex);
+	glDeleteShader(fragment);
+	if ( geometryCode != nullptr ) { glDeleteShader ( geometry ); }
+	if ( tessControlCode != nullptr ) { glDeleteShader ( tessControl ); }
+	if ( tessEvalCode != nullptr ) { glDeleteShader ( tessEval ); }
 }
 
 int Shader::checkCompileErrors ( GLuint shader, std::string type ) {
 	int success;
 	char infoLog[1024];
-	if (type != "PROGRAM")
-	{
+	if (type != "PROGRAM") {
 		glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
-		if (!success)
-		{
+		if (!success) {
 			glGetShaderInfoLog(shader, 1024, NULL, infoLog);
-			std::cout << "| ERROR::SHADER: Compile-time error: Type: " << type << "\n"
-				<< infoLog << "\n -- --------------------------------------------------- -- "
-				<< std::endl;
+			DEBUG ( 3, "Compile time ", infoLog );
 			return FAILED_COMPILING_PROGRAM;
 		}
-	}
-	else
-	{
+	} else {
 		glGetProgramiv(shader, GL_LINK_STATUS, &success);
-		if (!success)
-		{
+		if (!success) {
 			glGetProgramInfoLog(shader, 1024, NULL, infoLog);
-			std::cout << "| ERROR::Shader: Link-time error: Type: " << type << "\n"
-				<< infoLog << "\n -- --------------------------------------------------- -- "
-				<< std::endl;
-			return FAILED_COMPILING_SHADER; 
+			DEBUG ( 3, "linking time ", infoLog );
+			return FAILED_LINKING_SHADER;
 		}
 	}
 	return SUCCESS;

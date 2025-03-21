@@ -11,7 +11,7 @@ namespace Manager {
         // start of the data to log
         unsigned char * point = nullptr;
         // legth of the data to log
-        unsigned int len = 0;
+        size_t len = 0;
     };
     static std::unordered_map < std::string, data > _logged_data;
 
@@ -75,8 +75,8 @@ namespace Manager {
 
             bool Quotation_Mark = false;
 		    char current;
-            int i = 0;
-            for ( i; i < data_point.size ( ); i++) {
+            size_t i = 0;
+            for ( ; i < data_point.size ( ); i++) {
                 current = data_point[i];
 
                 if ( current == '\"' )
@@ -91,7 +91,7 @@ namespace Manager {
             _data.point = ( unsigned char * ) calloc ( _data.len, 1 );
 
             DEBUG ( 5, "Data len: ", _data.len, " : '" );
-            for ( int x = 0; x < _data.len; x++ ) {
+            for ( size_t x = 0; x < _data.len; x++ ) {
                 _data.point [ x ] = data_point [ i + x + 1];
                 // DEBUG ( 6, _data.point [x] );
             }
@@ -99,9 +99,8 @@ namespace Manager {
             // insert
             auto where = _logged_data[name].point;
 
-            for ( int i = 0; i < _data.len; i++ ) {
-                where[i] = _data.point[i];
-                /* code */
+            for ( size_t x = 0; x < _data.len; x++ ) {
+                where[x] = _data.point[x];
             }
         }
 

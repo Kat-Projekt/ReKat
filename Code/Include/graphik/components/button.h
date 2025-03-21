@@ -2,7 +2,6 @@
 #define BUTTON
 #include <functional>
 #include "../../objekt.hpp"
-#include "../../objekt.hpp"
 #include "../graphik.hpp"
 using namespace ReKat::grapik::Input;
 
