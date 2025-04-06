@@ -16,42 +16,63 @@ public:
 		T data;
 		Element * next = nullptr;
 
-		friend std::ostream& operator << ( std::ostream& os, const Element& ele ) {
-			os << ele.data << " { " << ele.prev << ", " << ele.next << " }";
+		friend std::ostream& 
+		operator << 
+		( std::ostream& os, const Element& ele ) 
+		{
+			os << "( "<< ele.data << " { " << ele.prev << ", " << ele.next << " } )";
 			return os;
 		}
 	};
 	struct Iterator {
 		Element * ele;
 
-		Iterator& operator++() {
-			if ( ele->next == nullptr ) {
+		Iterator&
+		operator++ ( void ) 
+		{
+			if ( ele->next == nullptr ) 
+			{
 				std::cout << '\n' << *ele;
-				Error ( "Continuing with a nullptr" );
+				Error ( "(++) Continuing with a nullptr" );
 			}
 			ele = ele->next;
 			return *this;
 		}
-		Iterator operator++(int) {
-			Iterator __t(*this);
+		Iterator 
+		operator++ ( int ) 
+		{
 			++(*this);
-			return __t;
+			return *this;
 		}
 
-		Iterator& operator--() {
+		Iterator&
+		operator-- ( void )
+		{
+			if ( ele->prev == nullptr ) 
+			{
+				std::cout << '\n' << *ele;
+				Error ( "(--) Continuing with a nullptr" );
+			}
 			ele = ele->prev;
 			return *this;
 		}
-		Iterator operator--(int) {
-			Iterator __t(*this);
+		Iterator
+		operator-- ( int )
+		{
 			--(*this);
-			return __t;
+			return *this;
 		}
 
-		bool operator!= ( Iterator &I ) 
-		{ return ( I.ele != this->ele ); }
+		bool
+		operator!=
+		( Iterator &I )
+		{
+			return ( I.ele != this->ele );
+		}
 
-		T operator*() const {
+		T
+		operator* ( void )
+		const {
 			return ele->data;
 		}
 	};
@@ -61,16 +82,31 @@ private:
 	Element* _first = nullptr;
 	Element* _last = nullptr;
 public:
-	List ( ) { _last = new Element; };
-	// ~List ( ) { Deallocate ( ); };
+	List ( void )
+	:
+	_last ( new Element )
+	{ }
+	~List ( void )
+	{
+		Deallocate ( );
+	}
 	
-	void Deallocate ( ) {
+	void 
+	Deallocate ( void )
+	{
 		auto C = _first;
-		while ( C != nullptr ) {
+		while 
+		( C != nullptr )
+		{
 			auto C1 =  C->next;
 			delete C;
 			C = C1;
 		}
+
+		// re inizialize
+		_size = 0;
+		_first = nullptr;
+		_last = new Element;
 	}
 	// size of list
 	integer size ( ) { return _size; }

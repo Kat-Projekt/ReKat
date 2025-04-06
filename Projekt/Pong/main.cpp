@@ -1,4 +1,4 @@
-#define DIAGNOSTIC
+// #define DIAGNOSTIC
 // #define EXPANCE
 #include <engine.hpp>
 

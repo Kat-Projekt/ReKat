@@ -4,42 +4,113 @@
 #include "debugger.hpp"
 
 template < typename T >
-class _behaviour {
+class _behaviour
+{
 protected:
 	bool _active = true;
 	bool _started = false;
+
 public:
-    T* obj;
+    T* obj = nullptr;
 
-	void _Start ( ) { if ( _active && !_started ) { Start ( ); } _started = true; }
-	void _Update ( ) { if ( _active ) { Update ( ); } }
-	void _Fixed_Update ( ) { if ( _active ) { Fixed_Update ( ); } }
-
-	void _Collision ( T* _obj ) { if ( _active ) { Collision ( _obj ); } }
-	void _Collision_Trigger ( T* _obj ) { if ( _active ) { Collision_Trigger ( _obj ); } }
+	// call protection prevents repeted starts of components and prevents calling when the copmonent is inactive
+	void 
+	_Start ( void )
+	{
+		if ( _active && !_started )
+			Start ( );
+		
+		_started = true;
+	}
+	void 
+	_Update ( void )
+	{
+		if ( _active )
+			Update ( );
+	}
+	void 
+	_Fixed_Update ( void ) 
+	{ 
+		if ( _active )
+			Fixed_Update ( );
+	}
 
 	// Called only once Before every other function
-    virtual void Start ( ) { }
+    virtual void
+	Start ( void ) 
+	{ }
 	// Called every Time Update is called on the parent objekt
-    virtual void Update ( ) { }
+    virtual void 
+	Update ( void ) 
+	{ }
 	// Called every Time Fixed Update is called on the parent objekt
-	virtual void Fixed_Update ( ) { }
+	virtual void
+	Fixed_Update ( void ) 
+	{ }
 
 	// Collision handleing
-	virtual void Collision ( T* _obj ) { }
-	virtual void Collision_Exit ( T* _obj ) { }
-	virtual void Collision_Enter ( T* _obj ) { }
+	virtual void 
+	Collision
+	( T* _obj ) 
+	{
+		_obj;
+	}
+	virtual void
+	Collision_Exit
+	(T* _obj)
+	{
+		_obj;
+	}
+	virtual void
+	Collision_Enter
+	(T* _obj)
+	{
+		_obj;
+	}
 
-    virtual void Collision_Trigger ( T* _obj ) { }
-	virtual void Collision_Trigger_Exit ( T* _obj ) { }
-	virtual void Collision_Trigger_Enter ( T* _obj ) { }
+    virtual void
+	Collision_Trigger
+	(T* _obj)
+	{
+		_obj;
+	}
+	virtual void
+	Collision_Trigger_Exit
+	(T* _obj)
+	{
+		_obj;
+	}
+	virtual void
+	Collision_Trigger_Enter
+	(T* _obj)
+	{
+		_obj;
+	}
 
-	void Set_Active ( bool active ) 
-	{ _active = active; if ( !_started ) { Start( ); } }
-	bool Get_Active ( ) { return _active; }
+	void
+	Set_Active 
+	( bool active )
+	{
+		_active = active;
+		if ( !_started ) 
+			Start( );
+	}
+	bool
+	Get_Active ( void )
+	{
+		return _active;
+	}
 
-	virtual void Delete ( ) {
+	virtual void
+	Delete ( void )
+	{
 		delete this;
+	}
+
+	virtual _behaviour *
+	Set ( void )
+	{
+		return this;
 	}
 };
 
@@ -53,7 +124,7 @@ using namespace glm;
 
 class Objekt {
 protected:
-    std::string _name;
+    std::string _name = "";
 	bool _active = true;
 	bool _started = false;
 
@@ -67,28 +138,67 @@ protected:
     mat4 _model = mat4(1.0f);
 
 	Objekt* _father = nullptr;
-	List < Objekt* > _childrens;
-	List < _behaviour < Objekt >* > _components;
+	List < Objekt* > _childrens = { };
+	List < _behaviour < Objekt >* > _components = { };
 
 public:
 	#define Behaviour _behaviour<Objekt>
 
-    Objekt ( ) { DEBUG ( 4,"Created Empty Objekt"); }
-    Objekt ( std::string name, vec3 pos = {0,0,0}, vec3 size = {100,100,100}, vec3 rot = {0,0,0}, vec3 rot_pivot = {0,0,0} ) 
-	: _name(name), _pos(pos), _size(size), _rot(rot), _rot_pivot(rot_pivot) 
-	{ DEBUG ( 4,"Inizializing Objekt: ", name, ", pos: ", pos, ", size: ", size, ", rot: ", rot, ", rot_pivot: ", rot_pivot ); }
-	void Free ( std::string p = "" ) {
+	/* constructor */
+    Objekt ( void )
+	{
+		DEBUG ( 4,"Created Empty Objekt" );
+	}
+    Objekt
+	(
+		std::string name,
+		vec3 pos = {0,0,0},
+		vec3 size = {100,100,100},
+		vec3 rot = {0,0,0},
+		vec3 rot_pivot = {0,0,0}
+	) 
+	:
+		_name(name),
+		_pos(pos),
+		_size(size),
+		_rot(rot),
+		_rot_pivot(rot_pivot) 
+	{
+		DEBUG ( 4,
+			"Inizializing Objekt: ", name,
+			", pos: ", pos, 
+			", size: ", size,
+			", rot: ", rot,
+			", rot_pivot: ", rot_pivot
+		);
+	}
+
+	/* destructor */
+	void
+	Free
+	( std::string p = "" )
+	{
 		DEBUG ( 4, p + "Deleting components of: ", _name );
-		for ( auto C : _components )
-		{ C->Delete ( ); }
-		// _components.Deallocate ( );
+
+		for 
+		( auto C : _components )
+		{
+			C->Delete ( );
+		}
+
+		_components.Deallocate ( );
 		_components = List < _behaviour < Objekt >* > ( );
+
 		DEBUG ( 4, p + _name, " is Free - Deleting childrens" );
-		for ( auto C : _childrens ) {
+	
+		for
+		( auto C : _childrens )
+		{
 			C->Free ( p + "\t" );
 			delete C;
 		}
-		// _childrens.Deallocate ( );
+	
+		_childrens.Deallocate ( );
 		_childrens = List < Objekt* > ( );
 	}
 	~Objekt ( ) {
@@ -397,6 +507,10 @@ namespace Manager {
 		auto D = Objekt_Get ( name );
 		D->Delete ( );
 		objekts.remove ( D );
+
+		if( D == _current_scene ) 
+			_current_scene = nullptr;
+
 		delete D;
 	}
 }
