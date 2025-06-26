@@ -2,6 +2,11 @@
 #define OBJEKT_H
 
 #include "debugger.hpp"
+#include "utility/printer.h"
+#include "utility/map.h"
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <string>
 
 template < typename T >
 class _behaviour
@@ -11,7 +16,13 @@ protected:
 	bool _started = false;
 
 public:
-    T* obj = nullptr;
+	T* obj = nullptr;
+
+	_behaviour ( ) // empty constructor
+	{ }
+
+	virtual ~_behaviour ( ) // empty deconstructor
+	{ }
 
 	// call protection prevents repeted starts of components and prevents calling when the copmonent is inactive
 	void 
@@ -36,55 +47,52 @@ public:
 	}
 
 	// Called only once Before every other function
-    virtual void
-	Start ( void ) 
-	{ }
+	virtual void
+	Start ( void ) { };	
 	// Called every Time Update is called on the parent objekt
-    virtual void 
-	Update ( void ) 
-	{ }
+	virtual void 
+	Update ( void ) { };	
 	// Called every Time Fixed Update is called on the parent objekt
 	virtual void
-	Fixed_Update ( void ) 
-	{ }
+	Fixed_Update ( void ) { };	
 
 	// Collision handleing
 	virtual void 
 	Collision
 	( T* _obj ) 
 	{
-		_obj;
+		( void ) _obj; // for preventing the error 
 	}
 	virtual void
 	Collision_Exit
-	(T* _obj)
+	( T* _obj )
 	{
-		_obj;
+		( void ) _obj;
 	}
 	virtual void
 	Collision_Enter
-	(T* _obj)
+	( T* _obj )
 	{
-		_obj;
+		( void ) _obj;
 	}
 
-    virtual void
+	virtual void
 	Collision_Trigger
-	(T* _obj)
+	( T* _obj )
 	{
-		_obj;
+		( void ) _obj;
 	}
 	virtual void
 	Collision_Trigger_Exit
-	(T* _obj)
+	( T* _obj )
 	{
-		_obj;
+		( void ) _obj;
 	}
 	virtual void
 	Collision_Trigger_Enter
-	(T* _obj)
+	( T* _obj )
 	{
-		_obj;
+		( void ) _obj;
 	}
 
 	void
@@ -114,42 +122,33 @@ public:
 	}
 };
 
-#include "utility/printer.h"
-#include "utility/map.h"
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <string>
-
-using namespace glm;
-
 class Objekt {
 protected:
-    std::string _name = "";
+	std::string _name = "";
 	bool _active = true;
 	bool _started = false;
 
-    // Transform
-    vec3 _pos  = {0,0,0};
-    vec3 _size = {100,100,100};
-    vec3 _rot  = {0,0,0};
+		// Transform
+	glm::vec3 _pos  = {0,0,0};
+	vec3 _size = {100,100,100};
+	vec3 _rot  = {0,0,0};
 	vec3 _rot_pivot = {0,0,0};
 
-    // Render Matrix
-    mat4 _model = mat4(1.0f);
+		// Render Matrix
+	mat4 _model = mat4(1.0f);
 
+		// CES
 	Objekt* _father = nullptr;
 	List < Objekt* > _childrens = { };
 	List < _behaviour < Objekt >* > _components = { };
-
 public:
 	#define Behaviour _behaviour<Objekt>
 
 	/* constructor */
-    Objekt ( void )
-	{
-		DEBUG ( 4,"Created Empty Objekt" );
-	}
-    Objekt
+	Objekt 
+	( void ) 
+	{ }
+	Objekt
 	(
 		std::string name,
 		vec3 pos = {0,0,0},
@@ -173,7 +172,7 @@ public:
 		);
 	}
 
-	/* destructor */
+	/* Free function */
 	void
 	Free
 	( std::string p = "" )
@@ -201,7 +200,11 @@ public:
 		_childrens.Deallocate ( );
 		_childrens = List < Objekt* > ( );
 	}
-	~Objekt ( ) {
+
+	/* Deconstructor */
+	~Objekt
+	( void )
+	{
 		Free ( );
 	}
 
@@ -210,7 +213,7 @@ public:
 		_father = father;
 	}
 	Objekt* Get_Father ( ) { return _father; }
-    Objekt* Add_Child ( Objekt * child ) {
+	Objekt* Add_Child ( Objekt * child ) {
 		DEBUG ( 5,"\tadding child: ", child->Get_Name (), " to: ", _name );
 		child->Set_Father ( this );
 		_childrens.append ( child );
@@ -235,7 +238,7 @@ public:
 		Print_Tree ( p );
 		_started = false;
 	}
-    Objekt* Get_Children ( std::string name ) {
+	Objekt* Get_Children ( std::string name ) {
 		for ( auto C : _childrens )  {
 			if ( C->Get_Name() == name ) 
 			{ return C; }
@@ -276,32 +279,32 @@ public:
 	void Set_Rot_Pivot ( vec3 rot_pivot = {0,0,0} ) { _rot_pivot = rot_pivot; }
 	vec3 Get_Rot_Pivot ( ) { return _rot_pivot; }
 
-    void Set_Active ( bool active ) {
+	void Set_Active ( bool active ) {
 		_active = active;
 		if ( !_started && active == true )
 		{ Start( ); }
 		for ( auto child : _childrens ) 
 		{ child->Set_Active ( active ); }
 	}
-    bool Get_Active ( ) { return _active; }
+	bool Get_Active ( ) { return _active; }
 
-    void Set_Name ( std::string name ) { _name = name; }
-    inline std::string Get_Name ( ) { return _name; }
+	void Set_Name ( std::string name ) { _name = name; }
+	inline std::string Get_Name ( ) { return _name; }
 
-    template < class C >
-    C* Add_Component ( ) {
-        if ( std::is_base_of<Behaviour, C>::value ) { 
+	template < class C >
+	C* Add_Component ( ) {
+        	if ( std::is_base_of<Behaviour, C>::value ) { 
 			C* c = new C ( );
 			DEBUG ( 4, "Adding Component: ", std::string(typeid(*c).name()), " to: ", _name );
 			c->obj = this;
 			_components.append ( ( Behaviour * ) ( c ) );
 			if ( _started ) { c->_Start( ); }
-        	return c;
+        		return c;
 		}
 		DEBUG ( 2, "Wrong component decraration" );
-    }
-    template < class C > 
-    C* Add_Component ( C* c ) {
+	}
+	template < class C > 
+	C* Add_Component ( C* c ) {
 		DEBUG ( 4,"Adding Component: ", std::string(typeid(*c).name()), " to: ", _name );
 		if ( std::is_base_of<Behaviour, C>::value ) {
 			c->obj = this;
@@ -310,9 +313,9 @@ public:
         	return c;
 		}
 		DEBUG ( 2, "Wrong component Behaviour" );
-    }
+	}
 	
-    template < class C > 
+	template < class C > 
 	C* Get_Component ( ) {
 		DEBUG ( 6,"Getting Component" );
 		for ( auto c : _components ) 
@@ -341,7 +344,7 @@ public:
 		return false;
 	}
 
-    virtual void Start ( ) {
+	void Start ( ) {
 		if ( _started ) { return; }
 		if ( !_active ) { return; }
 		DEBUG ( 4,"Starting Objekt: ", Get_Name() );
@@ -359,54 +362,58 @@ public:
 		_started = true;
     }
 
-    virtual void Update ( std::string ind = "" ) {
+	void Update ( std::string ind = "" ) {
 		if ( !_active ) { return; }
-		DEBUG ( 4,ind,"Updating Objekt: ", Get_Name() );
-        for ( auto &&C : _components ) {
+		DEBUG ( 5,ind,"Updating Components of: ", Get_Name() );
+
+		for ( auto &&C : _components ) {
 			DEBUG ( 6,ind,"+ Updating Componenet: ", std::string(typeid(*C).name()));
 			C->_Update ( );
-			DEBUG ( 6,ind,"+ Done" );
 		}
-		DEBUG ( 6,ind,"Updating Childrens" );
-		for ( auto &&O : _childrens ) 
+
+		DEBUG ( 5,ind,"Updating Childrens of: ", Get_Name ( ) );
+		for ( auto &&O : _childrens )
 		{ O->Update ( ind + "- " ); }
-		DEBUG ( 6,ind,"Childrens Updated" );
+
 		DEBUG ( 5,ind,"Updated Objekt: ", Get_Name() );
-    }
-
-    virtual void Fixed_Update ( ) {
-		if ( !_active ) { return; }
-		DEBUG ( 5,"Updating Fixed Objekt: ", Get_Name() );
-        for ( auto C : _components ) {
-			DEBUG ( 6,"Updating Fixed Componenet: ", std::string(typeid(*C).name()));
-			C->_Fixed_Update ( );
-			DEBUG ( 6,"Done" );
-		}
-		DEBUG ( 6,"Updating Childrens Fixed" );
-		for ( auto O : _childrens ) 
-		{ O->Fixed_Update ( ); }
-		DEBUG ( 6,"Childrens Updated Fixed" );
-		DEBUG ( 5,"Updated Fixed Objekt: " + Get_Name() );
-    }
-
-	virtual void Andle_Collsions ( Objekt * collider, float trigger = false, int Type = 0 ) {
-		for ( auto C : _components ) {
-	if ( !trigger ) {
-		switch ( Type ) {
-			case 0: C->Collision ( collider ); break; // Stay 
-			case 1: C->Collision_Enter ( collider ); break; // Enter 
-			case 2: C->Collision_Exit ( collider ); break; // Exit
-		}
-		DEBUG ( 4, "calling ", typeid ( *C ).name ( ) );
-	} else {
-		switch ( Type ) {
-			case 0: C->Collision_Trigger ( collider ); break; // Stay 
-			case 1: C->Collision_Trigger_Enter ( collider ); break; // Enter 
-			case 2: C->Collision_Trigger_Exit ( collider ); break; // Exit
-		}
 	}
+
+	void Fixed_Update ( std::string ind = "" ) {
+		if ( !_active ) { return; }
+		DEBUG ( 5,ind,"Updating Fixed Components of: ", Get_Name() );
+        	
+		for ( auto C : _components ) {
+			DEBUG ( 6,ind,"+ Updating Fixed Componenet: ", std::string(typeid(*C).name()));
+			C->_Fixed_Update ( );
 		}
-		DEBUG ( 4, "andling collision of type: ", Type, " triggered ", trigger );
+		
+		DEBUG ( 5,ind,"Updating Fixed Childrens of: ", Get_Name ( ) );
+		for ( auto O : _childrens ) 
+		{ O->Fixed_Update ( ind + "- "); }
+
+		DEBUG ( 5,ind,"Updated Fixed Objekt: " + Get_Name() );
+	}
+
+	void Andle_Collsions ( Objekt * collider, float trigger = false, int Type = 0 ) {
+		for ( auto C : _components ) {
+			if ( !trigger ) {
+				switch ( Type ) {
+					case 0: C->Collision ( collider ); break; // Stay 
+					case 1: C->Collision_Enter ( collider ); break; // Enter 
+					case 2: C->Collision_Exit ( collider ); break; // Exit
+				}
+				DEBUG ( 4, "calling ", typeid ( *C ).name ( ) );
+			} else {
+				switch ( Type ) {
+					case 0: C->Collision_Trigger ( collider ); break; // Stay 
+					case 1: C->Collision_Trigger_Enter ( collider ); break; // Enter 
+					case 2: C->Collision_Trigger_Exit ( collider ); break; // Exit
+				}
+			}
+		}
+
+		DEBUG ( 5, "A collision of type: ", Type, ( trigger ? "(trigger)" : "(solid)" ), 
+			   " between ", Get_Name ( ), " and ", collider->Get_Name () );
 	} 
 
 	mat4 Get_Model_Mat ( ) {
@@ -415,28 +422,26 @@ public:
 		if ( _father != nullptr ) { position+= _father->Get_Pos(); }
 
 		mat4 model = glm::mat4(1.0f);
-        model = glm::translate(model, position);
-        if ( _rot.x != 0 ) { model = glm::rotate(model, glm::radians(_rot.x), glm::vec3(1.0f, 0.0f, 0.0f)); }
-    	if ( _rot.y != 0 ) { model = glm::rotate(model, glm::radians(_rot.y), glm::vec3(0.0f, 1.0f, 0.0f)); }
-    	if ( _rot.z != 0 ) { model = glm::rotate(model, glm::radians(_rot.z), glm::vec3(0.0f, 0.0f, 1.0f)); }
-        model = glm::translate(model, -Pivot);
+		model = glm::translate(model, position);
+		if ( _rot.x != 0 ) { model = glm::rotate(model, glm::radians(_rot.x), glm::vec3(1.0f, 0.0f, 0.0f)); }
+		if ( _rot.y != 0 ) { model = glm::rotate(model, glm::radians(_rot.y), glm::vec3(0.0f, 1.0f, 0.0f)); }
+		if ( _rot.z != 0 ) { model = glm::rotate(model, glm::radians(_rot.z), glm::vec3(0.0f, 0.0f, 1.0f)); }
+		model = glm::translate(model, -Pivot);
 
-        model = glm::scale(model, _size);
+        	model = glm::scale(model, _size);
 
 		return model;
 	}
 
 	void Print_Tree ( std::string level = "" ) {
-		DEBUG ( 4, level, _name, " ", _pos, " ", _size, ( _active ? " v" : " x") );
-		for ( auto C : _components ) 
-		{ DEBUG ( 5, level, "+ ", typeid(*C).name(), ( C->Get_Active () ? " v" : " x") ); }
+		DEBUG ( 4, level, (*this) );
 		level += "- ";
 		for ( auto C : _childrens )
 		{ C->Print_Tree ( level ); }
 	}
 	
 	friend std::ostream& operator << ( std::ostream& os, Objekt& n ) {
-        os << n.Get_Name ( ) << " " << n._pos << " " << n._size << ( n._active ? " v" : " x" ) << " { ";
+        	os << n.Get_Name ( ) << " " << n._pos << " " << n._size << ( n._active ? " v" : " x" ) << " { ";
 		// print components
 		os << n._components.size ( ) << " ";
 		for ( auto C : n._components ) 
@@ -446,6 +451,7 @@ public:
 		
 		return os;
 	}
+
 	friend std::ostream& operator,(std::ostream& out, Objekt& n )
 	{ out << n; return out; }
 };
@@ -509,7 +515,7 @@ namespace Manager {
 		objekts.remove ( D );
 
 		if( D == _current_scene ) 
-			_current_scene = nullptr;
+		{ _current_scene = nullptr; }
 
 		delete D;
 	}

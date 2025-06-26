@@ -73,27 +73,29 @@ public:
 	}
 	// size of list
 	integer size ( ) { return _size; }
-
-    T get ( K key, bool u ) {
-        auto C = _first;
+	// the u is for setting the single
+	T get_single ( K key ) {
+		auto C = _first;
 		while ( C != nullptr ) {
-            if ( C->key == key ) 
-            { return C->data; }
+			if ( C->key == key ) 
+			{ return C->data; }
+			
 			C = C->next;
 		}
 		DEBUG ( 1, "Cannot Find Keyd Item" );
-    }
+	}
 
-    List <T> * get ( K key ) {
-        List <T> * list = new List < T >;
-        auto C = _first;
+	List <T> * get ( K key ) {
+		List <T> * list = new List < T >;
+		auto C = _first;
 		while ( C != nullptr ) {
-            if ( C->key == key ) 
-            { list->append ( C->data ); }
+			if ( C->key == key ) 
+			{ list->append ( C->data ); }
+			
 			C = C->next;
 		}
-        return list;
-    }
+		return list;
+	}
 
     List <T> get ( K* keys, integer _l ) {
 		DEBUG ( 5, "Getting" );

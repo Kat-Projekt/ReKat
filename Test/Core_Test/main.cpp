@@ -63,7 +63,7 @@ main ( void )
         Manager::Get_Active_Scene ( )->Print_Tree ( );
         
         Manager::Free_Objekt ( "franco" );
-        DEBUG ( 3,
+        DEBUG ( 3, "Acrive Scene: ",
             Manager::Get_Active_Scene ( )
         );
         
