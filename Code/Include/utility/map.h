@@ -83,6 +83,7 @@ public:
 			C = C->next;
 		}
 		DEBUG ( 1, "Cannot Find Keyd Item" );
+		return _last->data; // this is an empty objekt and is out of bound
 	}
 
 	List <T> * get ( K key ) {

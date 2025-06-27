@@ -46,7 +46,7 @@ if ( REKAT_TEST )
     endforeach ( TEST )
 endif ( )
 
-set ( PROJEKTS Pong )
+set ( PROJEKTS Wordle )
 
 if ( REKAT_PROJEKT )
 

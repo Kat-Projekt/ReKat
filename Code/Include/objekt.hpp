@@ -476,6 +476,7 @@ namespace Manager {
 			{ return S; }
 		}
 		DEBUG ( 1, "Cannot find objekt ", name );
+		return nullptr;
 	}
 	static Objekt* Objekt_Load ( std::string name, vec3 pos = {0,0,0}, vec3 size = {100,100,100}, vec3 rot = {0,0,0}, vec3 rot_pivot = {0,0,0} ) {
 		auto o = new Objekt(name, pos, size, rot, rot_pivot);

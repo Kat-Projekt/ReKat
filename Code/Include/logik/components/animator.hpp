@@ -25,7 +25,7 @@ class Animator : public Behaviour {
     Map < std::string, Node* > nodes;
 public:
     Animator * Change_Animation ( std::string name ) {
-        auto New_Node = nodes.get ( name, true );
+        auto New_Node = nodes.get_single ( name );
 
         Active_Node = New_Node;
         Metronome = 0;
@@ -37,7 +37,7 @@ public:
 
     template < typename A >
     Animator * Add_Animation ( std::string node, Animation < A > * anim ) {
-        auto n = nodes.get ( node, true );
+        auto n = nodes.get_single ( node );
         if ( n == nullptr )
         { DEBUG (2, "node not found" ); return this; }
         n->Add_Animation ( anim );
@@ -45,7 +45,7 @@ public:
     }
 
     Animator * Add_Animation ( std::string node, std::string anim ) {
-        auto n = nodes.get ( node, true );
+        auto n = nodes.get_single ( node );
         if ( n == nullptr )
         { DEBUG (2, "node not found" ); return this; }
         n->Add_Animation ( Manager::Animation_Get ( anim ) );

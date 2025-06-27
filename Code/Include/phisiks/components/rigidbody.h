@@ -14,16 +14,17 @@ public:
 	bool block_z = true;
 
 	void Fixed_Update ( ) {
+		// implement verlet integration
+		// x_{n+1} = 2 x_n - x_{n+1} + acc_n * dt
 		if ( block_z ) { velocity.z = 0; acceleration.z = 0;}
-		if ( acceleration != vec3{0,0,0} ) { velocity += acceleration * Timer::fixed_delta_time * time_scale; }
+		if ( acceleration != vec3{0,0,0} )
+		{ velocity += acceleration * Timer::fixed_delta_time * time_scale; }
 		obj->Inc_Pos ( velocity * Timer::fixed_delta_time * time_scale );
 	}
 
 	void Vincolar_Reaction ( vec3 plane_normal ) {
-		//std::cout << " normal: " << plane_normal << " vel: " << velocity << " acc: " << acceleration << '\n';
 		acceleration -= plane_normal * ( dot ( plane_normal, acceleration ) ) * ( 1 + bouncy );
 		velocity -= plane_normal * ( dot ( plane_normal, velocity ) ) * ( 1 + bouncy );
-		//std::cout << " normal: " << plane_normal << " vel: " << velocity << " acc: " << acceleration << '\n';
 	}
 };
 
