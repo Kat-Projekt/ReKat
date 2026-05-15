@@ -67,6 +67,8 @@
 #define DEBUG(level, ...) ( ( level < DEBUG_LEVEL ) ? ( DEBUG_##level(__VA_ARGS__) ) : ( std::cout ) )
 #endif
 
+#define WAIT system("pause")
+
 const char* strip_root_path(const char* file) {
 	if(!file) {
 		return NULL;
@@ -119,6 +121,7 @@ std::ostream& operator,(std::ostream& out, std::ostream&(*f)(std::ostream&))
 #else
 #define DEBUG(...)
 #define __DEBUG(...)
+#define WAIT
 #endif
 
 #endif

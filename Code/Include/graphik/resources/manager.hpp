@@ -13,7 +13,7 @@
 namespace Manager {
 	// Gets a Font
 	// -------------
-    static Font* Font_Get  ( std::string name ) {
+	static Font* Font_Get  ( std::string name ) {
 		auto ff = Get < Font > ( name );
 		if ( !ff ) {
 			Font *s = new Font ( 98, 5 );
@@ -23,10 +23,10 @@ namespace Manager {
 		}
 		return ff;
 	}
-    static int Font_Load ( std::string name, const char* fontPath, int heigth = 48, int letters_spacing = 0 ) {
-        Font *s = new Font ( heigth, letters_spacing );
-        _resources.insert( { (name + std::string(typeid(Font).name())) , s } );
-        return (*s).Make( fontPath );
+	static int Font_Load ( std::string name, const char* fontPath, int heigth = 48, int letters_spacing = 0 ) {
+		Font *s = new Font ( heigth, letters_spacing );
+		_resources.insert( { (name + std::string(typeid(Font).name())) , s } );
+		return (*s).Make( fontPath );
     }
 
 	// Gets a Shader

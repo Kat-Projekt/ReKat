@@ -12,7 +12,12 @@ std::ostream& operator << ( std::ostream& os, const vec2& vec ) {
 }
 
 std::ostream& operator << ( std::ostream& os, const vec3& vec ) {
-	os << "{ " << vec.x << ": " << vec.y<< ": " << vec.z << " }";
+	os << "{ " << vec.x << ": " << vec.y << ": " << vec.z << " }";
+	return os;
+}
+
+std::ostream& operator << ( std::ostream& os, const vec4& vec ) {
+	os << "{ " << vec.x << ": " << vec.y << ": " << vec.z << ": " << vec.w << " }";
 	return os;
 }
 
@@ -30,7 +35,7 @@ std::ostream& operator << ( std::ostream& os, const std::vector<T>& vec ) {
 	if ( vec.size ( ) == 0 ) { return os; }
 	os << " : ";
 	for ( auto e : vec ) 
-	{ std::cout << "{" << e << "} "; }
+	{ os << "{" << e << "} "; }
 	return os;
 }
 

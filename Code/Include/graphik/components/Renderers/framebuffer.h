@@ -8,9 +8,15 @@ and saves it in a texture
 than it behaves like a sprite Behaviour
 */
 
+#ifndef STB_IMAGE_WRITE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
+#endif
+
 #include "../../../objekt.hpp"
 #include "../camera.h"
 #include "../../resources/shader.h"
+#include "../../resources/texture.h"
 #include "../../graphik.hpp"
 
 // default shaders
@@ -53,7 +59,7 @@ public:
 		}
 
 		// generation of buffers
-        glGenFramebuffers(1, &FBO); GL_CHECK_ERROR;
+		glGenFramebuffers(1, &FBO); GL_CHECK_ERROR;
 		glGenRenderbuffers(1, &RBO); GL_CHECK_ERROR;
 		glGenTextures(1, &TEX); GL_CHECK_ERROR;
 		DEBUG ( 4, "generating buffers" );
@@ -93,15 +99,15 @@ public:
 
 	void Create_Sprite ( ) {
 		float vertices[] = { 
-            // pos      // tex
-            0.0f, 1.0f, 0.0f, 0.0f,
-            0.0f, 0.0f, 0.0f, 1.0f,
-            1.0f, 0.0f, 1.0f, 1.0f,
+			// pos      // tex
+			0.0f, 1.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f,
+			1.0f, 0.0f, 1.0f, 1.0f,
 
-            0.0f, 1.0f, 0.0f, 0.0f,
-            1.0f, 0.0f, 1.0f, 1.0f,
-            1.0f, 1.0f, 1.0f, 0.0f
-        };
+			0.0f, 1.0f, 0.0f, 0.0f,
+			1.0f, 0.0f, 1.0f, 1.0f,
+			1.0f, 1.0f, 1.0f, 0.0f
+		};
 		glGenVertexArrays(1, &VAO); GL_CHECK_ERROR;
 		glGenBuffers(1, &VBO); GL_CHECK_ERROR;
 
@@ -121,7 +127,7 @@ public:
 		DEBUG ( 4, "succesfuly created sprite" );
 	}
 
-    void Start ( ) {
+	void Start ( ) {
 		// STARTING TO RENDER OBJEKT
 		// VERY IMPORTANT LINE OF MADNESS
 		if ( _to_render != nullptr ) { _to_render->Start ( ); }
@@ -137,7 +143,7 @@ public:
 
 		resize = false; 
 		ready_to_render = true;
-    }
+	}
 
 	void Update ( ) {
 		if ( resize ) {
@@ -151,7 +157,7 @@ public:
 		// set render buffer
 		glBindFramebuffer(GL_FRAMEBUFFER, FBO); GL_CHECK_ERROR;
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); GL_CHECK_ERROR;
-        glClearColor(1.0f, 1.0f, 1.0f, 1.0f); GL_CHECK_ERROR;
+		glClearColor(1.0f, 1.0f, 1.0f, 1.0f); GL_CHECK_ERROR;
 		glEnable(GL_DEPTH_TEST); GL_CHECK_ERROR;
 		DEBUG (4, "set render framebuffer");
 		
@@ -169,13 +175,13 @@ public:
 		if ( _shader == "" || ( _camera == "" && !_UI_render ) ) { DEBUG ( 3, "FrameBuffer Sprite not set Correctly" ); return; }
 		
 		Manager::Shader_Get ( _shader )->setMat4  ( "projection", ( _UI_render ? Camera::UI_Projkection ( ) : Manager::Camera_Get ( _camera )->Projkection ( ) ) );
-        DEBUG ( 6, "Updated Camera uniform");
+		DEBUG ( 6, "Updated Camera uniform");
 		Manager::Shader_Get ( _shader )->setMat4 ( "model", obj->Get_Model_Mat ( ) );
 
-        glBindVertexArray(VAO); GL_CHECK_ERROR;
-        glBindTexture(GL_TEXTURE_2D, TEX); GL_CHECK_ERROR;
-        glDrawArrays(GL_TRIANGLES, 0, 6); GL_CHECK_ERROR;
-        glBindVertexArray(0); GL_CHECK_ERROR;
+		glBindVertexArray(VAO); GL_CHECK_ERROR;
+		glBindTexture(GL_TEXTURE_2D, TEX); GL_CHECK_ERROR;
+		glDrawArrays(GL_TRIANGLES, 0, 6); GL_CHECK_ERROR;
+		glBindVertexArray(0); GL_CHECK_ERROR;
 
 		DEBUG (4, "framebuffer rendered to main context");
 	}
@@ -187,10 +193,29 @@ public:
 	void Delete ( ) {
 		glDeleteRenderbuffers(1, &RBO);
 		glDeleteFramebuffers(1, &FBO);
-        glDeleteVertexArrays(1, &VAO);
+		glDeleteVertexArrays(1, &VAO);
 		glDeleteTextures(1, &TEX);
-        glDeleteBuffers(1, &VBO);
-    }
+		glDeleteBuffers(1, &VBO);
+	}
+
+	void Save ( std::string file ) {
+		// read data
+		char * data = ( char * ) calloc ( _width * _heigth * 4, sizeof ( char ) );
+
+		// glBindTexture(GL_TEXTURE_2D, TEX); GL_CHECK_ERROR;
+		// glPixelStorei(GL_PACK_ALIGNMENT, 1); GL_CHECK_ERROR;
+		// glGetTexImage(GL_TEXTURE_2D, 0, GL_RGBA, GL_UNSIGNED_BYTE, data); GL_CHECK_ERROR;
+
+		glReadPixels( 0, 0, _width, _heigth, GL_RGBA, GL_UNSIGNED_BYTE, data );
+
+		stbi_flip_vertically_on_write ( true );
+		if
+		( !stbi_write_png ( file.c_str ( ), _width, _heigth, 4, data, 100 ) ) {
+			DEBUG ( 2, "cannot write to file" );
+		} else {
+			DEBUG ( 3, "image saved at: ", file );
+		}
+	}
 
 	// set resolution of the buffer
 	Framebuffer* Set ( unsigned int width, unsigned int heigth ) {

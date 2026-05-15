@@ -6,26 +6,25 @@
 
 // instances a series of objekts with Data as the instance data
 // in partivular it manages a buffer of type Data from where you can instance objekts
-// by default it renders Quads
 class Instance : public Resource {
 private:
-    bool changed = true;
+	bool changed = true;
 	int _instances = 0;
-    unsigned int _buffer = 0;
-    unsigned int _index = 0;
+	unsigned int _buffer = 0;
+	unsigned int _index = 0;
 
-    int _data_size = 0;
-    int _buffer_size = 0;
-    int _memory_chunk = 16;
+	int _data_size = 0;
+	int _buffer_size = 0;
+	int _memory_chunk = 16;
 
-    struct Attribute {
-        GLint size; // dimension of the attribute
-        GLenum type; // type
-        GLboolean normalized = false; // to clamp [0,1]
-        GLsizei stride; // stride normaly is equal to size * sizeof(type)
-    };
+	struct Attribute {
+		GLint size; // dimension of the attribute
+		GLenum type; // type
+		GLboolean normalized = false; // to clamp [0,1]
+		GLsizei stride; // stride normaly is equal to size * sizeof(type)
+	};
 
-    std::vector < Attribute > _attributes;
+	std::vector < Attribute > _attributes;
 public:
     void Add_Data ( void * data, unsigned int elements ) {
         if ( !glIsBuffer(_buffer) || _buffer_size < _instances + elements ) {
@@ -90,16 +89,23 @@ public:
     void Configure_Atributes ( std::vector < Attribute > attributes, unsigned int index = 1 ) {
         _attributes = attributes;
         _index = index;
+	changed = true;
     }
+    // first thing to call to confingure data dimensions
+    // then call Add_Data
+    // then call Configure_Attributes
+    // then you can use it
     int Make ( unsigned int data_size, unsigned int chunk_size ) {
         _data_size = data_size;
         _memory_chunk = chunk_size;
         _instances = 0;
         return 0;
     }
+    // to end the resource
     void End ( ) 
     { if ( glIsBuffer(_buffer) ) { glDeleteBuffers(1,&_buffer); } }
-    
+
+    // used to trigger vertex attriv reconfiguration
     void Use ( ) { if ( changed ) {
         glBindBuffer(GL_ARRAY_BUFFER, _buffer); GL_CHECK_ERROR;
         unsigned int pointer = 0;
@@ -114,6 +120,7 @@ public:
             index++;
         }
         glBindBuffer(GL_ARRAY_BUFFER, 0);
+	changed = false;
     } }
 
     unsigned int Instances ( ) { return _instances; }
