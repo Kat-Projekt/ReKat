@@ -1,4 +1,4 @@
-message("balls")
+message("balls last")
 
 ## remove examples
 set(OPENAL_BUILD_EXAMPLES OFF)
@@ -16,6 +16,9 @@ add_subdirectory(Code/Lib/glfw)
 
 add_subdirectory(Code/Lib/freetype)
 
+set(BOOST_INCLUDE_LIBRARIES config dll)
+add_subdirectory(Code/Lib/boost)
+
 if(MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /std:c++17")
 else()
@@ -27,20 +30,27 @@ else()
 	endif()
 endif()
 
-include_directories(Code/Include/
-					Code/Lib/glad/include/
-					Code/Lib/freetype/include/
-					Code/Lib/glfw/include/
-					Code/Lib/glm/
-					Code/Lib/stb/
-					Code/Lib/openal-soft/include )
-file(GLOB LIBS_SOURCES	Code/Lib/glad/src/glad.c
-						Code/Include/Synth/FFT/*.cpp)
-file(GLOB PROJECT_HEADERS Code/Include/*.hpp
-						  Code/Inlcude/*.h)
-file(GLOB PROJECT_CONFIGS CMakeLists.txt
-						  CMakePresets.json
-						  Readme.md)
+include_directories(	Code/Include/
+			Code/Lib/glad/include/
+			Code/Lib/freetype/include/
+			Code/Lib/glfw/include/
+			Code/Lib/glm/
+			Code/Lib/stb/
+			Code/Lib/openal-soft/include/
+			Code/Lib/boost/include/
+		)
+file(GLOB LIBS_SOURCES		Code/Lib/glad/src/glad.c
+				Code/Include/Synth/FFT/*.cpp
+		)
+file(GLOB PROJECT_HEADERS	Code/Include/*.hpp
+				Code/Inlcude/*.h
+		)
+file(GLOB PROJECT_CONFIGS	CMakeLists.txt
+				Readme.md
+				.gitattributes
+				.gitignore
+				.gitmodules
+		)
 
 source_group("Include" FILES ${PROJECT_HEADERS})
 source_group("Sources" FILES ${PROJECT_SOURCES})
@@ -49,19 +59,3 @@ source_group("Libs" FILES ${LIBS_SOURCES})
 add_definitions(-DGLFW_INCLUDE_NONE
 				-DPROJECT_SOURCE_DIR=\"${PROJECT_SOURCE_DIR}\")
 
-foreach(PROJEKT ${PROJEKTS})
-	file(GLOB PROJECT_SOURCES ${CMAKE_SOURCE_DIR}/${PROJEKT}/main.cpp )
-	add_executable(${PROJEKT}	${PROJECT_SOURCES} ${PROJECT_HEADERS}
-	 							${PROJECT_CONFIGS} ${LIBS_SOURCES})
-
-	target_link_libraries(${PROJEKT} glfw freetype OpenAL # OpenAL::OpenAL
-						${GLFW_LIBRARIES} ${GLAD_LIBRARIES} ${WINSOCK_LIBRARIES} )
-
-	set_target_properties(${PROJEKT} PROPERTIES
-		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Projekts/${PROJEKT})
-
-	add_custom_command(
-		TARGET ${PROJEKT} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/${PROJEKT}/Resources $<TARGET_FILE_DIR:${PROJEKT}> )
-
-endforeach(PROJEKT)

@@ -386,7 +386,7 @@ public:
 		DEBUG ( 2, "Wrong component decraration" );
 	}
 	template < class C > 
-	C* Add_Component ( C* c ) {
+	C* Add_Component ( std::shared_ptr < C > c ) {
 		DEBUG ( 4,"Adding Component: ", std::string(typeid(*c).name()), " to: ", _name );
 		if ( std::is_base_of<Behaviour, C>::value ) {
 			c->obj = this;

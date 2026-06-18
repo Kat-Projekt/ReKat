@@ -1,6 +1,7 @@
 #define DIAGNOSTIC
 // #define EXPANCE
 #include <engine.hpp>
+#include <boost/dll/import.hpp> // for import_alias
 
 class C1 : public Behaviour
 {
@@ -56,9 +57,20 @@ int main ( )
 	pippo11.Add_Component < C1 > ( );
 	pippo21.Add_Component < C3 > ( );
 
-	// call update 
+	// load dll
+	boost::dll::fs::path lib_path( "Comp_Test.dylib" ); 
+	std::cout << "Loading the plugin" << std::endl;
+
+	auto plugin = boost::dll::import_symbol<Behaviour>(    // type of imported symbol is located between `<` and `>`
+		lib_path / "my_plugin_sum",                     // path to the library and library name
+		"plugin",                                       // name of the symbol to import
+		boost::dll::load_mode::append_decorations              // makes `libmy_plugin_sum.so` or `my_plugin_sum.dll` from `my_plugin_sum`
+	);
+
+	pippo111.Add_Component ( plugin );
+
+	// Start and Update
+	pippo.Start ( ); 
 	pippo.Print_Tree ( );
 	pippo.Update ( );
-
-	// print the trasnsimttable
 }

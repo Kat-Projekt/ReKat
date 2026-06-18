@@ -17,3 +17,6 @@
 [submodule "Code/Lib/openal-soft"]
 	path = Code/Lib/openal-soft
 	url = https://github.com/kcat/openal-soft
+[submodule "Code/Lib/boost"]
+	path = Code/Lib/boost
+	url = https://github.com/boostorg/boost.git

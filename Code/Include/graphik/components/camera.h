@@ -16,7 +16,7 @@ public:
 	// pithc rot.y
 	// roll  rot.z
 
-	auto Projkection ( )
+	glm::mat4 Projkection ( )
 	{
 		float X = Bound_Window_Handler->Screen_Ratio;
 		if ( fb_scale != nullptr ) 
@@ -28,14 +28,14 @@ public:
         	return glm::ortho ( pos.x - X, pos.x + X, pos.y - Y, pos.y + Y, -1.0f, 1.0f );
 	}
 
-	auto Prospective ( )
+	glm::mat4 Prospective ( )
 	{
 		vec3 Front; // the rotated [1,0,0] by the quaternion
 		vec3 Up;    // the rotated [0,0,1] by the quaternion
 		return glm::lookAt( obj->Get_Pos ( ), obj->Get_Pos ( ) + Front, Up);
 	}
 
-	static auto UI_Projkection ( )
+	static glm::mat4 UI_Projkection ( )
 	{
         	DEBUG ( 5, "Getting_UI_Projkection" );
 		float X = Bound_Window_Handler->Screen_Ratio * 500.0f;
