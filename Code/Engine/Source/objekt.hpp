@@ -1,6 +1,3 @@
-#ifndef OBJEKT_H
-#define OBJEKT_H
-
 #include "debugger.hpp"
 #include "utility/printer.h"
 #include "utility/map.h"
@@ -11,119 +8,7 @@
 
 #define M_PI_2 1.57079632679489661923
 
-template < typename T >
-class BOOST_SYMBOL_VISIBLE _behaviour
-{
-protected:
-	bool _active = true;
-	bool _started = false;
 
-public:
-	T* obj = nullptr;
-
-	_behaviour ( ) // empty constructor
-	{ }
-
-	virtual ~_behaviour ( ) // empty deconstructor
-	{ }
-
-	// call protection prevents repeted starts of components and prevents calling when the copmonent is inactive
-	void 
-	_Start ( void )
-	{
-		if ( _active && !_started )
-			Start ( );
-		
-		_started = true;
-	}
-	void 
-	_Update ( void )
-	{
-		if ( _active )
-			Update ( );
-	}
-	void 
-	_Fixed_Update ( void ) 
-	{ 
-		if ( _active )
-			Fixed_Update ( );
-	}
-
-	// Called only once Before every other function
-	virtual void
-	Start ( void ) { };	
-	// Called every Time Update is called on the parent objekt
-	virtual void 
-	Update ( void ) { };	
-	// Called every Time Fixed Update is called on the parent objekt
-	virtual void
-	Fixed_Update ( void ) { };	
-
-	// Collision handleing
-	virtual void 
-	Collision
-	( T* _obj ) 
-	{
-		( void ) _obj; // for preventing the error 
-	}
-	virtual void
-	Collision_Exit
-	( T* _obj )
-	{
-		( void ) _obj;
-	}
-	virtual void
-	Collision_Enter
-	( T* _obj )
-	{
-		( void ) _obj;
-	}
-
-	virtual void
-	Collision_Trigger
-	( T* _obj )
-	{
-		( void ) _obj;
-	}
-	virtual void
-	Collision_Trigger_Exit
-	( T* _obj )
-	{
-		( void ) _obj;
-	}
-	virtual void
-	Collision_Trigger_Enter
-	( T* _obj )
-	{
-		( void ) _obj;
-	}
-
-	void
-	Set_Active 
-	( bool active )
-	{
-		_active = active;
-		if ( !_started ) 
-			Start( );
-	}
-	bool
-	Get_Active ( void )
-	{
-		return _active;
-	}
-
-	virtual void
-	Delete ( void )
-	{
-		delete this;
-	}
-
-	virtual _behaviour *
-	Set ( void )
-	{
-		return this;
-	}
-};
 
 class Objekt {
 protected:
@@ -377,7 +262,7 @@ public:
 
 	template < class C >
 	C* Add_Component ( ) {
-        	if ( std::is_base_of<Behaviour, C>::value ) { 
+	    	if ( std::is_base_of<Behaviour, C>::value ) { 
 			C* c = new C ( );
 			DEBUG ( 4, "Adding Component: ", std::string(typeid(*c).name()), " to: ", _name );
 			c->obj = this;
@@ -638,5 +523,3 @@ namespace Manager {
 		delete D;
 	}
 }
-
-#endif

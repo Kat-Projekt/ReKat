@@ -17,7 +17,7 @@ add_subdirectory(Code/Lib/glfw)
 add_subdirectory(Code/Lib/freetype)
 
 set(BOOST_INCLUDE_LIBRARIES config dll)
-add_subdirectory(Code/Lib/boost)
+add_subdirectory(Code/Lib/boost)	
 
 if(MSVC)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /std:c++17")
@@ -30,7 +30,8 @@ else()
 	endif()
 endif()
 
-include_directories(	Code/Include/
+include_directories(	
+			Code/Engine/Include/
 			Code/Lib/glad/include/
 			Code/Lib/freetype/include/
 			Code/Lib/glfw/include/
@@ -39,11 +40,14 @@ include_directories(	Code/Include/
 			Code/Lib/openal-soft/include/
 			Code/Lib/boost/include/
 		)
-file(GLOB LIBS_SOURCES		Code/Lib/glad/src/glad.c
+file(GLOB LIBS_SOURCES		
+				Code/Lib/glad/src/glad.c
 				Code/Include/Synth/FFT/*.cpp
+				Code/Engine/Source/*.cpp
 		)
-file(GLOB PROJECT_HEADERS	Code/Include/*.hpp
-				Code/Inlcude/*.h
+file(GLOB PROJECT_HEADERS	
+				Code/Engine/Include/*.hpp
+				Code/Engine/Include/*.h
 		)
 file(GLOB PROJECT_CONFIGS	CMakeLists.txt
 				Readme.md
