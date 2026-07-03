@@ -1,2 +1,1 @@
-#include "Objekt/objekt.hpp"
-#include "Objekt/manager.hpp"
+#include "objekt/manager.hpp"

@@ -146,7 +146,7 @@ public:
 	List* append ( T data ) {
 		// first item
 		if ( _first == nullptr ) {
-			std::shared_ptr e = std::make_shared < Element > ( );
+			std::shared_ptr < Element > e = std::make_shared < Element > ( );
 			e->data = data;
 			e->prev = nullptr;
 			e->next = _last;
@@ -156,7 +156,7 @@ public:
 			return this;
 		}
 
-		std::shared_ptr e = std::make_shared < Element > ( );
+		std::shared_ptr < Element > e = std::make_shared < Element > ( );
 		e->data = data;
 		e->next = _last;
 		e->prev = _last->prev;
@@ -222,8 +222,8 @@ public:
 		return this;
 	}
 
-	Element* Get_Begin ( ) { return _first; }
-	Element* Get_Endin ( ) { return _last; }
+	std::shared_ptr < Element > Get_Begin ( ) { return _first; }
+	std::shared_ptr < Element > Get_Endin ( ) { return _last; }
 	Iterator begin ( ) {
 		Iterator pippo;
 		pippo.ele = _first;

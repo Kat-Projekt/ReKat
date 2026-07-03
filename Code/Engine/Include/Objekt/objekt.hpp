@@ -1,47 +1,45 @@
 #pragma once
 
-#include "debugger.hpp"
-#include "utility/printer.h"
-#include "utility/map.h"
+#include <utilities/debugger.hpp>
+#include <utilities/printer.h>
+#include <utilities/list.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
+#include <memory>
 
 #include "behaviour.hpp"
+#include "component_manager.hpp"
 
-class Objekt
+
+class Objekt : public std::enable_shared_from_this<Objekt>
 {
 protected:
 	std::string _name = "";
 	bool _active = true;
 	bool _started = false;
 
-	glm::vec3 _pos = {0,0,0};
-	vec3 _size = {100,100,100};
-
 	struct quat
 	{
 		float w,x,y,z;
 	};
 
+	vec3 _pos = {0,0,0};
+	vec3 _size = {100,100,100};
 	quat _rot = {1,0,0,0};
 	vec3 _rot_pivot = {0,0,0};
 
 	bool _recalcutate = true;
 	mat4 _model = mat4(1.0f);
 
-	Objekt* _father = nullptr;
-	List < Objekt* > _childrens = { };
-	List < Behaviour > _components = { };
+	std::shared_ptr < Objekt > _father = nullptr;
+	List < std::shared_ptr < Objekt > > _childrens = { };
+	List < std::shared_ptr < Behaviour > > _components = { };
 
 public:
-
-	#define Behaviour _behaviour < Objekt >
-
 	Objekt ( void );
 
-	Objekt 
-	(
+	Objekt ( 
 		std::string name,
 		vec3 pos = {0,0,0},
 		vec3 size = {100,100,100},
@@ -50,54 +48,55 @@ public:
 
 	~Objekt ( void );
 
-	void Free ( std::string p = "" );
+	void Free ( );
 
-	void Set_Father ( Objekt * father );
-	Objekt* Get_Father ( );
-	Objekt* Add_Child ( Objekt * child );
-	void Rem_Child ( std::string name );
-	void Rem_Child ( Objekt* O );
-	void Delete ( std::string p = "" );
+	void Set_Father ( std::shared_ptr < Objekt > father );
+	std::shared_ptr < Objekt > Get_Father ( );
+	std::shared_ptr < Objekt > Add_Child ( std::shared_ptr < Objekt > child );
+	std::shared_ptr < Objekt > Get_Children ( std::string name );
+	List < std::shared_ptr < Objekt > > & Get_Childrens ( );
+	bool Has_Children ( std::shared_ptr < Objekt > child );
+	bool Has_Children ( std::string name );
+	std::shared_ptr < Objekt > Rem_Child ( std::string name );
+	std::shared_ptr < Objekt > Rem_Child ( std::shared_ptr < Objekt > O );
+	int  Count_Childrens ( );
 
-	Objekt* Get_Children ( std::string name );
-	bool Has_Children ( Objekt* child );
-	List < Objekt* > Get_Childrens ( );
-	int Count_Childrens ( );
-
-	void Set_Pos ( vec3 pos = {0,0,0} );
-	void Set_Pos ( float z = 0 );
-	void Inc_Pos ( vec3 pos = {0,0,0} );
-	vec3 Get_Pos ( );
-	vec3 * Expose_Pos ( );
-
-	void Set_Rot ( vec3 rot = {0,0,0} );
-	void Set_2D_Rot ( float rot );
-	vec3 Get_Rot ( );
-
-	struct mono_axis_rotation
-	{
+	std::shared_ptr < Objekt > Set_Pos ( vec3 pos = {0,0,0} );
+	std::shared_ptr < Objekt > Set_Pos ( float z = 0 );
+	std::shared_ptr < Objekt > Inc_Pos ( vec3 pos = {0,0,0} );
+	std::shared_ptr < Objekt > Set_Size ( vec3 size = {0,0,0} );
+	std::shared_ptr < Objekt > Set_Rot ( vec3 rot = {0,0,0} );
+	std::shared_ptr < Objekt > Set_2D_Rot ( float rot );
+	std::shared_ptr < Objekt > Set_Active ( bool active );
+	std::shared_ptr < Objekt > Set_Rot_Pivot ( vec3 rot_pivot = {0,0,0} );
+	std::shared_ptr < Objekt > Set_Name ( std::string name );
+	
+	// from quaternion rotation results
+	struct mono_axis_rotation {
 		float angle;
 		vec3 axis;
 	};
-	mono_axis_rotation Get_Rot_Mono ( );
-
-	void Set_Size ( vec3 size = {0,0,0} );
+	
+	vec3 Get_Pos ( );
+	vec3& Expose_Pos ( );
 	vec3 Get_Size ( );
-
-	void Set_Rot_Pivot ( vec3 rot_pivot = {0,0,0} );
+	vec3 Get_Rot ( );
 	vec3 Get_Rot_Pivot ( );
-
-	void Set_Active ( bool active );
+	mono_axis_rotation Get_Rot_Mono ( );
 	bool Get_Active ( );
-
-	void Set_Name ( std::string name );
 	std::string Get_Name ( );
 
-	template < class C > C* Add_Component ( );
-	template < class C > C* Add_Component ( std::shared_ptr < C > c );
-	template < class C > C* Get_Component ( );
-	template < class C > List < C* > Get_Component_Recursive ( );
-	template < typename C > bool Has_Component ( );
+	template < class C > std::shared_ptr < C > Add_Component ( );
+	template < class C > std::shared_ptr < C > Add_Component ( std::shared_ptr < C > c );
+	std::shared_ptr < Behaviour > Add_Component_Special ( std::string type );
+
+	template < class C > std::shared_ptr < C > Get_Component ( );
+	std::shared_ptr < Behaviour > Get_Component ( std::string type );
+	template < class C > List < std::shared_ptr < C > > Get_Component_Recursive ( );
+	List < std::shared_ptr < Behaviour > > Get_Component_Recursive ( std::string type );
+
+	template < class C > bool Has_Component ( );
+	bool Has_Component ( std::string type );
 
 	void Start ( std::string ind = "" );
 	void Update ( std::string ind = "" );
@@ -108,12 +107,17 @@ public:
 		Stay,
 		Exit
 	};
-	void Andle_Collsions ( Objekt * collider, float trigger = false, collision_type Type = Stay );
+	void Handle_Collsions (
+		std::shared_ptr < Objekt > collider,
+		float trigger = false,
+		collision_type Type = Stay
+	);
 
 	mat4 Get_Model_Mat ( );
 
 	void Print_Tree ( std::string level = "" );
-
 	friend std::ostream& operator << ( std::ostream& os, Objekt& n );
 	friend std::ostream& operator , ( std::ostream& out, Objekt& n );
 };
+
+#include "objekt.tpp"

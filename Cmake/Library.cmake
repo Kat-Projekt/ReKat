@@ -5,7 +5,7 @@ include ( Included )
 add_library( ReKat SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${PROJECT_CONFIGS} ${LIBS_SOURCES} )
 message ( ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${PROJECT_CONFIGS} ${LIBS_SOURCES} )
 
-target_link_libraries( ReKat glfw freetype OpenAL Boost::config # Boost::filesystem Boost::system 
+target_link_libraries( ReKat glfw freetype OpenAL Boost::config Boost::dll # Boost::filesystem Boost::system 
 
                        ${GLFW_LIBRARIES} ${GLAD_LIBRARIES} ${WINSOCK_LIBRARIES} )
 

@@ -38,7 +38,7 @@ include_directories(
 			Code/Lib/glm/
 			Code/Lib/stb/
 			Code/Lib/openal-soft/include/
-			Code/Lib/boost/include/
+			Code/Lib/boost/libs/dll/include/
 		)
 file(GLOB LIBS_SOURCES		
 				Code/Lib/glad/src/glad.c

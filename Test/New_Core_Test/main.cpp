@@ -1,76 +1,78 @@
 #define DIAGNOSTIC
 // #define EXPANCE
 #include <engine.hpp>
-#include <boost/dll/import.hpp> // for import_alias
 
 class C1 : public Behaviour
 {
 	void Update ( )
-	{ DEBUG ( 4, obj->Get_Name ( ), " C1" ); }
+	{ DEBUG ( 4, "Update ", obj->Get_Name ( ), " C1" ); }
 };
 class C2 : public Behaviour
 {
 	void Update ( )
-	{ DEBUG ( 4, obj->Get_Name ( ), " C2" ); }
+	{ DEBUG ( 4, "Update ", obj->Get_Name ( ), " C2" ); }
 };
 class C3 : public Behaviour
 {
 	void Update ( )
-	{ DEBUG ( 4, obj->Get_Name ( ), " C3" ); }
+	{ DEBUG ( 4, "Update ", obj->Get_Name ( ), " C3" ); }
 };
 
 int main ( )
 {
 	// create a tree gierarcky ( creation order is scrambled )
 
-	Objekt pippo111 ( "p111" ); // son of pippo11
-	Objekt pippo ( "pippo" ); // root node
-	Objekt nino1 ( "nino1" ); // son of nino
-	Objekt pippo11 ( "p11" ); // son of pippo1
-	Objekt pippo21 ( "p21" ); // son of pippo2
-	Objekt nino ( "nino" ); // root node
-	Objekt pippo1 ( "p1" ); // son of pippo
-	Objekt pippo22 ( "p22" ); // son of pippo2
-	Objekt pippo23 ( "p23" ); // son of pippo2
-	Objekt pippo2 ( "p2" ); // son of pippo
+	std::shared_ptr < Objekt > pippo111 = std::make_shared < Objekt > ( "p111" ); // son of pippo11
+	std::shared_ptr < Objekt > pippo = std::make_shared < Objekt > ( "pippo" ); // root node
+	std::shared_ptr < Objekt > nino1 = std::make_shared < Objekt > ( "nino1" ); // son of nino
+	std::shared_ptr < Objekt > pippo11 = std::make_shared < Objekt > ( "p11" ); // son of pippo1
+	std::shared_ptr < Objekt > pippo21 = std::make_shared < Objekt > ( "p21" ); // son of pippo2
+	std::shared_ptr < Objekt > nino = std::make_shared < Objekt > ( "nino" ); // root node
+	std::shared_ptr < Objekt > pippo1 = std::make_shared < Objekt > ( "p1" ); // son of pippo
+	std::shared_ptr < Objekt > pippo22 = std::make_shared < Objekt > ( "p22" ); // son of pippo2
+	std::shared_ptr < Objekt > pippo23 = std::make_shared < Objekt > ( "p23" ); // son of pippo2
+	std::shared_ptr < Objekt > pippo2 = std::make_shared < Objekt > ( "p2" ); // son of pippo
 	
 	// create tree ( also randomized )
-	pippo.Add_Child ( &pippo2 );
-	pippo2.Add_Child ( &pippo21 );
-	pippo1.Add_Child ( &pippo11 );
-	nino.Add_Child ( &nino1 );
-	pippo.Add_Child ( &pippo1 );
-	pippo2.Add_Child ( &pippo22 );
-	pippo11.Add_Child ( &pippo111 );
-	pippo2.Add_Child ( &pippo23 );
+	pippo->Add_Child ( pippo2 );
+	pippo2->Add_Child ( pippo21 );
+	pippo1->Add_Child ( pippo11 );
+	nino->Add_Child ( nino1 );
+	pippo->Add_Child ( pippo1 );
+	pippo2->Add_Child ( pippo22 );
+	pippo11->Add_Child ( pippo111 );
+	pippo2->Add_Child ( pippo23 );
+
+	Factory::Register ( "new comp", "Comp_Test.dylib" );
 
 	// add random components 
-	pippo.Add_Component < C1 > ( );
-	pippo.Add_Component < C2 > ( );
-	pippo21.Add_Component < C3 > ( );
-	nino1.Add_Component < C2 > ( );
-	pippo111.Add_Component < C2 > ( );
-	nino.Add_Component < C1 > ( );
-	pippo21.Add_Component < C3 > ( );
-	pippo21.Add_Component < C3 > ( );
-	pippo.Add_Component < C3 > ( );
-	pippo11.Add_Component < C1 > ( );
-	pippo21.Add_Component < C3 > ( );
+	pippo->Add_Component < C1 > ( );
+	pippo->Add_Component < C2 > ( );
+	pippo21->Add_Component < C3 > ( );
+	nino1->Add_Component < C2 > ( ); //
+	pippo111->Add_Component < C2 > ( );
+	nino->Add_Component < C1 > ( ); //
+	pippo21->Add_Component < C3 > ( );
+	pippo21->Add_Component < C3 > ( );
+	pippo->Add_Component < C3 > ( );
+	pippo11->Add_Component < C1 > ( );
+	pippo21->Add_Component < C3 > ( );
 
-	// load dll
-	boost::dll::fs::path lib_path( "Comp_Test.dylib" ); 
-	std::cout << "Loading the plugin" << std::endl;
+	DEBUG ( 3, "Trying special" );
+	pippo->Add_Component_Special ( "new comp" );
 
-	auto plugin = boost::dll::import_symbol<Behaviour>(    // type of imported symbol is located between `<` and `>`
-		lib_path / "my_plugin_sum",                     // path to the library and library name
-		"plugin",                                       // name of the symbol to import
-		boost::dll::load_mode::append_decorations              // makes `libmy_plugin_sum.so` or `my_plugin_sum.dll` from `my_plugin_sum`
-	);
+	for ( auto con : Factory::constructors )
+	{
+		DEBUG ( 5, "Components ", con.first );
+	}
 
-	pippo111.Add_Component ( plugin );
+	DEBUG ( 6, *pippo );
+	DEBUG ( 5, "Has new comp? ", ( pippo->Has_Component ("12NewComponent") ? "true" : "false" ) );
 
 	// Start and Update
-	pippo.Start ( ); 
-	pippo.Print_Tree ( );
-	pippo.Update ( );
+	pippo->Start ( ); 
+	pippo->Print_Tree ( );
+	pippo->Update ( );
+
+	DEBUG ( 3, "ENDED" );
 }

@@ -1,11 +1,15 @@
 #include <engine.hpp>
 
 class NewComponent : public Behaviour {
-	void Update ( )
+	void Update ( ) override
 	{
-		DEBUG ( 2, 'We are so back' );
+		DEBUG ( 5, 'We are so back' );
 	}
 };
 
-extern "C++" BOOST_SYMBOL_EXPORT NewComponent NewComp;
-NewComponent NewComp;
+extern "C" BOOST_SYMBOL_EXPORT
+std::shared_ptr < Behaviour > _Factory ( )
+{
+	DEBUG ( 5, "Calling Factory for NewComponent" );
+	return std::make_shared < NewComponent > ( );
+}

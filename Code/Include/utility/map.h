@@ -14,15 +14,15 @@ class Map {
 public:
 	struct Element {
 		Element * prev = nullptr;
-        K key;
+		K key;
 		T data;
 		Element * next = nullptr;
 	};
 
-    struct Pair {
-        K key;
+	struct Pair {
+		K key;
 		T data;
-    };
+	};
 
 
 	struct Iterator {

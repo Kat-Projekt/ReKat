@@ -1,8 +1,9 @@
-#include "Objekt/behaviour.hpp"
+#include "objekt/behaviour.hpp"
 
 Behaviour::Behaviour ( ) { }
 
-Behaviour::~Behaviour ( ) { }
+Behaviour::~Behaviour ( ) 
+{ Delete ( ); }
 
 void Behaviour::_Start ( )
 {
@@ -28,17 +29,17 @@ void Behaviour::Start ( ) { }
 void Behaviour::Update ( ) { }
 void Behaviour::Fixed_Update ( ) { }
 
-void Behaviour::Collision ( Objekt * _obj )
+void Behaviour::Collision ( std::shared_ptr < Objekt > _obj )
 { ( void ) _obj; }
-void Behaviour::Collision_Exit ( Objekt * _obj )
+void Behaviour::Collision_Exit ( std::shared_ptr < Objekt > _obj )
 { ( void ) _obj; }
-void Behaviour::Collision_Enter ( Objekt * _obj )
+void Behaviour::Collision_Enter ( std::shared_ptr < Objekt > _obj )
 { ( void ) _obj; }
-void Behaviour::Collision_Trigger ( Objekt * _obj )
+void Behaviour::Collision_Trigger ( std::shared_ptr < Objekt > _obj )
 { ( void ) _obj; }
-void Behaviour::Collision_Trigger_Exit ( Objekt * _obj )
+void Behaviour::Collision_Trigger_Exit ( std::shared_ptr < Objekt > _obj )
 { ( void ) _obj; }
-void Behaviour::Collision_Trigger_Enter ( Objekt * _obj )
+void Behaviour::Collision_Trigger_Enter ( std::shared_ptr < Objekt > _obj )
 { ( void ) _obj; }
 
 void Behaviour::Set_Active ( bool active )
@@ -55,5 +56,8 @@ bool Behaviour::Get_Active ( )
 void Behaviour::Delete ( )
 { delete this; }
 
-Behaviour * Behaviour::Set ( ... )
-{ return this; }
+Behaviour * Behaviour::Set ( const std::vector < std::string > &Args )
+{
+	( void ) Args;
+	return  this;
+}
