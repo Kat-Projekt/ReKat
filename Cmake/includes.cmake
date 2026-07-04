@@ -31,7 +31,7 @@ else()
 endif()
 
 include_directories(	
-			Code/Engine/Include/
+			Include/
 			Code/Lib/glad/include/
 			Code/Lib/freetype/include/
 			Code/Lib/glfw/include/
@@ -42,12 +42,11 @@ include_directories(
 		)
 file(GLOB LIBS_SOURCES		
 				Code/Lib/glad/src/glad.c
-				Code/Include/Synth/FFT/*.cpp
-				Code/Engine/Source/*.cpp
+				Source/*.cpp
 		)
 file(GLOB PROJECT_HEADERS	
-				Code/Engine/Include/*.hpp
-				Code/Engine/Include/*.h
+				Include/*.hpp
+				Include/*.h
 		)
 file(GLOB PROJECT_CONFIGS	CMakeLists.txt
 				Readme.md

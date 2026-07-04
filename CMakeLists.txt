@@ -94,6 +94,9 @@ endif ( )
 set ( COMPONENTS Comp_Test )
 
 if ( REKAT_COMPONENT )
+	set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+	set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
+
 	foreach ( COMP ${COMPONENTS} )
 	add_library(${COMP} SHARED ${CMAKE_SOURCE_DIR}/Component/${COMP}/main.cpp 
 			${PROJECT_HEADERS} ${PROJECT_CONFIGS}  ${LIBS_SOURCES})

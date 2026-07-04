@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 #include <boost/config.hpp>
+#include <utilities/debugger.hpp>
 
 class Objekt;
 

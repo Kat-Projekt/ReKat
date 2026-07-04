@@ -1,6 +1,6 @@
 message("cok")
 
-include ( Included )
+include ( includes )
 
 add_library( ReKat SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${PROJECT_CONFIGS} ${LIBS_SOURCES} )
 message ( ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${PROJECT_CONFIGS} ${LIBS_SOURCES} )
@@ -16,13 +16,13 @@ set_target_properties( ReKat PROPERTIES
 							 CXX_VISIBILITY_PRESET hidden
 							 OUTPUT_NAME ReKat )
 
-set_target_properties( ReKat PROPERTIES PUBLIC_HEADER Code/Include/engine.hpp )
+set_target_properties( ReKat PROPERTIES PUBLIC_HEADER Include/engine.hpp )
 # target_compile_options( ReKat PRIVATE -O3)
 # set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
 
 # Export the library's public include path to dependent targets
 target_include_directories( ReKat INTERFACE ${CMAKE_CURRENT_SOURCE_DIR} )
-target_include_directories( ReKat PRIVATE Code/Include/ )
+target_include_directories( ReKat PRIVATE Include/ )
 
 include(GNUInstallDirs)
 

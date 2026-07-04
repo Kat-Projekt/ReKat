@@ -1,9 +1,10 @@
+#define DIAGNOSTIC
 #include <engine.hpp>
 
 class NewComponent : public Behaviour {
 	void Update ( ) override
 	{
-		DEBUG ( 5, 'We are so back' );
+		DEBUG ( 3, "We are so back" );
 	}
 };
 

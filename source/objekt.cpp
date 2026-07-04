@@ -425,10 +425,11 @@ std::shared_ptr < Behaviour > Objekt::Add_Component_Special
 std::shared_ptr < Behaviour > Objekt::Get_Component
 ( std::string type )
 {
+	DEBUG ( 5, "finding component: ", type );
 	for ( auto c : _components ) 
 	{
 		if ( (typeid(*(c)).name ( ) == type ) )
-		{ return c; }
+		{ DEBUG ( 5, "found component: ", type ); return c; }
 	}
 	
 	return nullptr;

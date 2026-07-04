@@ -69,6 +69,8 @@ int main ( )
 	DEBUG ( 6, *pippo );
 	DEBUG ( 5, "Has new comp? ", ( pippo->Has_Component ("12NewComponent") ? "true" : "false" ) );
 
+	pippo->Get_Component ( "12NewComponent" )->Update ( );
+
 	// Start and Update
 	pippo->Start ( ); 
 	pippo->Print_Tree ( );

@@ -71,7 +71,7 @@
 
 #define WAIT system("pause")
 
-const char* strip_root_path(const char* file) {
+inline const char* strip_root_path(const char* file) {
 	if(!file) {
 		return NULL;
 	}
@@ -115,9 +115,9 @@ const char* strip_root_path(const char* file) {
 #define __DEBUG(error_type,...) ( std::cout , error_type, "\t: " , __VA_ARGS__ , std::endl )
 #endif
 template <typename T>
-std::ostream& operator,(std::ostream& out, const T& t)
+inline std::ostream& operator,(std::ostream& out, const T& t)
 { out << t; return out; }
-std::ostream& operator,(std::ostream& out, std::ostream&(*f)(std::ostream&))
+inline std::ostream& operator,(std::ostream& out, std::ostream&(*f)(std::ostream&))
 { out << f; return out; }
 
 #else

@@ -15,6 +15,7 @@ void Behaviour::_Start ( )
 
 void Behaviour::_Update ( )
 {
+	DEBUG ( 6, "tring to update component: ", typeid (*this).name( ) );
 	if ( _active )
 	{ Update ( ); }
 }
