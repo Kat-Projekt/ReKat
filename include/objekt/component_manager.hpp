@@ -23,12 +23,12 @@ namespace Factory
 	extern int Register ( );
 	/*
 		Remember that the dll must export this symbol
-
-		extern "C" BOOST_SYMBOL_EXPORT
+		
+		extern "C" BOOST_SYMBOL_VISIBLE
 		std::shared_ptr < Behaviour > _Factory ( )
-		{ return std::make_shared < Comp > ( ); }
+		{ return std::make_shared < NewComponent > ( ); }
 	*/
-	extern int Register ( const std::string& name, const std::string& path );
+	extern int Register ( const std::string& path );
 
 	extern std::shared_ptr < Behaviour > Construct ( const std::string& name );
 	template < class C >

@@ -43,7 +43,7 @@ int main ( )
 	pippo11->Add_Child ( pippo111 );
 	pippo2->Add_Child ( pippo23 );
 
-	Factory::Register ( "new comp", "Comp_Test.dylib" );
+	Factory::Register ( "Comp_Test.dylib" );
 
 	// add random components 
 	pippo->Add_Component < C1 > ( );
@@ -58,13 +58,13 @@ int main ( )
 	pippo11->Add_Component < C1 > ( );
 	pippo21->Add_Component < C3 > ( );
 
-	DEBUG ( 3, "Trying special" );
-	pippo->Add_Component_Special ( "new comp" );
-
 	for ( auto con : Factory::constructors )
 	{
 		DEBUG ( 5, "Components ", con.first );
 	}
+
+	DEBUG ( 3, "Trying special" );
+	pippo->Add_Component_Special ( "NewComponent" );
 
 	DEBUG ( 6, *pippo );
 	DEBUG ( 5, "Has new comp? ", ( pippo->Has_Component ("12NewComponent") ? "true" : "false" ) );

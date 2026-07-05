@@ -55,10 +55,22 @@ bool Behaviour::Get_Active ( )
 { return _active; }
 
 void Behaviour::Delete ( )
-{ delete this; }
+{ }
 
-Behaviour * Behaviour::Set ( const std::vector < std::string > &Args )
+std::shared_ptr <Behaviour> Behaviour::Set ( const std::vector < std::string > &Args )
 {
 	( void ) Args;
-	return  this;
+	return shared_from_this ( );
 }
+
+Behaviour::Component_Metadata Behaviour::Get_Info ( )
+{
+	return Informations;
+}
+
+Behaviour::Component_Metadata::Component_Metadata
+( const char* _name, float _version, const char* _description )
+: name(_name), version(_version), description(_description) { }
+
+Behaviour::Component_Metadata::Component_Metadata
+( ) { }

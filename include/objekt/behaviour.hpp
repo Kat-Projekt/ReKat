@@ -1,5 +1,6 @@
 #pragma once
 
+#include <functional>
 #include <memory>
 #include <vector>
 #include <string>
@@ -8,7 +9,7 @@
 
 class Objekt;
 
-class BOOST_SYMBOL_VISIBLE Behaviour
+class BOOST_SYMBOL_VISIBLE Behaviour : public std::enable_shared_from_this<Behaviour>
 {
 protected:
 	bool _active = true;
@@ -17,7 +18,9 @@ protected:
 public:
 	std::shared_ptr < Objekt > obj = nullptr;
 
+	// override the Constructor for adding metadata
 	Behaviour ( );
+	// override the Delete function not this
 	virtual ~Behaviour ( );
 
 	void _Start ( );
@@ -44,6 +47,17 @@ public:
 	// used for calling the specific Set functions from the interpreter
 	// when calling normaly override the Set function and specify your arguments
 	// when call the arguments will bee ['arg1','<value>','arg2',...]
-	// using Behaviour for semplicity
-	virtual Behaviour * Set ( const std::vector < std::string > &Args = {} );
+	virtual std::shared_ptr < Behaviour > Set ( const std::vector < std::string > &Args = {} );
+
+	struct Component_Metadata {
+		const char* name = "Behaviour";
+		float version = 0;
+		const char* description = "This is an empty Component";
+
+		Component_Metadata ( );
+		Component_Metadata ( const char* _name, float _version, const char* _description );
+	};
+
+	Component_Metadata Informations;
+	Component_Metadata Get_Info ( );
 };

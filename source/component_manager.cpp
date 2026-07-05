@@ -16,26 +16,30 @@ std::shared_ptr<Behaviour> Factory::Construct
 	auto con = constructors.find ( name );
 
 	if ( con == constructors.end ( ) )
-	{ return nullptr; }
+	{ 
+		DEBUG ( 1, "Cannot find component", name );
+		return nullptr;
+	}
 
 	return con->second ( );
 }
 
-int Factory::Register ( const std::string& name, const std::string& path )
+int Factory::Register ( const std::string& path )
 {
 	DEBUG ( 3, "Creating new Factory" );
 	boost::dll::fs::path lib_path ( path );
 
-	auto factory = boost::dll::import_symbol
-		 < std::shared_ptr < Behaviour > ( ) > (
-			lib_path,
-			"_Factory",
-			boost::dll::load_mode::append_decorations
+	auto _factory = boost::dll::import_symbol < std::shared_ptr < Behaviour > ( ) > (
+		lib_path,
+		"_Factory",
+		boost::dll::load_mode::append_decorations
 	);
 
-	constructors [ name ] = factory;
+	Behaviour::Component_Metadata comp_info = _factory ( )->Get_Info ( );
+	constructors [ comp_info.name ] = _factory;
 
-	DEBUG ( 3, "Created new Factory ", name, " from file: ", path );
+	DEBUG ( 3, "Added ", comp_info.name, "::", comp_info.version, 
+		" ( ", comp_info.description, " ) from ", path );
 
 	return 0;
 }

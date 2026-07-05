@@ -2,52 +2,81 @@ cmake_minimum_required ( VERSION 3.13 )
 
 project ( ReKat )
 
-option ( REKAT_LIBRARY "Compile the Engine as a library, else the headers will be included in the executable" ON )
-option ( REKAT_TEST "Compile the test suite" OFF )
+option ( REKAT_TEST "Compile the tests" OFF )
 option ( REKAT_PROJEKT "Compile the projekts" OFF )
-option ( REKAT_ENGINE "Compile the Engine interpreter" OFF )
-option ( REKAT_LAUNCH "Removes the console window" ON )
-option ( REKAT_COMPONENT "Buils a behaviour component" ON )
+option ( REKAT_LAUNCH "Removes the console window for projekts" ON )
+option ( REKAT_COMPONENT "Builds all specified components" ON )
+option ( REKAT_DEBUG "Activates DIAGNOSTIC for every file" OFF )
+option ( REKAT_DEBUG_EXPANCE "Activates EXPANCE for every file" OFF )
 
-# unicode text
-add_definitions(-DUNICODE -D_UNICODE)
+set ( PROJEKTS Pong )
+set ( COMPONENTS Comp_Test )
 
-list ( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/Cmake" )
+## function to copy the build targets of components to the EXECUTABLE dir
+function ( component_package EXECUTABLE )
+foreach ( COMPONENT IN LISTS ARGN )
 
-# compile the libray
-if ( REKAT_LIBRARY )
-	message ( "Creating library" )
-	include ( Library )
-else ( )
-	message ( "Linking filling" )
-	include ( Included )
-endif ( )
+        add_custom_command(
+        	TARGET ${EXECUTABLE} POST_BUILD
+        	COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                $<TARGET_FILE:${COMPONENT}>
+                $<TARGET_FILE_DIR:${EXECUTABLE}>
+        )
 
-# compile the examples
-set ( TESTS Render_Test Core_Test Collision_Test )
-set ( TESTS Multi_Window_Test Button_Test )
-set ( TESTS New_Core_Test )
+endforeach()
+endfunction ( )
 
-if ( REKAT_TEST )
-	foreach ( TEST ${TESTS} )
-	file ( GLOB PROJECT_SOURCES ${CMAKE_SOURCE_DIR}/Test/${TEST}/main.cpp )
-	add_executable(${TEST}	${PROJECT_SOURCES}  ${PROJECT_HEADERS}
-					${PROJECT_CONFIGS}  ${LIBS_SOURCES})
+function ( test TEST )
+	file ( GLOB TEST_SOURCES ${CMAKE_SOURCE_DIR}/tests/${TEST}/main.cpp )
+	add_executable( ${TEST}	${TEST_SOURCES} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
+				${PROJECT_CONFIGS}  ${LIBS_SOURCES})
 
 	target_link_libraries ( ${TEST} ReKat )
 
 	set_target_properties ( ${TEST} PROPERTIES
-		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Test/${TEST} )
+		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests/${TEST} )
 
-	add_custom_command (
-		TARGET ${TEST} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Test/${TEST}/Resources $<TARGET_FILE_DIR:${TEST}> )
+	set ( TEST_RESOURCES ${CMAKE_SOURCE_DIR}/tests/${TEST}/Resources )
 
-	endforeach ( TEST )
+	if ( EXISTS ${TEST_RESOURCES_DIR} )
+		add_custom_command(
+        		TARGET ${TEST} POST_BUILD
+       			COMMAND ${CMAKE_COMMAND} -E copy_directory
+			${TEST_RESOURCES}
+			$<TARGET_FILE_DIR:${TEST}>
+		)
+	endif()
+
+	component_package ( ${TEST} ${ARGN} )
+endfunction ( )
+
+
+list ( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake" )
+## this compiles RaKat shared library 
+include ( library )
+
+## Build components
+if ( REKAT_COMPONENT )
+	foreach ( COMP ${COMPONENTS} )
+	add_library( ${COMP} SHARED ${CMAKE_SOURCE_DIR}/components/${COMP}/main.cpp )
+
+	target_link_libraries( ${COMP} ReKat )
+
+	set_target_properties ( ${COMP} PROPERTIES
+		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/components/
+		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/components/
+		PREFIX "" 
+	)
+
+	endforeach( COMP )
 endif ( )
 
-set ( PROJEKTS Wordle )
+# compile tests
+if ( REKAT_TEST )
+	test ( new_core_test Comp_Test )
+endif ( )
 
+#[[
 if ( REKAT_PROJEKT )
 foreach ( PROJEKT ${PROJEKTS} )
 	file ( GLOB PROJECT_SOURCES ${CMAKE_SOURCE_DIR}/Projekt/${PROJEKT}/main.cpp )
@@ -77,40 +106,4 @@ foreach ( PROJEKT ${PROJEKTS} )
 
 endforeach ( PROJEKT )
 endif ( )
-
-if ( REKAT_ENGINE )
-	file ( GLOB PROJECT_SOURCES ${CMAKE_SOURCE_DIR}/Src/main.cpp )
-	add_executable(Engine	    ${PROJECT_SOURCES}  ${PROJECT_HEADERS}
-					${PROJECT_CONFIGS}  ${LIBS_SOURCES})
-
-	target_link_libraries ( Engine glfw freetype OpenAL # OpenAL::OpenAL
-				${GLFW_LIBRARIES} ${GLAD_LIBRARIES} ${WINSOCK_LIBRARIES} )
-
-	set_target_properties ( Engine PROPERTIES
-		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Engine_Interpreter )
-
-endif ( )
-
-set ( COMPONENTS Comp_Test )
-
-if ( REKAT_COMPONENT )
-	set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-	set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
-
-	foreach ( COMP ${COMPONENTS} )
-	add_library(${COMP} SHARED ${CMAKE_SOURCE_DIR}/Component/${COMP}/main.cpp 
-			${PROJECT_HEADERS} ${PROJECT_CONFIGS}  ${LIBS_SOURCES})
-
-	# target_link_libraries ( ${COMP} glfw freetype OpenAL # OpenAL::OpenAL
-	# 			${GLFW_LIBRARIES} ${GLAD_LIBRARIES} ${WINSOCK_LIBRARIES} )
-
-	target_link_libraries( ${COMP} ReKat )
-
-	set_target_properties ( ${COMP} PROPERTIES
-		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Component/${COMP}
-		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Component/${COMP}
-		PREFIX "" 
-	)
-
-	endforeach( COMP )
-endif ( )
+]]
