@@ -24,11 +24,15 @@ public:
 	virtual ~Behaviour ( );
 
 	void _Start ( );
+	void _Early_Update ( );
 	void _Update ( );
+	void _Late_Update ( );
 	void _Fixed_Update ( );
 
 	virtual void Start ( );
+	virtual void Early_Update ( );
 	virtual void Update ( );
+	virtual void Late_Update ( );
 	virtual void Fixed_Update ( );
 
 	virtual void Collision ( std::shared_ptr < Objekt > _obj );

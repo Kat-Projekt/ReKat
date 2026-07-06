@@ -13,11 +13,23 @@ void Behaviour::_Start ( )
 	_started = true;
 }
 
+void Behaviour::_Early_Update ( )
+{
+	if ( _active )
+	{ Early_Update ( ); }
+}
+
 void Behaviour::_Update ( )
 {
 	DEBUG ( 6, "tring to update component: ", typeid (*this).name( ) );
 	if ( _active )
 	{ Update ( ); }
+}
+
+void Behaviour::_Late_Update ( )
+{
+	if ( _active )
+	{ Late_Update ( ); }
 }
 
 void Behaviour::_Fixed_Update ( )
@@ -27,7 +39,9 @@ void Behaviour::_Fixed_Update ( )
 }
 
 void Behaviour::Start ( ) { }
+void Behaviour::Early_Update ( ) { }
 void Behaviour::Update ( ) { }
+void Behaviour::Late_Update ( ) { }
 void Behaviour::Fixed_Update ( ) { }
 
 void Behaviour::Collision ( std::shared_ptr < Objekt > _obj )

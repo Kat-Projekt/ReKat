@@ -1,0 +1,13 @@
+#include "@PATH@"
+
+static_assert (
+	std::is_base_of<Behaviour, @COMP@>::value,
+	"@COMP@ must inherit from Behaviour"
+);
+
+extern "C" BOOST_SYMBOL_VISIBLE
+std::shared_ptr < Behaviour > _Factory ( )
+{
+	DEBUG ( 5, "creating @COMP@" );
+	return std::make_shared < @COMP@ > ( );
+}

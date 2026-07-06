@@ -43,7 +43,7 @@ int main ( )
 	pippo11->Add_Child ( pippo111 );
 	pippo2->Add_Child ( pippo23 );
 
-	Factory::Register ( "Comp_Test.dylib" );
+	Factory::Register ( "NewComponent.dylib" );
 
 	// add random components 
 	pippo->Add_Component < C1 > ( );

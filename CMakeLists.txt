@@ -3,7 +3,6 @@ cmake_minimum_required ( VERSION 3.13 )
 project ( ReKat )
 
 option ( REKAT_TEST "Compile the tests" OFF )
-option ( REKAT_PROJEKT "Compile the projekts" OFF )
 option ( REKAT_LAUNCH "Removes the console window for projekts" ON )
 option ( REKAT_COMPONENT "Builds all specified components" ON )
 option ( REKAT_DEBUG "Activates DIAGNOSTIC for every file" OFF )
@@ -12,98 +11,149 @@ option ( REKAT_DEBUG_EXPANCE "Activates EXPANCE for every file" OFF )
 set ( PROJEKTS Pong )
 set ( COMPONENTS Comp_Test )
 
-## function to copy the build targets of components to the EXECUTABLE dir
+# pack_components ( <EXECUTABLE> <COMPONENTS...> )
+#
+# Arguments:
+# 	<EXECUTABLE>    Name of the target.
+# 	<COMPONENTS...> Name of components to pack with target, or ALL_COMPONENTS.
+#
+# Examples:
+# 	pack_components ( MyProject Sprite NewComponent Player )
+# 	pack_components ( MyProject ALL_COMPONENTS )
 function ( component_package EXECUTABLE )
-foreach ( COMPONENT IN LISTS ARGN )
+	## set ( COMPONETDEF "{ " )
+	foreach ( COMPONENT ${ARGN} )
+		message ( VERBOSE "adding ${COMPONENT} to: ${EXECUTABLE}" )
+		## list ( APPEND COMPONETDEF "\"${COMPONENT}\", ")
+		add_custom_command(
+			TARGET ${EXECUTABLE} POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E copy_if_different
+			$<TARGET_FILE:${COMPONENT}>
+			$<TARGET_FILE_DIR:${EXECUTABLE}>
+		)
 
-        add_custom_command(
-        	TARGET ${EXECUTABLE} POST_BUILD
-        	COMMAND ${CMAKE_COMMAND} -E copy_if_different
-                $<TARGET_FILE:${COMPONENT}>
-                $<TARGET_FILE_DIR:${EXECUTABLE}>
-        )
+	endforeach ( COMPONENT )
+	
+	## list ( APPEND COMPONETDEF "}")
 
-endforeach()
+	## add definitions for including
+	## target_compile_definitions( ReKat PUBLIC COMPONENTS=COMPONETDEF )
+	## message( ${COMPONETDEF} )
 endfunction ( )
 
-function ( test TEST )
-	file ( GLOB TEST_SOURCES ${CMAKE_SOURCE_DIR}/tests/${TEST}/main.cpp )
-	add_executable( ${TEST}	${TEST_SOURCES} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
+# KAT_project ( <TARGET> <PATH> <COMPONENTS...> )
+#
+# Arguments:
+# 	<TARGET>        Name of the projekt.
+# 	<PATH>          Where to find the projekt root. note that main.cpp is expected to be in that PATH
+# 	<COMPONENTS...> Name of components to pack with the projekt, or ALL_COMPONENTS.
+#
+# Examples:
+# 	KAT_project ( MyProject PATH ${CMAKE_SOURCE_DIR} COMPONENTS Sprite NewComponent Player )
+# 	KAT_project ( Sample_projekt PATH ${CMAKE_SOURCE_DIR}/example ALL_COMPONENTS )
+function ( KAT_project TARGET )
+	set ( options ALL_COMPONENTS )
+	set ( oneValueArgs PATH )
+	set ( multiValueArgs ADD_COMPONENTS )
+
+	cmake_parse_arguments (
+		KAT
+		${options}
+		${oneValueArgs}
+		${multiValueArgs}
+		${ARGN}
+	)
+
+	if ( DEFINED KAT_PATH )
+		file ( GLOB TEST_SOURCE ${KAT_PATH}/main.cpp )
+	else ( )
+		file ( GLOB TEST_SOURCE ${CMAKE_SOURCE_DIR}/tests/${TARGET}/main.cpp )
+	endif ( )
+
+	add_executable( ${TARGET}	${TEST_SOURCE} ${PROJECT_SOURCES} ${PROJECT_HEADERS}
 				${PROJECT_CONFIGS}  ${LIBS_SOURCES})
 
-	target_link_libraries ( ${TEST} ReKat )
+	target_link_libraries ( ${TARGET} ReKat )
 
-	set_target_properties ( ${TEST} PROPERTIES
-		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests/${TEST} )
+	set_target_properties ( ${TARGET} PROPERTIES
+		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/tests/${TARGET} )
 
-	set ( TEST_RESOURCES ${CMAKE_SOURCE_DIR}/tests/${TEST}/Resources )
+	set ( TEST_RESOURCES ${CMAKE_SOURCE_DIR}/tests/${TARGET}/Resources )
 
 	if ( EXISTS ${TEST_RESOURCES_DIR} )
 		add_custom_command(
-        		TARGET ${TEST} POST_BUILD
+        		TARGET ${TARGET} POST_BUILD
        			COMMAND ${CMAKE_COMMAND} -E copy_directory
 			${TEST_RESOURCES}
-			$<TARGET_FILE_DIR:${TEST}>
+			$<TARGET_FILE_DIR:${TARGET}>
 		)
 	endif()
 
-	component_package ( ${TEST} ${ARGN} )
+	if ( KAT_ALL_COMPONENTS )
+		message ( STATUS "${TARGET} requres ALL_COMPONENTS" )
+		component_package ( ${TARGET} ${COMPONENTS_LIST} )
+	else ( )
+		message ( STATUS "${TARGET} requres ${KAT_ADD_COMPONENTS}" )
+		component_package ( ${TARGET} ${KAT_ADD_COMPONENTS} )
+	endif ( )
 endfunction ( )
 
+# component ( <COMP> <PATH> )
+#
+# Arguments:
+# 	<COMP> Name of the component.
+# 	<PATH> Where to find the component root.
+function ( component COMP PATH )
+	configure_file(
+		${CMAKE_SOURCE_DIR}/cmake/component_wrapper.cpp.in
+		${CMAKE_BINARY_DIR}/generated/${COMP}_wrapper.cpp
+		@ONLY
+	)
 
-list ( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake" )
-## this compiles RaKat shared library 
-include ( library )
+	add_library ( ${COMP} SHARED ${CMAKE_BINARY_DIR}/generated/${COMP}_wrapper.cpp )
 
-## Build components
-if ( REKAT_COMPONENT )
-	foreach ( COMP ${COMPONENTS} )
-	add_library( ${COMP} SHARED ${CMAKE_SOURCE_DIR}/components/${COMP}/main.cpp )
-
-	target_link_libraries( ${COMP} ReKat )
+	target_link_libraries ( ${COMP} ReKat )
 
 	set_target_properties ( ${COMP} PROPERTIES
 		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/components/
 		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/components/
 		PREFIX "" 
 	)
+endfunction ( )
 
-	endforeach( COMP )
+list ( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake" )
+## this compiles RaKat shared library 
+include ( library )
+
+set ( COMPONENTS_LIST )
+## build components
+if ( REKAT_COMPONENT )
+	# first the compoents in /component/
+	file ( GLOB COMPONENTS
+		${CMAKE_SOURCE_DIR}/components/*.cpp
+	)
+	# then the additional ones
+	foreach ( DIR ${ADDITIONAL_COMPONENTS_DIRS} )
+		file ( GLOB EXTRA_COMPONENTS
+			${DIR}/*.cpp
+		)
+		foreach ( COMP ${EXTRA_COMPONENTS} )
+		list ( APPEND COMPONENTS "${DIR}/${COMP}" )
+		endforeach()
+	endforeach()
+
+	foreach ( PATH ${COMPONENTS} )
+		cmake_path ( GET PATH STEM COMP )
+		list ( APPEND COMPONENTS_LIST ${COMP} )
+		message( STATUS "Building '${COMP}' from: ${PATH}" )
+		component (
+			${COMP}
+			${PATH}
+		)
+	endforeach( PATH )
 endif ( )
 
 # compile tests
 if ( REKAT_TEST )
-	test ( new_core_test Comp_Test )
+	KAT_project ( new_core_test ALL_COMPONENTS )
 endif ( )
-
-#[[
-if ( REKAT_PROJEKT )
-foreach ( PROJEKT ${PROJEKTS} )
-	file ( GLOB PROJECT_SOURCES ${CMAKE_SOURCE_DIR}/Projekt/${PROJEKT}/main.cpp )
-	add_executable(${PROJEKT} ${PROJECT_SOURCES}  ${PROJECT_HEADERS}
-					${PROJECT_CONFIGS}  ${LIBS_SOURCES} ${CMAKE_SOURCE_DIR}/Projekt/${PROJEKT}/favicon.rc)
-
-	target_link_libraries ( ${PROJEKT} glfw freetype OpenAL # OpenAL::OpenAL
-				${GLFW_LIBRARIES} ${GLAD_LIBRARIES} ${WINSOCK_LIBRARIES} )
-
-	# removes console
-	if(WIN32)
-	set_target_properties(${PROJEKT}  
-	PROPERTIES
-		LINK_FLAGS_DEBUG "/SUBSYSTEM:CONSOLE"
-		LINK_FLAGS_RELEASE "/SUBSYSTEM:windows /ENTRY:mainCRTStartup"
-		LINK_FLAGS_RELWITHDEBINFO "/SUBSYSTEM:windows /ENTRY:mainCRTStartup"
-		LINK_FLAGS_MINSIZEREL "/SUBSYSTEM:windows /ENTRY:mainCRTStartup"
-	)
-	endif(WIN32)
-
-	set_target_properties ( ${PROJEKT} PROPERTIES
-		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/Projekt/${PROJEKT} )
-
-	add_custom_command (
-		TARGET ${PROJEKT} POST_BUILD
-		COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_SOURCE_DIR}/Projekt/${PROJEKT}/Data $<TARGET_FILE_DIR:${PROJEKT}>/Data )
-
-endforeach ( PROJEKT )
-endif ( )
-]]
