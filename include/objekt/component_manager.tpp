@@ -5,7 +5,9 @@ int Factory::Register ( )
 {
 	static_assert ( std::is_base_of<Behaviour, C>::value, "T must derive from Behaviour" );
 
-	std::string name = std::string ( typeid ( C ).name ( ) );
+	C name_get;
+
+	std::string name = std::string ( name_get.Get_Type ( ) );
 	constructors [ name ] = [ ] ( )
 	{ return std::make_shared < C > ( ); };
 

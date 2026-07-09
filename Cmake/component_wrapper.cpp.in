@@ -7,7 +7,4 @@ static_assert (
 
 extern "C" BOOST_SYMBOL_VISIBLE
 std::shared_ptr < Behaviour > _Factory ( )
-{
-	DEBUG ( 5, "creating @COMP@" );
-	return std::make_shared < @COMP@ > ( );
-}
+{ return std::make_shared < @COMP@ > ( ); }

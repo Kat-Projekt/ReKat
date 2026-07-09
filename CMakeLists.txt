@@ -156,4 +156,5 @@ endif ( )
 # compile tests
 if ( REKAT_TEST )
 	KAT_project ( new_core_test ALL_COMPONENTS )
+	KAT_project ( transform_verify )
 endif ( )

@@ -44,17 +44,23 @@ void Behaviour::Update ( ) { }
 void Behaviour::Late_Update ( ) { }
 void Behaviour::Fixed_Update ( ) { }
 
-void Behaviour::Collision ( std::shared_ptr < Objekt > _obj )
+void Behaviour::Collision
+( std::shared_ptr < Objekt > _obj )
 { ( void ) _obj; }
-void Behaviour::Collision_Exit ( std::shared_ptr < Objekt > _obj )
+void Behaviour::Collision_Exit
+( std::shared_ptr < Objekt > _obj )
 { ( void ) _obj; }
-void Behaviour::Collision_Enter ( std::shared_ptr < Objekt > _obj )
+void Behaviour::Collision_Enter
+( std::shared_ptr < Objekt > _obj )
 { ( void ) _obj; }
-void Behaviour::Collision_Trigger ( std::shared_ptr < Objekt > _obj )
+void Behaviour::Collision_Trigger
+( std::shared_ptr < Objekt > _obj )
 { ( void ) _obj; }
-void Behaviour::Collision_Trigger_Exit ( std::shared_ptr < Objekt > _obj )
+void Behaviour::Collision_Trigger_Exit
+( std::shared_ptr < Objekt > _obj )
 { ( void ) _obj; }
-void Behaviour::Collision_Trigger_Enter ( std::shared_ptr < Objekt > _obj )
+void Behaviour::Collision_Trigger_Enter
+( std::shared_ptr < Objekt > _obj )
 { ( void ) _obj; }
 
 void Behaviour::Set_Active ( bool active )
@@ -71,13 +77,15 @@ bool Behaviour::Get_Active ( )
 void Behaviour::Delete ( )
 { }
 
-std::shared_ptr <Behaviour> Behaviour::Set ( const std::vector < std::string > &Args )
+Behaviour& Behaviour::Set
+( const std::vector < std::string > &Args )
 {
 	( void ) Args;
-	return shared_from_this ( );
+	return *this;
 }
 
-Behaviour::Component_Metadata Behaviour::Get_Info ( )
+const Behaviour::Component_Metadata& Behaviour::Get_Info
+( ) const
 {
 	return Informations;
 }
@@ -88,3 +96,6 @@ Behaviour::Component_Metadata::Component_Metadata
 
 Behaviour::Component_Metadata::Component_Metadata
 ( ) { }
+
+const char* Behaviour::Get_Type ( )
+{ return Informations.name; }

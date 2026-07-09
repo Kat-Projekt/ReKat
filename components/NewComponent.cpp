@@ -1,3 +1,4 @@
+#define DIAGNOSTIC
 #include <engine.hpp>
 
 class NewComponent : public Behaviour {

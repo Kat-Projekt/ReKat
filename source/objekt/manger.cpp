@@ -14,7 +14,11 @@ namespace Manager
 	extern void Update ( )
 	{
 		if ( _current_scene != nullptr )
-		{ _current_scene->Update ( ); }
+		{
+			_current_scene->Early_Update ( );
+			_current_scene->Update ( );
+			_current_scene->Late_Update ( );
+		}
 	}
 
 	extern std::shared_ptr < Objekt > Objekt_Get ( std::string name )

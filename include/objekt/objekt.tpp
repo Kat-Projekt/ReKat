@@ -48,7 +48,7 @@ List < std::shared_ptr < C > > Objekt::Get_Component_Recursive ( )
 		{ L.append ( recast ); }
 	}
 
-	for ( auto O : _childrens ) {
+	for ( auto O : _children ) {
 		auto Data = O->Get_Component_Recursive < C > ( );
 		L.append ( Data );
 	}

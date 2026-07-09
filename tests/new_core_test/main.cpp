@@ -4,16 +4,25 @@
 
 class C1 : public Behaviour
 {
+public:
+	C1 ( ) { Informations = { "C1", 1.0, "Ciao" }; }
+
 	void Update ( )
 	{ DEBUG ( 4, "Update ", obj->Get_Name ( ), " C1" ); }
 };
 class C2 : public Behaviour
 {
+public:
+	C2 ( ) { Informations = { "C2", 1.0, "Ciao" }; }
+
 	void Update ( )
 	{ DEBUG ( 4, "Update ", obj->Get_Name ( ), " C2" ); }
 };
 class C3 : public Behaviour
 {
+public:
+	C3 ( ) { Informations = { "C3", 1.0, "Ciao" }; }
+
 	void Update ( )
 	{ DEBUG ( 4, "Update ", obj->Get_Name ( ), " C3" ); }
 };
@@ -43,7 +52,8 @@ int main ( )
 	pippo11->Add_Child ( pippo111 );
 	pippo2->Add_Child ( pippo23 );
 
-	Factory::Register ( "NewComponent.dylib" );
+	if ( !Factory::Register_Directory ( "." ) )
+	{ DEBUG ( 2, "ERROR WHEN LOADING" ); }
 
 	// add random components 
 	pippo->Add_Component < C1 > ( );
@@ -64,12 +74,11 @@ int main ( )
 	}
 
 	DEBUG ( 3, "Trying special" );
-	pippo->Add_Component_Special ( "NewComponent" );
+	pippo->Add_Component ( "NewComponent" );
 
 	DEBUG ( 6, *pippo );
-	DEBUG ( 5, "Has new comp? ", ( pippo->Has_Component ("12NewComponent") ? "true" : "false" ) );
-
-	pippo->Get_Component ( "12NewComponent" )->Update ( );
+	DEBUG ( 5, "Has new comp? ", ( pippo->Has_Component ("NewComponent") ? "true" : "false" ) );
+	/// DEBUG ( 4, pippo->Get_Component ( "NewComponent")->Get_Info ( ).description );
 
 	// Start and Update
 	pippo->Start ( ); 

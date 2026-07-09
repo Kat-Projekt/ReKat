@@ -5,6 +5,7 @@
 
 #include <boost/dll/import.hpp>
 #include <boost/filesystem/path.hpp>
+#include <boost/filesystem.hpp>
 #include <functional>
 #include <memory>
 #include <unordered_map>
@@ -21,14 +22,9 @@ namespace Factory
 
 	template < class C >
 	extern int Register ( );
-	/*
-		Remember that the dll must export this symbol
-		
-		extern "C" BOOST_SYMBOL_VISIBLE
-		std::shared_ptr < Behaviour > _Factory ( )
-		{ return std::make_shared < NewComponent > ( ); }
-	*/
-	extern int Register ( const std::string& path );
+	extern int Register ( const boost::dll::fs::path& path );
+	// -1 errors, n >= 0 numero di componenti trovati
+	extern int Register_Directory ( const std::string& path );
 
 	extern std::shared_ptr < Behaviour > Construct ( const std::string& name );
 	template < class C >
