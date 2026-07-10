@@ -26,7 +26,7 @@ protected:
 
 	Component_Metadata Informations;
 public:
-	std::shared_ptr < Objekt > obj = nullptr;
+	Objekt * obj;
 
 	// override the Constructor for adding metadata
 	Behaviour ( );

@@ -47,7 +47,7 @@ public:
 
 	~Objekt ( void );
 
-	void Free ( );
+	void Delete ( );
 
 	void Set_Father ( std::shared_ptr < Objekt > father );
 	std::shared_ptr < Objekt > Get_Father ( ) const;

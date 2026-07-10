@@ -1,6 +1,7 @@
 #include "extensions/resource.hpp"
 
 Resource::Resource ( void ) { }
+Resource::~Resource ( void ) { }
 int Resource::Make ( void ) { return 0; }
 void Resource::End ( void ) { }
 void Resource::Use ( void ) { }

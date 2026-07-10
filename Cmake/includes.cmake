@@ -45,7 +45,7 @@ include_directories(
 		)
 
 file(GLOB LIBS_SOURCES libraries/glad/src/glad.c )
-file(GLOB PROJECT_SOURCES source/*.cpp )
+file(GLOB PROJECT_SOURCES source/*/*.cpp source/*.cpp )
 file(GLOB PROJECT_HEADERS include/*.hpp )
 file(GLOB PROJECT_CONFIGS	
 				CMakeLists.txt

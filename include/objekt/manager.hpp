@@ -4,6 +4,9 @@
 
 namespace Manager
 {
+	extern List < std::shared_ptr < Objekt > > objekts;
+	extern std::shared_ptr < Objekt > _current_scene;
+
 	extern void Start ( );
 	extern void Update ( );
 

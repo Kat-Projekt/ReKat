@@ -7,6 +7,7 @@
 class Resource {
 public:
 	Resource ( void );
+	virtual ~Resource ( void );
 	virtual int Make ( );
 	virtual void End ( void );
 	virtual void Use ( void );

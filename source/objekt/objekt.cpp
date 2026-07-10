@@ -26,15 +26,19 @@ Objekt::Objekt (
 }
 
 
-void Objekt::Free
+void Objekt::Delete
 ( )
 {
 	DEBUG ( 4, "Deleting Objekt", Get_Name ( ) );
+
+	for ( auto C : _children )  {
+		C->Delete( );
+	}
 }
 
 /* Deconstructor */
 Objekt::~Objekt
-( void ) { Free ( ); }
+( void ) { Delete ( ); }
 
 void Objekt::Set_Father
 ( std::shared_ptr < Objekt > father )
@@ -263,7 +267,7 @@ std::shared_ptr < Behaviour > Objekt::Add_Component
 	
 	if ( comp )
 	{
-		comp->obj = shared_from_this ( );
+		comp->obj = this;
 		_components.append ( comp );
 		if ( _started ) { comp->_Start( ); }
 		return comp;

@@ -7,7 +7,7 @@ std::shared_ptr < C > Objekt::Add_Component ( )
 	
 	if ( comp )
 	{
-		comp->obj = shared_from_this ( );
+		comp->obj = this;
 		_components.append ( comp );
 		if ( _started ) { comp->_Start( ); }
 		return std::static_pointer_cast < C > ( comp );
@@ -21,7 +21,7 @@ std::shared_ptr < C > Objekt::Add_Component
 {
 	static_assert ( std::is_base_of<Behaviour, C>::value, "C must derive from Behaviour" );
 
-	c->obj = shared_from_this ( );
+	c->obj = this;
 	_components.append ( std::static_pointer_cast < Behaviour > ( c ) );
 	if ( _started ) { c->_Start( ); }
 
