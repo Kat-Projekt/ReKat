@@ -1,9 +1,9 @@
 #include "extensions/graphik/graphik.hpp"
 
 namespace ReKat {
-namespace grapik {
-	std::unordered_map < std::string, Window* > _windows;
-	Window* _current_window;
+namespace Graphik {
+	std::unordered_map < std::string, std::shared_ptr < Window > > _windows;
+	std::shared_ptr < Window > _current_window;
 
 	extern int Start
 	(
@@ -15,10 +15,10 @@ namespace grapik {
 		bool resizable,
 		std::string icon_path
 	) {
-		Window *t = new Window;
-        	_windows.insert( { name , t } );
+		std::shared_ptr < Window > t = std::make_shared < Window > ( );
+        	_windows [ name ] = t;
 		_current_window = t;
-        	return (*t).Make (
+        	return t->Make (
 			name, SCR_WIDTH, SCR_HEIGTH, 
 			icon_path, transparent, fullscreen, resizable
 		);
@@ -86,5 +86,7 @@ namespace grapik {
 	( ) {
 		for ( auto W : _windows ) 
 		{ W.second->End ( ); }
+
+		_windows.clear ( );
 	}
 } }

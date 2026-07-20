@@ -9,16 +9,22 @@
 
 class Objekt;
 
-class BOOST_SYMBOL_VISIBLE Behaviour : public std::enable_shared_from_this<Behaviour>
+class BOOST_SYMBOL_VISIBLE Behaviour // : public std::enable_shared_from_this<Behaviour>
 {
 public:
 	struct Component_Metadata {
 		const char* name = "Behaviour";
 		float version = 0;
 		const char* description = "This is an empty Component";
+		std::vector < const char* > arguments = {};
 
 		Component_Metadata ( );
-		Component_Metadata ( const char* _name, float _version, const char* _description );
+		Component_Metadata (
+			const char* _name,
+			float _version,
+			const char* _description,
+			std::vector < const char* > _arguments = { }
+		);
 	};
 protected:
 	bool _active = true;
@@ -60,8 +66,8 @@ public:
 
 	// used for calling the specific Set functions from the interpreter
 	// when calling normaly override the Set function and specify your arguments
-	// when call the arguments will bee ['arg1','<value>','arg2',...]
-	virtual Behaviour& Set ( const std::vector < std::string > &Args = {} );
+	// when call the arguments will bee ['arg1','<value>','arg2','<value>',...]
+	// virtual Behaviour& Set ( const std::vector < std::string > &Args = {} ) = delete;
 
 	const Component_Metadata& Get_Info ( ) const;
 	const char* Get_Type ( );

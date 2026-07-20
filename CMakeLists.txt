@@ -2,6 +2,8 @@ cmake_minimum_required ( VERSION 3.13 )
 
 project ( ReKat )
 
+set(CMAKE_CXX_STANDARD 17)
+
 option ( REKAT_TEST "Compile the tests" OFF )
 option ( REKAT_LAUNCH "Removes the console window for projekts" ON )
 option ( REKAT_COMPONENT "Builds all specified components" ON )
@@ -157,5 +159,7 @@ endif ( )
 if ( REKAT_TEST )
 	# KAT_project ( core_test ALL_COMPONENTS )
 	# KAT_project ( transform_verify )
-	KAT_project ( graphik_window_test )
+	# KAT_project ( graphik_window_test )
+	KAT_project ( sprite_test )
+	KAT_project ( font_test )
 endif ( )

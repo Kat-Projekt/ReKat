@@ -1,6 +1,6 @@
-#include "extensions/graphik/core/window.hpp"
+#include "extensions/graphik/window.hpp"
 
-void Keyboard
+void ReKat::Graphik::Keyboard
 ( GLFWwindow* window, int key, int scancode, int action, int mode )
 {
 	Window* _window = static_cast<Window*>( glfwGetWindowUserPointer ( window ) );
@@ -8,7 +8,7 @@ void Keyboard
 	{ _window->input.Keyboard ( window, key, scancode, action, mode ); }
 }
 
-void Mouse_pos
+void ReKat::Graphik::Mouse_pos
 ( GLFWwindow* window, double xpos, double ypos )
 {
 	Window* _window = static_cast<Window*>( glfwGetWindowUserPointer ( window ) );
@@ -16,7 +16,7 @@ void Mouse_pos
 	{ _window->input.Mouse_pos ( window, xpos, ypos ); }
 }
 
-void Mouse_key
+void ReKat::Graphik::Mouse_key
 ( GLFWwindow* window, int button, int action, int mode )
 {
 	Window* _window = static_cast<Window*>( glfwGetWindowUserPointer ( window ) );
@@ -24,7 +24,7 @@ void Mouse_key
 	{ _window->input.Mouse_key ( window, button, action, mode ); }
 }
 
-void ScrollWell
+void ReKat::Graphik::ScrollWell
 ( GLFWwindow* window, double xoffset, double yoffset )
 {
 	Window* _window = static_cast<Window*>( glfwGetWindowUserPointer ( window ) );
@@ -32,7 +32,7 @@ void ScrollWell
 	{ _window->input.ScrollWell ( window, xoffset, yoffset ); }
 }
 
-void FreamBufferResize
+void ReKat::Graphik::FreamBufferResize
 ( GLFWwindow* window, int width, int height )
 {
 	Window* _window = static_cast<Window*>( glfwGetWindowUserPointer ( window ) );
@@ -40,7 +40,7 @@ void FreamBufferResize
 	{ _window->input.FreamBufferResize ( window, width, height ); }
 }
 
-void Caracters
+void ReKat::Graphik::Caracters
 ( GLFWwindow* window, unsigned int codepoint )
 {
 	Window* _window = static_cast<Window*>( glfwGetWindowUserPointer ( window ) );

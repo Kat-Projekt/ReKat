@@ -1,4 +1,4 @@
-#include "extensions/graphik/core/window.hpp"
+#include "extensions/graphik/window.hpp"
 
 #ifndef STB_IMAGE_IMPLEMENTATION
 #define STB_IMAGE_IMPLEMENTATION
@@ -55,12 +55,12 @@ int Window::Make
 	{ glfwTerminate(); return 1; }
 
 	glfwMakeContextCurrent ( window );
-	glfwSetKeyCallback ( window, Keyboard );
-	glfwSetCursorPosCallback ( window, Mouse_pos );
-	glfwSetMouseButtonCallback ( window, Mouse_key );
-	glfwSetScrollCallback ( window, ScrollWell );
-	glfwSetFramebufferSizeCallback ( window, FreamBufferResize );
-	glfwSetCharCallback( window, Caracters );
+	glfwSetKeyCallback ( window, ReKat::Graphik::Keyboard );
+	glfwSetCursorPosCallback ( window, ReKat::Graphik::Mouse_pos );
+	glfwSetMouseButtonCallback ( window, ReKat::Graphik::Mouse_key );
+	glfwSetScrollCallback ( window, ReKat::Graphik::ScrollWell );
+	glfwSetFramebufferSizeCallback ( window, ReKat::Graphik::FreamBufferResize );
+	glfwSetCharCallback( window, ReKat::Graphik::Caracters );
 	glfwSetWindowUserPointer ( window, this );
 
 	if ( !gladLoadGLLoader ( (GLADloadproc)glfwGetProcAddress ) ) 

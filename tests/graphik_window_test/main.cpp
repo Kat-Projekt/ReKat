@@ -3,11 +3,11 @@
 
 int main ( )
 {
-	ReKat::grapik::Start ( "Window Test", 800, 600 );
+	ReKat::Graphik::Start ( "Window Test", 800, 600 );
 
-	while ( ReKat::grapik::Is_End ( ) )
+	while ( ReKat::Graphik::Is_End ( ) )
 	{
-		ReKat::grapik::Clear_Screen ( 1.0f );
-		ReKat::grapik::Update ( );
+		ReKat::Graphik::Clear_Screen ( 1.0f );
+		ReKat::Graphik::Update ( );
 	}
 }

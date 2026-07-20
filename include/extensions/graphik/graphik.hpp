@@ -1,12 +1,12 @@
 #pragma once
 
 #include <unordered_map>
-#include "core/window.hpp"
+#include "window.hpp"
 
 namespace ReKat {
-namespace grapik {
-	extern std::unordered_map < std::string, Window* > _windows;
-	extern Window* _current_window;
+namespace Graphik {
+	extern std::unordered_map < std::string, std::shared_ptr < Window > > _windows;
+	extern std::shared_ptr < Window > _current_window;
 
 	extern int Start
 	(
@@ -37,4 +37,13 @@ namespace grapik {
 	extern void End ( std::string window = "" );
 	extern int Is_End ( std::string window = "" );
 	extern void Terminate ( );
+
+	template < typename T >
+	extern bool Key_Down ( T key );
+	template < typename T >
+	extern bool Key_Pressed ( T key );
+	template < typename T >
+	extern bool Key_Up ( T key );
 } }
+
+#include "graphik.tpp"
