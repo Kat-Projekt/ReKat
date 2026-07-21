@@ -15,22 +15,18 @@ std::shared_ptr < Texture > Font::Get_Texture
 Font::Font 
 ( ) : _font_heigth(30), _letters_spacing(0) { }
 
-Font::Font
-( unsigned int font_heigth, unsigned int letters_spacing )
-: _font_heigth(font_heigth), _letters_spacing(letters_spacing) { }
-
-Font::Font
-( const char * path, unsigned int font_heigth )
-: _font_heigth(font_heigth)
-{ Make ( path ); }
-
 int Font::Make
 ( )
 { return 1; }
 
-int Font::Make
-( const char * path )
-{
+int Font::Make (
+	const char * path,
+	unsigned int font_heigth,
+	unsigned int letters_spacing
+) {
+	_font_heigth = font_heigth;
+	_letters_spacing = letters_spacing;
+
 	DEBUG( 4,"Creating Font", path);
 	FT_Library ft;
 	if ( FT_Init_FreeType ( &ft ) ) 

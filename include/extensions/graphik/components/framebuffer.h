@@ -8,7 +8,7 @@ and saves it in a texture
 than it behaves like a sprite Behaviour
 */
 
-#include <stb_image_write.h>
+// #include <stb_image_write.h>
 #include "objekt/objekt.hpp"
 
 class Framebuffer : public Behaviour {

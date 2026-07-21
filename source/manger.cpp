@@ -21,7 +21,8 @@ namespace Manager
 		}
 	}
 
-	extern std::shared_ptr < Objekt > Objekt_Get ( std::string name )
+	extern std::shared_ptr < Objekt > Objekt_Get
+	( std::string name )
 	{
 		for ( auto S : objekts )
 		{

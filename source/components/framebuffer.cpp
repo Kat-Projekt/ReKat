@@ -5,6 +5,13 @@
 
 #include "extensions/graphik/manager.hpp"
 
+/*
+#ifndef STB_IMAGE_WRITE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image_write.h>
+#endif
+*/
+
 void Framebuffer::Create_Frame_Buffer
 ( ) {
 	// clear evetual memeory
@@ -169,6 +176,7 @@ void Framebuffer::Delete
 void Framebuffer::Save
 ( std::string file )
 {
+	DEBUG ( 2, "FUNCTION FRAMEBUFFER::SAVE not implementated ", file );
 	// read data
 	char * data = ( char * ) calloc ( _width * _heigth * 4, sizeof ( char ) );
 
@@ -178,6 +186,7 @@ void Framebuffer::Save
 
 	glReadPixels( 0, 0, _width, _heigth, GL_RGBA, GL_UNSIGNED_BYTE, data );
 
+	/*
 	stbi_flip_vertically_on_write ( true );
 	if
 	( !stbi_write_png ( file.c_str ( ), _width, _heigth, 4, data, 100 ) ) {
@@ -185,6 +194,7 @@ void Framebuffer::Save
 	} else {
 		DEBUG ( 3, "image saved at: ", file );
 	}
+	*/
 
 	free ( data );
 }

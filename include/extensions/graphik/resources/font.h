@@ -23,11 +23,9 @@ public:
 	unsigned int  * char_widths;
 
 	Font ( );
-	Font ( unsigned int font_heigth, unsigned int letters_spacing );
-	Font ( const char * path, unsigned int font_heigth = 30 );
 
 	int Make ( );
-	int Make ( const char * );
+	int Make ( const char * path, unsigned int font_heigth = 30, unsigned int letters_spacing = 5 );
 	void End ( );
 	void Use ( );
 

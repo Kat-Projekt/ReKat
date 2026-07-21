@@ -1,7 +1,7 @@
 #ifndef INPUT_BOX
 #define INPUT_BOX
 
-#include "../../objekt.hpp"
+#include "objekt/objekt.hpp"
 #include "../graphik.hpp"
 
 class Input_Box : public Behaviour {

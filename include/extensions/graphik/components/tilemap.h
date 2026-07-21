@@ -1,10 +1,10 @@
 #ifndef TILEMAP_H
 #define TILEMAP_H
 
-#include "../camera.h"
-#include "../../resources/manager.hpp"
+#include "camera.h"
 
-#include "../../graphik_debugger.hpp"
+#include "../manager.hpp"
+#include "../graphik_debugger.hpp"
 
 class Tilemap : public Behaviour {
 private:
@@ -22,7 +22,7 @@ public:
 	void Start
 	( ) {
 		DEBUG ( 4,"Starting tilemap");
-		int H, W;
+		size_t H, W;
 
 		std::vector < std::string > Data;
 		std::ifstream Data_stream;
@@ -60,7 +60,6 @@ public:
 		// set up instatiation
 		// getting the position and frame of the tile:
 		std::vector < vec3 > pos_frame;
-		vec2 size = obj->Get_Size();
 		for (size_t x = 0; x < W; x++)
 		{
 			for (size_t y = 0; y < H; y++)
@@ -127,7 +126,7 @@ public:
 		// prepare transformations
 		if ( _texture == "" || _camera == "" )
 		{ return; }
-		auto shader = Manager::Shader_Get ( _shader );
+		auto shader = Manager::Get < Shader > ( _shader );
 		shader->setMat4  ( "projection", Manager::Camera_Get( _camera )->Projkection ( ) );
 
 		mat4 model = obj->Get_Model_Mat ( );
@@ -139,7 +138,7 @@ public:
 		shader->setFloat ( "SPRITE_ROWS", _tile_set.y );
 		shader->setFloat ( "NUM_OF_SPRITES", (int)(_tile_set.x * _tile_set.y) );
 
-		Manager::Texture_Get( _texture )->Use();
+		Manager::Get < Texture > ( _texture )->Use();
 
 		glBindVertexArray(_quad);
 		glDrawArraysInstanced(GL_TRIANGLES, 0, 6, _instances);

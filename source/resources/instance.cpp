@@ -75,7 +75,7 @@ void Instance::Update_Data
 	glUnmapBuffer(GL_ARRAY_BUFFER); GL_CHECK_ERROR;
 }
 void Instance::Configure_Atributes
-( std::vector < Attribute > attributes, unsigned int index = 1 )
+( std::vector < Attribute > attributes, unsigned int index )
 {
 	_attributes = attributes;
 	_index = index;
@@ -105,7 +105,7 @@ void Instance::Use ( )
 {
 	if ( _changed ) {
 		glBindBuffer(GL_ARRAY_BUFFER, _buffer); GL_CHECK_ERROR;
-		unsigned int pointer = 0;
+		int* pointer = 0;
 		unsigned int index = _index;
 		for ( auto Att : _attributes )
 		{
@@ -127,7 +127,7 @@ unsigned int Instance::Instances
 { return _instances; }
 
 std::ostream& operator << ( std::ostream& os, const Instance& ele ) {
-	for ( int i = 0; i < ele._attributes.size ( ); i++ )
+	for ( size_t i = 0; i < ele._attributes.size ( ); i++ )
 	{
 		auto Att = ele._attributes [ i ];
 		os << "Att: " << i << " of size " << Att.size << " type ";
@@ -151,15 +151,15 @@ std::ostream& operator << ( std::ostream& os, const Instance& ele ) {
 	glBindBuffer(GL_ARRAY_BUFFER, ele._buffer); GL_CHECK_ERROR;
 	char *ptr = (char*) glMapBuffer(GL_ARRAY_BUFFER, GL_READ_ONLY); GL_CHECK_ERROR;
 	
-	for (size_t i = 0; i < ele._instances; i++)
+	for ( int i = 0; i < ele._instances; i++ )
 	{
 		os << "I: " << i;
 
-		for ( int x = 0; x < ele._attributes.size ( ); x++ )
+		for ( size_t x = 0; x < ele._attributes.size ( ); x++ )
 		{
 			auto Att = ele._attributes [ x ];
 			os << " Atr: " << x << ": ";
-			for (size_t i = 0; i < Att.size; i++)
+			for ( int i = 0; i < Att.size; i++ )
 			{
 				switch ( Att.type ) {
 					case GL_INT: os << *(int*)(ptr + i*sizeof(int)); break;

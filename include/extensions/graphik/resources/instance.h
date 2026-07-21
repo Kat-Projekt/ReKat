@@ -11,9 +11,9 @@ private:
 	int _instances = 0;
 	unsigned int _buffer = 0;
 	unsigned int _index = 0;
-	int _data_size = 0;
-	int _buffer_size = 0;
-	int _memory_chunk = 16;
+	unsigned int _data_size = 0;
+	unsigned int _buffer_size = 0;
+	unsigned int _memory_chunk = 16;
 
 	bool _changed = true;
 

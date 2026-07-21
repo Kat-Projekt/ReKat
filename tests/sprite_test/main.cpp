@@ -23,7 +23,7 @@ class Move : public Behaviour
 
 int main ( )
 {
-	ReKat::Graphik::Start ( "Window Test", 800, 600, true );
+	ReKat::Graphik::Start ( "Sprite Test", 800, 600, true );
 	if ( Manager::Defaults_Load ( ) != 0 )
 	{ DEBUG ( 1, "failed to load defaults shaders"); }
 
@@ -39,7 +39,7 @@ int main ( )
 
 	while ( ReKat::Graphik::Is_End ( ) )
 	{
-		ReKat::Graphik::Clear_Screen ( 1.0f );
+		// ReKat::Graphik::Clear_Screen ( 1.0f );
 		Manager::Update ( );
 		ReKat::Graphik::Update ( );
 	}
