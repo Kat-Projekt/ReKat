@@ -3,6 +3,7 @@
 
 #include "../../resource.hpp"
 #include <vector>
+#include <utilities/math.h>
 
 enum PlayMode {
     LOOP,
@@ -40,29 +41,31 @@ public:
 		return 0;
 	}
 
-    Animation* Add_Frame ( T initial, T final, float duration, T ( *interpolator ) ( T, T, float ) = Lerp ) {
-        if ( duration <= 0 ) { DEBUG (2, "the duration is not correct" ); return this; }
-        frame nframe;
-        nframe.initial_state = initial;
-        nframe.final_state = final;
-        nframe.duration = duration;
-        nframe.interpolator = interpolator;
+	Animation* Add_Frame ( T initial, T final, float duration, T ( *interpolator ) ( T, T, float ) = Lerp < T >) {
+		if ( duration <= 0 )
+		{ DEBUG (2, "the duration is not correct" ); return this; }
 
-        total_duration += duration;
+		frame nframe;
+		nframe.initial_state = initial;
+		nframe.final_state = final;
+		nframe.duration = duration;
+		nframe.interpolator = interpolator;
 
-        if ( frames.size ( ) == 0 ) {
-            nframe.enter_time = 0;
-            frames.push_back ( nframe );
-            DEBUG ( 4, "added first animation frame" );
-            return this;
-        }
+		total_duration += duration;
 
-        frame lframe = * ( -- frames.end ( ) );
-        nframe.enter_time = lframe.enter_time + lframe.duration;
-        frames.push_back ( nframe );
-            DEBUG ( 4, "added animation frame, total frames: ", frames.size ( ) );
-        return this;
-    }
+		if ( frames.size ( ) == 0 ) {
+		nframe.enter_time = 0;
+		frames.push_back ( nframe );
+		DEBUG ( 4, "added first animation frame" );
+		return this;
+		}
+
+		frame lframe = * ( -- frames.end ( ) );
+		nframe.enter_time = lframe.enter_time + lframe.duration;
+		frames.push_back ( nframe );
+		DEBUG ( 4, "added animation frame, total frames: ", frames.size ( ) );
+		return this;
+	}
 
     void Use ( float _time ) {
         if ( frames.size() == 0 ) { DEBUG (2, "trying to animate an empty animation" ); }

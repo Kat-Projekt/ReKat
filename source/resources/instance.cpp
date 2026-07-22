@@ -1,4 +1,5 @@
-#include "extensions/graphik/resources/instance.h"
+#include "extensions/graphik/resources/instance.h"	
+#include <cstring>
 
 void Instance::Add_Data
 ( void * data, unsigned int elements )
