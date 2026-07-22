@@ -45,7 +45,7 @@ public:
 	void Update ( );
 	void Fixed_Update ( );
 	void Delete ( );
-	void Save ( std::string file );
+	void Save ( const std::string& file );
 
 	// set resolution of the buffer
 	Framebuffer& Set (

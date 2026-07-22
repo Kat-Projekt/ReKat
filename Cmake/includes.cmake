@@ -34,16 +34,6 @@ else()
 	endif()
 endif()
 
-include_directories(	
-			include/
-			libraries/glad/include/
-			libraries/freetype/include/
-			libraries/glfw/include/
-			libraries/glm/
-			libraries/stb/
-			libraries/openal-soft/include/
-		)
-
 file(GLOB LIBS_SOURCES libraries/glad/src/glad.c )
 file(GLOB PROJECT_SOURCES source/*/*.cpp source/*.cpp )
 file(GLOB PROJECT_HEADERS include/*.hpp )
@@ -59,3 +49,6 @@ file(GLOB PROJECT_CONFIGS
 source_group("Include" FILES ${PROJECT_HEADERS})
 source_group("Sources" FILES ${PROJECT_SOURCES})
 source_group("Libs" FILES ${LIBS_SOURCES})
+
+message(STATUS "CURRENT_SOURCE_DIR = ${CMAKE_CURRENT_SOURCE_DIR}")
+message(STATUS "CURRENT_LIST_DIR   = ${CMAKE_CURRENT_LIST_DIR}")

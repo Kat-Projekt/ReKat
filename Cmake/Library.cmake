@@ -28,19 +28,27 @@ target_link_libraries( ReKat glfw freetype OpenAL Boost::config Boost::dll
 set_target_properties(	ReKat PROPERTIES 
 			VERSION 2.0
 			LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/
-			C_VISIBILITY_PRESET hidden
-			CXX_VISIBILITY_PRESET hidden
+			CXX_STANDARD 17
+			CXX_STANDARD_REQUIRED YES
+			CXX_EXTENSIONS NO
 			OUTPUT_NAME ReKat 
 			PREFIX "" )
 
 set_target_properties( ReKat PROPERTIES PUBLIC_HEADER Include/engine.hpp )
 
 ## export the library's public include path to dependent targets
-target_include_directories( ReKat PUBLIC include )
+target_include_directories( ReKat
+    PUBLIC
+        ${CMAKE_CURRENT_SOURCE_DIR}/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/libraries/glad/include
+        ${CMAKE_CURRENT_SOURCE_DIR}/libraries/glm
+        ${CMAKE_CURRENT_SOURCE_DIR}/libraries/stb
+        ${CMAKE_CURRENT_SOURCE_DIR}/libraries/openal-soft/include
+)
 
 ## for library installation
 include(GNUInstallDirs)
 install(TARGETS ReKat
-    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
-    PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ReKat
+	LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+	PUBLIC_HEADER DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/ReKat
 )
