@@ -1,6 +1,7 @@
 #ifndef LOGIK_MANAGER
 #define LOGIK_MANAGER
 
+/*
 #include "../../resource.hpp"
 
 #include "animation.h"
@@ -19,6 +20,6 @@ namespace Manager {
         _resources.insert( { (name + std::string(typeid(Animation < int >).name())) , anim } );
     }
 }; // namespace Manager
-
+*/
 
 #endif

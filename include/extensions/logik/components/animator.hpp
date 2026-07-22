@@ -2,8 +2,9 @@
 #define ANIMATOR
 
 /* this is an helpfull component that can drive an objekts attributes as well as attributes from other objekts */
-#include "../../objekt.hpp"
-#include "../resources/manager.hpp"
+#include <objekt/objekt.hpp>
+#include "../resources/animation.h"
+#include <utilities/math.h>
 
 class Animator : public Behaviour {
     float Metronome = 0; // reseted every animation change

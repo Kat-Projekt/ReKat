@@ -2,7 +2,6 @@
 #define ANIMATION
 
 #include "../../resource.hpp"
-#include "../../utility/math.h"
 #include <vector>
 
 enum PlayMode {

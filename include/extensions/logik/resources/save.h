@@ -3,7 +3,7 @@
 
 #include <string>
 #include <unordered_map>
-#include "../../debugger.hpp"
+#include <utilities/debugger.hpp>
 #include <fstream>
 
 namespace Manager {

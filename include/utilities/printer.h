@@ -6,24 +6,23 @@
 #include <iostream>
 #include <vector>
 #include <glm/glm.hpp>
-using namespace glm;
 
-inline std::ostream& operator << ( std::ostream& os, const vec2& vec ) {
+inline std::ostream& operator << ( std::ostream& os, const glm::vec2& vec ) {
 	os << "{" << vec.x << ":" << vec.y << "}";
 	return os;
 }
 
-inline std::ostream& operator << ( std::ostream& os, const vec3& vec ) {
+inline std::ostream& operator << ( std::ostream& os, const glm::vec3& vec ) {
 	os << "{" << vec.x << ":" << vec.y << ":" << vec.z << "}";
 	return os;
 }
 
-inline std::ostream& operator << ( std::ostream& os, const vec4& vec ) {
+inline std::ostream& operator << ( std::ostream& os, const glm::vec4& vec ) {
 	os << "{ " << vec.x << ": " << vec.y << ": " << vec.z << ": " << vec.w << " }";
 	return os;
 }
 
-inline std::ostream& operator << ( std::ostream& os, const highp_mat4& mat ) {
+inline std::ostream& operator << ( std::ostream& os, const glm::highp_mat4& mat ) {
 	os << "{" << mat[0][0] << ":" << mat[0][1] << ":" << mat[0][2] << ":" << mat[0][3] << "},\n";
 	os << "{" << mat[1][0] << ":" << mat[1][1] << ":" << mat[1][2] << ":" << mat[1][3] << "},\n";
 	os << "{" << mat[2][0] << ":" << mat[2][1] << ":" << mat[2][2] << ":" << mat[2][3] << "},\n";
