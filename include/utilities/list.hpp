@@ -3,6 +3,7 @@
 
 #define integer unsigned long long int
 #include <iostream>
+#include <memory>
 
 #ifndef Error
 #define Error(msg) std::cout << "error: " << msg << " at line: " << __LINE__ << " of file: " << __FILE__; throw

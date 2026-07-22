@@ -7,23 +7,23 @@
 #include <utilities/math.h>
 
 class Animator : public Behaviour {
-    float Metronome = 0; // reseted every animation change
+	float Metronome = 0; // reseted every animation change
 
-    struct Node {
-        List <  Resource * > animations;
+	struct Node {
+		List <  Resource * > animations;
 
-        template < typename A >
-        void Add_Animation ( Animation < A > * anima ) 
-        { animations.append ( static_cast< Resource * >( anima ) ); }
+		template < typename A >
+		void Add_Animation ( Animation < A > * anima ) 
+		{ animations.append ( static_cast< Resource * >( anima ) ); }
 
-        void Interpolate ( float _time ) {
-            for ( auto A : animations ) 
-            { DEBUG ( 4, "Animating ", A ); A->Use ( _time ); }
-        }
-    };
-    
-    Node* Active_Node;
-    Map < std::string, Node* > nodes;
+		void Interpolate ( float _time ) {
+			for ( auto A : animations ) 
+			{ DEBUG ( 4, "Animating ", A ); A->Use ( _time ); }
+		}
+	};
+	
+	Node* Active_Node;
+	Map < std::string, Node* > nodes;
 public:
     Animator * Change_Animation ( std::string name ) {
         auto New_Node = nodes.get_single ( name );
@@ -49,7 +49,7 @@ public:
         auto n = nodes.get_single ( node );
         if ( n == nullptr )
         { DEBUG (2, "node not found" ); return this; }
-        n->Add_Animation ( Manager::Animation_Get ( anim ) );
+        n->Add_Animation ( Manager::Get < Animation > ( anim ) );
         return this;
     }
 

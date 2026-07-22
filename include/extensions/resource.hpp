@@ -11,6 +11,7 @@ public:
 	virtual int Make ( );
 	virtual void End ( void );
 	virtual void Use ( void );
+	virtual void Use ( float ); // fore time use
 };
 
 namespace Manager {
