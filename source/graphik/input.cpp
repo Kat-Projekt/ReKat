@@ -52,8 +52,8 @@ void ReKat::Graphik::Caracters
 void Input::Update ( ) {
 	for ( auto k = keys.begin(); k != keys.end(); k++ )
 	{
-		if ( k->second == PRESSED ) { k->second = HELD; }
-		if ( k->second == RELEASED ) { k->second = NONE; }
+		if ( k->second == InputMode::PRESSED ) { k->second = InputMode::HELD; }
+		if ( k->second == InputMode::RELEASED ) { k->second = InputMode::NONE; }
 	}
 	typed = "";
 }
@@ -61,27 +61,27 @@ void Input::Update ( ) {
 
 bool Input::Key_Down
 ( std::string key ) 
-{ return ( keys[key] == PRESSED ? true : false ); }
+{ return ( keys[key] == InputMode::PRESSED ? true : false ); }
 
 bool Input::Key_Pressed
 ( std::string key ) 
-{ return ( keys[key] != NONE ? true : false ); }
+{ return ( keys[key] != InputMode::NONE ? true : false ); }
 
 bool Input::Key_Up
 ( std::string key ) 
-{ return ( keys[key] == RELEASED ? true : false ); }
+{ return ( keys[key] == InputMode::RELEASED ? true : false ); }
 
 bool Input::Key_Down
 ( int key ) 
-{ return ( keys[std::to_string(key)] == PRESSED ? true : false ); }
+{ return ( keys[std::to_string(key)] == InputMode::PRESSED ? true : false ); }
 
 bool Input::Key_Pressed
 ( int key ) 
-{ return ( keys[std::to_string(key)] != NONE ? true : false ); }
+{ return ( keys[std::to_string(key)] != InputMode::NONE ? true : false ); }
 
 bool Input::Key_Up
 ( int key ) 
-{ return ( keys[std::to_string(key)] == RELEASED ? true : false ); }
+{ return ( keys[std::to_string(key)] == InputMode::RELEASED ? true : false ); }
 
 
 void Input::Keyboard
@@ -92,33 +92,33 @@ void Input::Keyboard
 	{ _Keyboard ( window, key, scancode, action, mode ); }
 	// adding meta charaters
 	if ( action == GLFW_PRESS ) {
-		if ( key == GLFW_KEY_LEFT_CONTROL || key == GLFW_KEY_RIGHT_CONTROL ) { keys["Ctrl"] = PRESSED; return; }
-		if ( key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT ) { keys["Shift"] = PRESSED; return; }
-		if ( key == GLFW_KEY_LEFT_ALT || key == GLFW_KEY_RIGHT_ALT ) { keys["Alt"] = PRESSED; return; }
-		if ( key == GLFW_KEY_DELETE || key == GLFW_KEY_BACKSPACE ) { keys["Del"] = PRESSED; return; }
-		if ( key == GLFW_KEY_ENTER ) { keys["Enter"] = PRESSED; return; }
-		if ( key == GLFW_KEY_ESCAPE ) { keys["Esc"] = PRESSED; return; }
+		if ( key == GLFW_KEY_LEFT_CONTROL || key == GLFW_KEY_RIGHT_CONTROL ) { keys["Ctrl"] = InputMode::PRESSED; return; }
+		if ( key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT ) { keys["Shift"] = InputMode::PRESSED; return; }
+		if ( key == GLFW_KEY_LEFT_ALT || key == GLFW_KEY_RIGHT_ALT ) { keys["Alt"] = InputMode::PRESSED; return; }
+		if ( key == GLFW_KEY_DELETE || key == GLFW_KEY_BACKSPACE ) { keys["Del"] = InputMode::PRESSED; return; }
+		if ( key == GLFW_KEY_ENTER ) { keys["Enter"] = InputMode::PRESSED; return; }
+		if ( key == GLFW_KEY_ESCAPE ) { keys["Esc"] = InputMode::PRESSED; return; }
 	}
 	if ( action == GLFW_RELEASE ) {
-		if ( key == GLFW_KEY_LEFT_CONTROL || key == GLFW_KEY_RIGHT_CONTROL ) { keys["Ctrl"] = RELEASED; return; }
-		if ( key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT ) { keys["Shift"] = RELEASED; return; }
-		if ( key == GLFW_KEY_LEFT_ALT || key == GLFW_KEY_RIGHT_ALT ) { keys["Alt"] = RELEASED; return; }
-		if ( key == GLFW_KEY_DELETE || key == GLFW_KEY_BACKSPACE ) { keys["Del"] = RELEASED; return; }
-		if ( key == GLFW_KEY_ENTER ) { keys["Enter"] = RELEASED; return; }
-		if ( key == GLFW_KEY_ESCAPE ) { keys["Esc"] = RELEASED; return; }	
+		if ( key == GLFW_KEY_LEFT_CONTROL || key == GLFW_KEY_RIGHT_CONTROL ) { keys["Ctrl"] = InputMode::RELEASED; return; }
+		if ( key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT ) { keys["Shift"] = InputMode::RELEASED; return; }
+		if ( key == GLFW_KEY_LEFT_ALT || key == GLFW_KEY_RIGHT_ALT ) { keys["Alt"] = InputMode::RELEASED; return; }
+		if ( key == GLFW_KEY_DELETE || key == GLFW_KEY_BACKSPACE ) { keys["Del"] = InputMode::RELEASED; return; }
+		if ( key == GLFW_KEY_ENTER ) { keys["Enter"] = InputMode::RELEASED; return; }
+		if ( key == GLFW_KEY_ESCAPE ) { keys["Esc"] = InputMode::RELEASED; return; }	
 	}
 
 	if ( ( GLFW_KEY_A <= key && key <= GLFW_KEY_Z ) || 
 			( key >= GLFW_KEY_0 && key <= GLFW_KEY_9 ) ||
 			( key == GLFW_KEY_SPACE )) { 
-		if ( action == GLFW_PRESS ) { keys[std::string(1,(char)key)] = PRESSED; }
-		if ( action == GLFW_RELEASE ) { keys[std::string(1,(char)key)] = RELEASED; }
+		if ( action == GLFW_PRESS ) { keys[std::string(1,(char)key)] = InputMode::PRESSED; }
+		if ( action == GLFW_RELEASE ) { keys[std::string(1,(char)key)] = InputMode::RELEASED; }
 	}
 
 	// default
 	switch ( action ) {
-		case GLFW_RELEASE: keys[std::to_string(key)] = RELEASED; break;
-		case GLFW_PRESS:  keys[std::to_string(key)] = PRESSED; break;
+		case GLFW_RELEASE: keys[std::to_string(key)] = InputMode::RELEASED; break;
+		case GLFW_PRESS:  keys[std::to_string(key)] = InputMode::PRESSED; break;
 	}
 	
 	DEBUG ( 5, "Key ", key );
@@ -152,14 +152,14 @@ void Input::Mouse_key
 	if ( _Mouse_key != nullptr ) 
 	{ _Mouse_key ( window, button, action, mode ); }
 	if ( action == GLFW_PRESS ) {
-		if ( button == GLFW_MOUSE_BUTTON_LEFT ) { keys["Mouse1"] = PRESSED; return; }
-		if ( button == GLFW_MOUSE_BUTTON_MIDDLE ) { keys["Mouse2"] = PRESSED; return; }
-		if ( button == GLFW_MOUSE_BUTTON_RIGHT ) { keys["Mouse3"] = PRESSED; return; }
+		if ( button == GLFW_MOUSE_BUTTON_LEFT ) { keys["Mouse1"] = InputMode::PRESSED; return; }
+		if ( button == GLFW_MOUSE_BUTTON_MIDDLE ) { keys["Mouse2"] = InputMode::PRESSED; return; }
+		if ( button == GLFW_MOUSE_BUTTON_RIGHT ) { keys["Mouse3"] = InputMode::PRESSED; return; }
 	}
 	if ( action == GLFW_RELEASE ) {
-		if ( button == GLFW_MOUSE_BUTTON_LEFT ) { keys["Mouse1"] = RELEASED; return; }
-		if ( button == GLFW_MOUSE_BUTTON_MIDDLE ) { keys["Mouse2"] = RELEASED; return; }
-		if ( button == GLFW_MOUSE_BUTTON_RIGHT ) { keys["Mouse3"] = RELEASED; return; }
+		if ( button == GLFW_MOUSE_BUTTON_LEFT ) { keys["Mouse1"] = InputMode::RELEASED; return; }
+		if ( button == GLFW_MOUSE_BUTTON_MIDDLE ) { keys["Mouse2"] = InputMode::RELEASED; return; }
+		if ( button == GLFW_MOUSE_BUTTON_RIGHT ) { keys["Mouse3"] = InputMode::RELEASED; return; }
 	}
 }
 

@@ -14,7 +14,7 @@ namespace Graphik {
 	extern void Caracters ( GLFWwindow* window, unsigned int codepoint );
 } }
 
-enum Mode {
+enum class InputMode {
 	NONE,
 	PRESSED,
 	HELD,
@@ -22,7 +22,7 @@ enum Mode {
 };
 
 struct Input {
-	std::map < std::string, Mode > keys;
+	std::map < std::string, InputMode > keys;
 	std::string typed;
 	glm::vec2 mouse_pos = {0,0};
 	glm::vec2 old_mouse_pos;

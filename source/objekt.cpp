@@ -380,9 +380,9 @@ mat4 Objekt::Get_Model_Mat
 { return _transform.Get_Model_Mat ( ); }
 
 
-vec3& Objekt::Expose_Pos
+vec3* Objekt::Expose_Pos
 ( )
-{ return _transform.Expose_Pos ( ); }
+{ return & ( _transform.Expose_Pos ( ) ); }
 
 
 void Objekt::Print_Tree

@@ -10,3 +10,5 @@
 #include "extensions/graphik/components/text_input.h"
 #include "extensions/graphik/components/text.h"
 #include "extensions/graphik/components/tilemap.h"
+
+#include "extensions/logik/components/animator.hpp"

@@ -20,19 +20,15 @@ std::shared_ptr < Transform > Transform::Get_Father
 
 Transform& Transform::Set_Pos
 ( vec3 pos )
-{
-	_pos = pos;
-	_recalcutate = true;
-	return *this;
-}
+{ _pos = pos; _exposable_pos = _pos; _recalcutate = true; return *this; }
 
 Transform& Transform::Set_Pos
 ( float z )
-{ _pos.z = z; _recalcutate = true; return *this; }
+{ _pos.z = z;_exposable_pos.z = _pos.z; _recalcutate = true; return *this; }
 
 Transform& Transform::Inc_Pos
 ( vec3 pos )
-{ _pos += pos; _recalcutate = true; return *this; }
+{ _pos += pos; _exposable_pos = _pos; _recalcutate = true; return *this; }
 
 Transform& Transform::Set_Size
 ( vec3 size )
@@ -89,7 +85,7 @@ const vec3 Transform::Get_Pos
 
 vec3& Transform::Expose_Pos
 ( )
-{ return _pos; }
+{ return _exposable_pos; }
 
 const vec3 Transform::Get_Size
 ( ) const
@@ -156,6 +152,11 @@ Transform::mono_axis_rotation Transform::Get_Rot_Mono
 mat4 Transform::Get_Model_Mat
 ( )
 {
+	if ( _pos != _exposable_pos )
+	{
+		_pos = _exposable_pos;
+		_recalcutate = true;
+	}
 	if ( _recalcutate )
 	{
 		// this is for centering during render trust me bro i know ( reduces 1 transation => good ) 

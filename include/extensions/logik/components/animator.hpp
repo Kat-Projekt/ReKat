@@ -9,7 +9,7 @@
 #include <extensions/phisiks/timer.hpp>
 
 class Animator : public Behaviour {
-	float Metronome = 0; // reseted every animation change
+	double Metronome = 0; // reseted every animation change
 
 	struct Node {
 		List < std::shared_ptr < Resource > > animations;
@@ -33,7 +33,7 @@ public:
         auto New_Node = nodes.get_single ( name );
 
         Active_Node = New_Node;
-        Metronome = 0;
+        Metronome = Timer::Get_Time_d ( );
         return this;
     }
 
@@ -41,7 +41,7 @@ public:
     { nodes.append ( { name, new Node ( ) } ); return this;}
 
     template < typename A >
-    Animator * Add_Animation ( std::string node, Animation < A > * anim ) {
+    Animator * Add_Animation ( std::string node, std::shared_ptr < Animation < A > > anim ) {
         auto n = nodes.get_single ( node );
         if ( n == nullptr )
         { DEBUG (2, "node not found" ); return this; }
@@ -57,14 +57,13 @@ public:
         return this;
     }
 
-    void Start ( ) 
-    { nodes = Map < std::string, Node * > ( true ); }
+	void Start ( ) 
+	{ nodes = Map < std::string, Node * > ( true ); }
 
-    void Update ( ) {
-        Metronome += Timer::delta_time;
-        Active_Node->Interpolate ( Metronome );
-        DEBUG ( 3, "interpolating ", Metronome );
-    }
+	void Update ( ) {
+		Active_Node->Interpolate ( Timer::Get_Time_d ( ) - Metronome );
+		DEBUG ( 3, "interpolating ", Timer::Get_Time_d ( ) - Metronome );
+	}
 };
 
 #endif

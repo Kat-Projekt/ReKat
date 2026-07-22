@@ -20,6 +20,7 @@ private:
 	std::shared_ptr < Transform > _father = nullptr;
 
 	vec3 _pos = {0,0,0};
+	vec3 _exposable_pos = {0,0,0};
 	vec3 _size = {100,100,100};
 	quat _rot = {1,0,0,0};
 	vec3 _rot_pivot = {0,0,0};

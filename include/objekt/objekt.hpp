@@ -76,7 +76,7 @@ public:
 	Objekt& Set_Name ( std::string name );
 	
 	const vec3 Get_Pos ( ) const;
-	vec3& Expose_Pos ( );
+	vec3* Expose_Pos ( );
 	const vec3 Get_Size ( ) const;
 	const vec3 Get_Rot ( ) const;
 	const vec3 Get_Rot_Pivot ( ) const;
