@@ -4,6 +4,7 @@
 #include "../../resource.hpp"
 #include <vector>
 #include <utilities/math.h>
+#include <utilities/math.h>
 
 enum class PlayMode {
     LOOP,
@@ -50,7 +51,17 @@ public:
 		nframe.final_state = final;
 		nframe.duration = duration;
 		nframe.interpolator = interpolator;
+	Animation* Add_Frame ( T initial, T final, float duration, T ( *interpolator ) ( T, T, float ) = Lerp < T >) {
+		if ( duration <= 0 )
+		{ DEBUG (2, "the duration is not correct" ); return this; }
 
+		frame nframe;
+		nframe.initial_state = initial;
+		nframe.final_state = final;
+		nframe.duration = duration;
+		nframe.interpolator = interpolator;
+
+		total_duration += duration;
 		total_duration += duration;
 
 		if ( frames.size ( ) == 0 ) {
