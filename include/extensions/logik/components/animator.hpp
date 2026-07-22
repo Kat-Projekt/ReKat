@@ -4,17 +4,21 @@
 /* this is an helpfull component that can drive an objekts attributes as well as attributes from other objekts */
 #include <objekt/objekt.hpp>
 #include "../resources/animation.h"
-#include <utilities/math.h>
+#include <utilities/map.h>
+
+#include <extensions/phisiks/timer.hpp>
 
 class Animator : public Behaviour {
 	float Metronome = 0; // reseted every animation change
 
 	struct Node {
-		List <  Resource * > animations;
+		List < std::shared_ptr < Resource > > animations;
 
 		template < typename A >
-		void Add_Animation ( Animation < A > * anima ) 
-		{ animations.append ( static_cast< Resource * >( anima ) ); }
+		void Add_Animation ( std::shared_ptr < Animation < A > > anima ) 
+		{
+			animations.append ( static_cast< std::shared_ptr < Resource > >( anima ) );
+		}
 
 		void Interpolate ( float _time ) {
 			for ( auto A : animations ) 
@@ -49,7 +53,7 @@ public:
         auto n = nodes.get_single ( node );
         if ( n == nullptr )
         { DEBUG (2, "node not found" ); return this; }
-        n->Add_Animation ( Manager::Get < Animation > ( anim ) );
+        n->Add_Animation ( Manager::Get < Animation < int > > ( anim ) );
         return this;
     }
 
