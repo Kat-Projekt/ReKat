@@ -267,7 +267,7 @@ void Objekt::Handle_Collisions
 			" between ", Get_Name ( ), " and ", collider->Get_Name () );
 }
 
-std::shared_ptr < Behaviour > Objekt::Add_Component
+std::shared_ptr < Behaviour > Objekt::Add_Component_Aux
 ( std::string type )
 {
 	DEBUG ( 3, "Requiring a special component", type );
@@ -284,7 +284,7 @@ std::shared_ptr < Behaviour > Objekt::Add_Component
 	return nullptr;
 }
 
-std::shared_ptr < Behaviour > Objekt::Get_Component
+std::shared_ptr < Behaviour > Objekt::Get_Component_Aux
 ( std::string type )
 {
 	DEBUG ( 5, "finding component: ", type );
@@ -297,7 +297,7 @@ std::shared_ptr < Behaviour > Objekt::Get_Component
 	return nullptr;
 }
 
-List < std::shared_ptr < Behaviour > > Objekt::Get_Component_Recursive ( std::string type )
+List < std::shared_ptr < Behaviour > > Objekt::Get_Component_Recursive_Aux ( std::string type )
 {
 	List < std::shared_ptr < Behaviour > > L;
 	for ( auto c : _components ) 
