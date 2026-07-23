@@ -97,6 +97,12 @@ namespace Manager
 		DEBUG ( 3, "ENDED INTEGRITY CHECK" );
 	}
 
+	extern void Free_Objekts ( )
+	{
+		objekts.Deallocate ();
+		DEBUG ( 3, "derefencing every objekt" );
+	}
+
 	extern void Free_Objekt ( std::string name )
 	{
 		auto D = Objekt_Get ( name );

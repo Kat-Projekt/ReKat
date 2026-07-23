@@ -1,7 +1,7 @@
 #include "extensions/graphik/manager.hpp"
 
 namespace Manager {
-	std::unordered_map < std::string, std::shared_ptr < Camera > > _cameras;
+	std::unordered_map < std::string, Camera* > _cameras;
 
 	extern int Defaults_Load ( void )
 	{
@@ -56,7 +56,7 @@ namespace Manager {
 		return 0;
 	}
 
-	extern std::shared_ptr < Camera > Camera_Get
+	extern Camera* Camera_Get
 	( std::string name )
 	{
 		if ( name == "" ) { return nullptr; }

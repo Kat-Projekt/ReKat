@@ -22,6 +22,7 @@ namespace Manager
 	extern std::shared_ptr < Objekt > Objekt_Get ( std::string name );
 	
 	extern void Free_Objekt ( std::string name );
+	extern void Free_Objekts ( );
 
 	extern void Set_Active_Scene ( std::shared_ptr < Objekt > o );
 	extern void Set_Active_Scene ( std::string s );

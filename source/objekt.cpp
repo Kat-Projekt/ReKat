@@ -1,5 +1,5 @@
 #include "objekt/objekt.hpp"
-#include "manager.hpp"
+#include "objekt/manager.hpp"
 
 Objekt::Objekt
 ( void )

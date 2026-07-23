@@ -15,12 +15,12 @@
 #include "resources/default_shaders.h"
 
 namespace Manager {
-	extern std::unordered_map < std::string, std::shared_ptr < Camera > > _cameras;
+	extern std::unordered_map < std::string, Camera* > _cameras;
 
 	extern int Defaults_Load ( void );
 
 	extern int Camera_Bind ( std::string name, std::string objekt, Framebuffer* framebuffer = nullptr );
-	extern std::shared_ptr < Camera > Camera_Get ( std::string name );
+	extern Camera* Camera_Get ( std::string name );
 };
 
 #endif

@@ -81,6 +81,7 @@ public:
 	const Transform& Get_Transform ( ) const;
 
 	Objekt& Add_Child ( std::shared_ptr < Objekt > child );
+	Objekt& Add_Child ( std::string name );
 	std::shared_ptr < Objekt > Get_Child ( std::string name );
 	List < std::shared_ptr < Objekt > > & Get_Children ( );
 

@@ -13,10 +13,10 @@
 
 namespace Timer {
 	auto start = std::chrono::system_clock::now ( );
-	double delta_time = 0;
-	double fixed_delta_time = 0;
-	double current_time = 0;
-	double current_fixed_time = 0;
+	double inline delta_time = 0;
+	double inline fixed_delta_time = 0;
+	double inline current_time = 0;
+	double inline current_fixed_time = 0;
 
 	double Get_Time_d
 	( ) {
@@ -25,7 +25,12 @@ namespace Timer {
 		* TIME_SCALING;
 	}
 	float Get_Time ( ) 
-	{ return (float)(Get_Time_d()); }
+	{ return (float)(Get_Time_d ( )); }
+
+	float Get_Delta ( )
+	{
+		return delta_time;
+	}
 	
 	void Update ( )
 	{
