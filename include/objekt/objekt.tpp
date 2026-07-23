@@ -50,7 +50,7 @@ List < std::shared_ptr < C > > Objekt::Get_Component_Recursive_Aux ( )
 	}
 
 	for ( auto O : _children ) {
-		auto Data = O->Get_Component_Recursive < C > ( );
+		auto Data = O->Get_Component_Recursive_Aux < C > ( );
 		L.append ( Data );
 	}
 
@@ -92,7 +92,7 @@ List < C* > Objekt::Get_Component_Recursive ( )
 {
     auto shared_list = Get_Component_Recursive_Aux < C > ( );
     List < C* > raw_list;
-    for ( auto& ptr : shared_list )
+    for ( auto ptr : shared_list )
     {
         if ( ptr ) raw_list.append ( ptr.get() );
     }
