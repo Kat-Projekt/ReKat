@@ -1,4 +1,5 @@
 #include "objekt/objekt.hpp"
+#include "manager.hpp"
 
 Objekt::Objekt
 ( void )
@@ -59,6 +60,13 @@ Objekt& Objekt::Add_Child
 	if ( _started ) { child->Start( ); }
 	return *this;
 }
+
+Objekt& Objekt::Add_Child
+( std::string name )
+{
+	return Add_Child(Manager::Objekt_Get(name));
+}
+
 Objekt& Objekt::Rem_Child
 ( std::string name )
 {
@@ -415,3 +423,30 @@ std::ostream & operator <<
 std::ostream & operator ,
 ( std::ostream & out, Objekt & n )
 { out << n; return out; }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+Behaviour* Objekt::Add_Component
+( std::string type )
+{
+    auto comp = Add_Component_Aux ( type );
+    return comp ? comp.get() : nullptr;
+}
+
+Behaviour* Objekt::Get_Component
+( std::string type )
+{
+    auto comp = Get_Component_Aux ( type );
+    return comp ? comp.get() : nullptr;
+}
+
+List < Behaviour* > Objekt::Get_Component_Recursive
+( std::string type )
+{
+    auto shared_list = Get_Component_Recursive_Aux ( type );
+    List < Behaviour* > raw_list;
+    for ( auto& ptr : shared_list )
+    {
+        if ( ptr ) { raw_list.append ( ptr.get() ); }
+    }
+    return raw_list;
+}

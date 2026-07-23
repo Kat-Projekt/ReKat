@@ -41,6 +41,25 @@ private:
 		Objekt_Call object_call
 	);
 
+	template < class C > std::shared_ptr < C > Add_Component_Aux ( );
+	template < class C > std::shared_ptr < C > Add_Component_Aux ( std::shared_ptr < C > c );
+	std::shared_ptr < Behaviour > Add_Component_Aux ( std::string type );
+
+	template < class C > std::shared_ptr < C > Get_Component_Aux ( );
+	template < class C > List < std::shared_ptr < C > >  Get_Components_Aux ( );
+	template < class C > List < std::shared_ptr < C > > Get_Component_Recursive_Aux ( );
+	template < class C > List < std::shared_ptr < C > > Get_Component_In_Children_Aux ( );
+
+	std::shared_ptr < Behaviour > Get_Component_Aux ( std::string type );
+	List < std::shared_ptr < Behaviour > >  Get_Components_Aux ( std::string type );
+	List < std::shared_ptr < Behaviour > > Get_Component_Recursive_Aux ( std::string type );
+	List < std::shared_ptr < Behaviour > > Get_Component_In_Children_Aux ( std::string type );
+
+	template < class C > std::shared_ptr < C > Rem_Component_Aux ( );
+	std::shared_ptr < Behaviour > Rem_Component_Aux ( std::string type );
+	template < class C > std::shared_ptr < C > Rem_Components_Aux ( );
+
+
 public:
 	Objekt ( void );
 
@@ -90,23 +109,23 @@ public:
 	bool Get_Active ( ) const;
 	std::string Get_Name ( ) const;
 
-	template < class C > std::shared_ptr < C > Add_Component ( );
-	template < class C > std::shared_ptr < C > Add_Component ( std::shared_ptr < C > c );
-	std::shared_ptr < Behaviour > Add_Component ( std::string type );
+	template < class C > C* Add_Component ( );
+	template < class C > C* Add_Component ( std::shared_ptr < C > c );
+	Behaviour* Add_Component ( std::string type );
 
-	template < class C > std::shared_ptr < C > Get_Component ( );
-	template < class C > List < std::shared_ptr < C > >  Get_Components ( );
-	template < class C > List < std::shared_ptr < C > > Get_Component_Recursive ( );
-	template < class C > List < std::shared_ptr < C > > Get_Component_In_Children ( );
+	template < class C > C* Get_Component ( );
+	template < class C > List < C* >  Get_Components ( );
+	template < class C > List < C* > Get_Component_Recursive ( );
+	template < class C > List < C* > Get_Component_In_Children ( );
 
-	std::shared_ptr < Behaviour > Get_Component ( std::string type );
-	List < std::shared_ptr < Behaviour > >  Get_Components ( std::string type );
-	List < std::shared_ptr < Behaviour > > Get_Component_Recursive ( std::string type );
-	List < std::shared_ptr < Behaviour > > Get_Component_In_Children ( std::string type );
+	Behaviour* Get_Component ( std::string type );
+	List < Behaviour* >  Get_Components ( std::string type );
+	List < Behaviour* > Get_Component_Recursive ( std::string type );
+	List < Behaviour* > Get_Component_In_Children ( std::string type );
 
-	template < class C > std::shared_ptr < C > Rem_Component ( );
-	std::shared_ptr < Behaviour > Rem_Component ( std::string type );
-	template < class C > std::shared_ptr < C > Rem_Components ( );
+	template < class C > C* Rem_Component ( );
+	Behaviour* Rem_Component ( std::string type );
+	template < class C > C* Rem_Components ( );
 
 	template < class C > bool Has_Component ( );
 	bool Has_Component ( std::string type );
