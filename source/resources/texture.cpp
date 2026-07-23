@@ -77,8 +77,8 @@ int Texture::Make (
 	const char * file,
 	unsigned int Texture_Number
 ) {
-	Make ( file );
 	_texture_number = Texture_Number;
+	return Make ( file );
 }
 
 int Texture::Make
