@@ -8,7 +8,7 @@ set(CMAKE_CXX_STANDARD 17)
 include(CMakeParseArguments)
 
 option ( REKAT_TEST "Compile the tests" OFF )
-option ( REKAT_LAUNCH "Removes the console window for projekts" ON )
+option ( REKAT_LAUNCH "Removes the console window for projekts" OFF )
 option ( REKAT_COMPONENT "Builds all specified components" OFF )
 option ( REKAT_DEBUG "Activates DIAGNOSTIC for every file" OFF )
 option ( REKAT_DEBUG_EXPANCE "Activates EXPANCE for every file" OFF )

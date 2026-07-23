@@ -73,6 +73,14 @@ int Texture::Make
 	return SUCCESS; 
 }
 
+int Texture::Make (
+	const char * file,
+	unsigned int Texture_Number
+) {
+	Make ( file );
+	_texture_number = Texture_Number;
+}
+
 int Texture::Make
 ( unsigned char* data, unsigned int width, unsigned int height, int channels )
 {

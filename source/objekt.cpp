@@ -263,7 +263,7 @@ void Objekt::Handle_Collisions
 		}
 	}
 
-	DEBUG ( 5, "A collision of type: ", Type, ( trigger ? "(trigger)" : "(solid)" ), 
+	DEBUG ( 5, "A collision of type: ", ( trigger ? "(trigger)" : "(solid)" ), 
 			" between ", Get_Name ( ), " and ", collider->Get_Name () );
 }
 
@@ -307,7 +307,7 @@ List < std::shared_ptr < Behaviour > > Objekt::Get_Component_Recursive_Aux ( std
 	}
 
 	for ( auto O : _children ) {
-		auto Data = O->Get_Component_Recursive ( type );
+		auto Data = O->Get_Component_Recursive_Aux ( type );
 		L.append ( Data );
 	}
 	
@@ -444,7 +444,7 @@ List < Behaviour* > Objekt::Get_Component_Recursive
 {
     auto shared_list = Get_Component_Recursive_Aux ( type );
     List < Behaviour* > raw_list;
-    for ( auto& ptr : shared_list )
+    for ( auto ptr : shared_list )
     {
         if ( ptr ) { raw_list.append ( ptr.get() ); }
     }

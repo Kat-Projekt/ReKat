@@ -2,7 +2,7 @@
 
 Transform::Transform
 ( vec3 pos, vec3 size, vec3 rot_pivot )
-: _pos(pos), _size(size), _rot_pivot(rot_pivot)
+: _pos(pos), _exposable_pos(pos), _size(size), _rot_pivot(rot_pivot)
 { }
 
 

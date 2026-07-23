@@ -226,7 +226,7 @@ Framebuffer& Framebuffer::Set (
 
 // sender render target
 Framebuffer& Framebuffer::Set
-( Objekt* to_render )
+( std::shared_ptr < Objekt > to_render )
 {
 	if ( _started )
 	{ to_render->Start ( ); }

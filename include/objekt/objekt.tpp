@@ -31,7 +31,8 @@ std::shared_ptr < C > Objekt::Add_Component_Aux
 template < class C > 
 std::shared_ptr < C > Objekt::Get_Component_Aux ( )
 {
-	std::shared_ptr < Behaviour > p = Get_Component_Aux ( typeid ( C ).name ( ) );
+	C _p;
+	std::shared_ptr < Behaviour > p = Get_Component_Aux ( _p.Get_Type ( ) );
 	if ( p )
 	{ return std::static_pointer_cast < C > ( p ); }
 	else

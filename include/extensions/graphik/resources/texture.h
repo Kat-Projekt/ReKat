@@ -36,6 +36,9 @@ public:
 	// loads the texture
 	// -----------------
 	int Make ( const char * file );
+	// loads the texture at specified texture number
+	// ---------------------------------------------
+	int Make ( const char * file, unsigned int Texture_Number );
 	// creates the texture
 	// ------------------
 	int Make (

@@ -68,7 +68,7 @@ void Sprite::Update
 
 	mat4 model = obj->Get_Model_Mat ( );
 	shader->setMat4 ( "model", model );
-	DEBUG ( 6, "Updated Model uniform");
+	DEBUG ( 6, "Updated Model uniform", model);
 
 	shader->setVec4 ( "spriteColor", _color );
 	shader->setInt  ( "frame", _frame );

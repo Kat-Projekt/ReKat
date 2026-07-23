@@ -18,7 +18,7 @@ private:
 
 	// where to do the main render call 
 	// this objekt must be exluded from the other callers: like manager
-	Objekt * _to_render;
+	std::shared_ptr < Objekt > _to_render;
 
 	// risolution
 	unsigned int _width = 0;
@@ -60,7 +60,7 @@ public:
 		bool UI_sprite = true
 	);
 	// sender render target
-	Framebuffer& Set ( Objekt* to_render );
+	Framebuffer& Set ( std::shared_ptr < Objekt > to_render );
 };
 
 #endif
