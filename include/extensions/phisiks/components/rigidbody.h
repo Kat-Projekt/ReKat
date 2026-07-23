@@ -1,7 +1,7 @@
 #ifndef RIGIDBODY_H
 #define RIGIDBODY_H
 
-#include "../../objekt.hpp"
+#include <objekt/objekt.hpp>
 #include "../timer.hpp"
 
 class Rigidbody : public Behaviour {
@@ -18,8 +18,8 @@ public:
 		// x_{n+1} = 2 x_n - x_{n+1} + acc_n * dt
 		if ( block_z ) { velocity.z = 0; acceleration.z = 0;}
 		if ( acceleration != vec3{0,0,0} )
-		{ velocity += acceleration * Timer::fixed_delta_time * time_scale; }
-		obj->Inc_Pos ( velocity * Timer::fixed_delta_time * time_scale );
+		{ velocity += acceleration * (float) Timer::fixed_delta_time * time_scale; }
+		obj->Inc_Pos ( velocity * (float) Timer::fixed_delta_time * time_scale );
 	}
 
 	void Vincolar_Reaction ( vec3 plane_normal ) {

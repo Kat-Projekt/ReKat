@@ -236,21 +236,21 @@ void Objekt::Fixed_Update
 }
 
 void Objekt::Handle_Collisions
-( std::shared_ptr < Objekt > collider, bool trigger, collision_type Type )
+( Objekt* collider, bool trigger, collision_type Type )
 {
 	for ( auto C : _components ) {
 		if ( !trigger ) {
 			switch ( Type ) {
-				case 0: C->Collision ( collider ); break; // Stay 
-				case 1: C->Collision_Enter ( collider ); break; // Enter 
-				case 2: C->Collision_Exit ( collider ); break; // Exit
+				case collision_type::Stay: C->Collision ( collider ); break; // Stay 
+				case collision_type::Enter: C->Collision_Enter ( collider ); break; // Enter 
+				case collision_type::Exit: C->Collision_Exit ( collider ); break; // Exit
 			}
 			DEBUG ( 4, "calling ", C->Get_Type ( ) );
 		} else {
 			switch ( Type ) {
-				case 0: C->Collision_Trigger ( collider ); break; // Stay 
-				case 1: C->Collision_Trigger_Enter ( collider ); break; // Enter 
-				case 2: C->Collision_Trigger_Exit ( collider ); break; // Exit
+				case collision_type::Stay: C->Collision_Trigger ( collider ); break; // Stay 
+				case collision_type::Enter: C->Collision_Trigger_Enter ( collider ); break; // Enter 
+				case collision_type::Exit: C->Collision_Trigger_Exit ( collider ); break; // Exit
 			}
 		}
 	}

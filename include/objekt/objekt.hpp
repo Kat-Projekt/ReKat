@@ -12,6 +12,12 @@
 #include "component_manager.hpp"
 #include "transform.hpp"
 
+enum class collision_type {
+	Enter,
+	Stay,
+	Exit
+};
+
 class Objekt : public std::enable_shared_from_this<Objekt>
 {
 protected:
@@ -111,15 +117,10 @@ public:
 	void Late_Update ( std::string ind = "" );
 	void Fixed_Update ( std::string ind = "" );
 
-	enum collision_type {
-		Enter,
-		Stay,
-		Exit
-	};
 	void Handle_Collisions (
-		std::shared_ptr < Objekt > collider,
+		Objekt* collider,
 		bool trigger = false,
-		collision_type Type = Stay
+		collision_type Type = collision_type::Stay
 	);
 
 	mat4 Get_Model_Mat ( );

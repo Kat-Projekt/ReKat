@@ -1,7 +1,7 @@
 #ifndef PRIMITIVE_COLLISION_H
 #define PRIMITIVE_COLLISION_H
 
-#include "../../objekt.hpp"
+#include <objekt/objekt.hpp>
 #include "rigidbody.h"
 
 class Collider : public Behaviour {

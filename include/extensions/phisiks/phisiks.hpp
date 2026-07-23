@@ -1,7 +1,7 @@
 #ifndef PHISIKS
 #define PHISIKS
 
-#include "../objekt.hpp"
+#include <objekt/objekt.hpp>
 #include "components/collision.h"
 #include <unordered_map>
 
@@ -249,7 +249,7 @@ class Brute_Force : public Collision_Narrower {
 
 public:
     void Set_Colliders ( List < Collider* > &colliders ) { _colliders = colliders; }
-	List < collision_check > Get_Collisions_To_Check ( ) {
+    List < collision_check > Get_Collisions_To_Check ( ) {
         List < collision_check > cheks;
 
         for ( auto col : _colliders ) {
@@ -309,9 +309,9 @@ namespace phisiks {
         List < Collider *> active_colliders;
         for ( auto C : Colliders ) {
             if ( C->Get_Active ( ) && C->obj->Get_Active ( ) ) {
-            if ( Manager::Objekt_Get ( Active )->Has_Children ( C->obj ) )
+            if ( Manager::Objekt_Get ( Active )->Has_Child ( C->obj->Get_Name ( ) ) )
             { active_colliders.append ( C ); } }
-		}
+        }
 
         DEBUG ( 4, " Colliders to check: ", active_colliders );
 
@@ -385,12 +385,12 @@ namespace phisiks {
             // collision category
             if ( C.collider1->Is_Trigger( ) || C.collider2->Is_Trigger( ) ) {
                 // trigger
-                C.collider1->obj->Andle_Collsions ( C.collider2->obj, true, 1 );
-                C.collider2->obj->Andle_Collsions ( C.collider1->obj, true, 1 );
+                C.collider1->obj->Handle_Collisions ( C.collider2->obj, true, collision_type::Enter );
+                C.collider2->obj->Handle_Collisions ( C.collider1->obj, true, collision_type::Enter );
             } else {
                 // not trigger
-                C.collider1->obj->Andle_Collsions ( C.collider2->obj, false, 1 );
-                C.collider2->obj->Andle_Collsions ( C.collider1->obj, false, 1 );
+                C.collider1->obj->Handle_Collisions ( C.collider2->obj, false, collision_type::Enter );
+                C.collider2->obj->Handle_Collisions ( C.collider1->obj, false, collision_type::Enter );
             } } }
 
             // inside collision => trigger stay collision always
@@ -427,11 +427,11 @@ namespace phisiks {
                         C.collider2->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction(-normalize_exit);
                     }
 
-                    C.collider1->obj->Andle_Collsions ( C.collider2->obj, false );
-                    C.collider2->obj->Andle_Collsions ( C.collider1->obj, false );
+                    C.collider1->obj->Handle_Collisions ( C.collider2->obj, false );
+                    C.collider2->obj->Handle_Collisions ( C.collider1->obj, false );
                 } else {
-                    C.collider1->obj->Andle_Collsions ( C.collider2->obj, true );
-                    C.collider2->obj->Andle_Collsions ( C.collider1->obj, true );
+                    C.collider1->obj->Handle_Collisions ( C.collider2->obj, true );
+                    C.collider2->obj->Handle_Collisions ( C.collider1->obj, true );
                 }
             }
 
@@ -445,12 +445,12 @@ namespace phisiks {
             // collision category
             if ( C.collider1->Is_Trigger( ) || C.collider2->Is_Trigger( ) ) {
                 // trigger
-                C.collider1->obj->Andle_Collsions ( C.collider2->obj, true, 2 );
-                C.collider2->obj->Andle_Collsions ( C.collider1->obj, true, 2 );
+                C.collider1->obj->Handle_Collisions ( C.collider2->obj, true, collision_type::Exit );
+                C.collider2->obj->Handle_Collisions ( C.collider1->obj, true, collision_type::Exit );
             } else {
                 // not trigger
-                C.collider1->obj->Andle_Collsions ( C.collider2->obj, false, 2 );
-                C.collider2->obj->Andle_Collsions ( C.collider1->obj, false, 2 );
+                C.collider1->obj->Handle_Collisions ( C.collider2->obj, false, collision_type::Exit );
+                C.collider2->obj->Handle_Collisions ( C.collider1->obj, false, collision_type::Exit );
             } } }
 
             // add collision to pool

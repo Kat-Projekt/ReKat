@@ -51,13 +51,13 @@ public:
 	virtual void Late_Update ( );
 	virtual void Fixed_Update ( );
 
-	virtual void Collision ( std::shared_ptr < Objekt > _obj );
-	virtual void Collision_Exit ( std::shared_ptr < Objekt > _obj );
-	virtual void Collision_Enter ( std::shared_ptr < Objekt > _obj );
+	virtual void Collision ( Objekt* _obj );
+	virtual void Collision_Exit ( Objekt* _obj );
+	virtual void Collision_Enter ( Objekt* _obj );
 
-	virtual void Collision_Trigger ( std::shared_ptr < Objekt > _obj );
-	virtual void Collision_Trigger_Exit ( std::shared_ptr < Objekt > _obj );
-	virtual void Collision_Trigger_Enter ( std::shared_ptr < Objekt > _obj );
+	virtual void Collision_Trigger ( Objekt* _obj );
+	virtual void Collision_Trigger_Exit ( Objekt* _obj );
+	virtual void Collision_Trigger_Enter ( Objekt* _obj );
 
 	void Set_Active ( bool active );
 	bool Get_Active ( );

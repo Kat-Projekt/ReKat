@@ -43,11 +43,11 @@ void Resolve_Collision ( C1 c1, C2 c2 ) {
 				c2->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction(-normalize_exit);
 			}
 
-			c1->obj->Andle_Collsions ( c2->obj, false );
-			c2->obj->Andle_Collsions ( c1->obj, false );
+			c1->obj->Handle_Collisions ( c2->obj, false );
+			c2->obj->Handle_Collisions ( c1->obj, false );
 		} else {
-			c1->obj->Andle_Collsions ( c2->obj, true );
-			c2->obj->Andle_Collsions ( c1->obj, true );
+			c1->obj->Handle_Collisions ( c2->obj, true );
+			c2->obj->Handle_Collisions ( c1->obj, true );
 		}
 	}
 }
@@ -55,9 +55,9 @@ void Resolve_Collision ( C1 c1, C2 c2 ) {
 void Resolve_Collisions ( Objekt * obj ) {
 	// broad collision fase
 	// // get all of the colliders
-	List < Box_Collider* > BCs = obj->Get_Component_Recursive < Box_Collider > ( );
-	List < Sfere_Collider* > SCs = obj->Get_Component_Recursive < Sfere_Collider > ( );
-	List < Tilemap_Collider* > TCs = obj->Get_Component_Recursive < Tilemap_Collider > ( );
+	List < std::shared_ptr < Box_Collider > > BCs = obj->Get_Component_Recursive < Box_Collider > ( );
+	List < std::shared_ptr < Sfere_Collider > > SCs = obj->Get_Component_Recursive < Sfere_Collider > ( );
+	List < std::shared_ptr < Tilemap_Collider > > TCs = obj->Get_Component_Recursive < Tilemap_Collider > ( );
 	// // get their type : STATIC / DINAMIC
 	
 	// // create a spacial hash map
@@ -72,11 +72,11 @@ void Resolve_Collisions ( Objekt * obj ) {
 	// Brute force
 	// // run Box - Box
 	for ( size_t primo = 0; primo + 1 < BCs.size(); primo ++ ) {
-		Box_Collider * _cp = BCs[primo];
+		std::shared_ptr < Box_Collider > _cp = BCs[primo];
 		if ( ! _cp->obj->Get_Active ( ) ) { continue; }
 		// ciclo per le coppie non viste e diverse dall'identità
 		for ( size_t secondo = 1 + primo; secondo < BCs.size(); secondo ++ ) {
-			Box_Collider * _cs = BCs[secondo];
+			std::shared_ptr < Box_Collider > _cs = BCs[secondo];
 			if ( ! _cs->obj->Get_Active ( ) ) { continue; }
 
 			Resolve_Collision ( _cp, _cs );
@@ -89,11 +89,11 @@ void Resolve_Collisions ( Objekt * obj ) {
 	//std::cout << SCs.size() << '\n';
 	for ( size_t primo = 0; primo + 1< SCs.size(); primo ++ ) {
 		//std::cout << "coked\n";
-		Sfere_Collider * _cp = SCs[primo];
+		std::shared_ptr < Sfere_Collider >  _cp = SCs[primo];
 		if ( ! _cp->obj->Get_Active ( ) ) { continue; }
 		// ciclo per le coppie non viste e diverse dall'identità
 		for ( size_t secondo = 1 + primo; secondo < SCs.size(); secondo ++ ) {
-			Sfere_Collider * _cs = SCs[secondo];
+			std::shared_ptr < Sfere_Collider >  _cs = SCs[secondo];
 			if ( ! _cs->obj->Get_Active ( ) ) { continue; }
 
 			Resolve_Collision ( _cp, _cs );
@@ -104,11 +104,11 @@ void Resolve_Collisions ( Objekt * obj ) {
 
 	// // run Box - Sfere
 	for ( size_t primo = 0; primo < BCs.size(); primo ++ ) {
-		Box_Collider * _cp = BCs[primo];
+		std::shared_ptr < Box_Collider > _cp = BCs[primo];
 		if ( ! _cp->obj->Get_Active ( ) ) { continue; }
 		// ciclo per le coppie non viste e diverse dall'identità
 		for ( size_t secondo = 0; secondo < SCs.size(); secondo ++ ) {
-			Sfere_Collider * _cs = SCs[secondo];
+			std::shared_ptr < Sfere_Collider >  _cs = SCs[secondo];
 
 			//std::cout << "collision: " << _cp->obj->Get_Name ( ) << " & " << _cs->obj->Get_Name ( ) << '\n';
 			if ( ! _cs->obj->Get_Active ( ) ) { continue; }
@@ -120,11 +120,11 @@ void Resolve_Collisions ( Objekt * obj ) {
 	//std::cout << "Box-Sfere computed\n";
 
 	for ( size_t primo = 0; primo < TCs.size(); primo ++ ) {
-		Tilemap_Collider * _cp = TCs[primo];
+		std::shared_ptr < Tilemap_Collider > _cp = TCs[primo];
 		if ( ! _cp->obj->Get_Active ( ) ) { continue; }
 		// ciclo per le coppie non viste e diverse dall'identità
 		for ( size_t secondo = 0; secondo < BCs.size(); secondo ++ ) {
-			Box_Collider * _cs = BCs[secondo];
+			std::shared_ptr < Box_Collider > _cs = BCs[secondo];
 			//std::cout << "collision: " << _cp->obj->Get_Name ( ) << " & " << _cs->obj->Get_Name ( ) << '\n';
 			if ( ! _cs->obj->Get_Active ( ) ) { continue; }
 			

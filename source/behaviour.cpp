@@ -45,22 +45,22 @@ void Behaviour::Late_Update ( ) { }
 void Behaviour::Fixed_Update ( ) { }
 
 void Behaviour::Collision
-( std::shared_ptr < Objekt > _obj )
+( Objekt* _obj )
 { ( void ) _obj; }
 void Behaviour::Collision_Exit
-( std::shared_ptr < Objekt > _obj )
+( Objekt* _obj )
 { ( void ) _obj; }
 void Behaviour::Collision_Enter
-( std::shared_ptr < Objekt > _obj )
+( Objekt* _obj )
 { ( void ) _obj; }
 void Behaviour::Collision_Trigger
-( std::shared_ptr < Objekt > _obj )
+( Objekt* _obj )
 { ( void ) _obj; }
 void Behaviour::Collision_Trigger_Exit
-( std::shared_ptr < Objekt > _obj )
+( Objekt* _obj )
 { ( void ) _obj; }
 void Behaviour::Collision_Trigger_Enter
-( std::shared_ptr < Objekt > _obj )
+( Objekt* _obj )
 { ( void ) _obj; }
 
 void Behaviour::Set_Active ( bool active )
