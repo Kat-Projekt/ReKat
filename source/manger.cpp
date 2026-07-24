@@ -30,7 +30,7 @@ namespace Manager
 			{ return S; }
 		}
 
-		DEBUG ( 1, "Cannot find objekt ", name );
+		DEBUG ( 1, "Cannot find objekt '", name, "'" );
 		return nullptr;
 	}
 

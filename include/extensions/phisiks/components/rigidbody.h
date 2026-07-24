@@ -18,8 +18,9 @@ public:
 		// x_{n+1} = 2 x_n - x_{n+1} + acc_n * dt
 		if ( block_z ) { velocity.z = 0; acceleration.z = 0;}
 		if ( acceleration != vec3{0,0,0} )
-		{ velocity += acceleration * (float) Timer::fixed_delta_time * time_scale; }
-		obj->Inc_Pos ( velocity * (float) Timer::fixed_delta_time * time_scale );
+		{ velocity += acceleration * Timer::Get_Delta ( ) * time_scale; }
+		obj->Inc_Pos ( velocity * Timer::Get_Delta ( ) * time_scale );
+		DEBUG ( 3, "vel: ", velocity );
 	}
 
 	void Vincolar_Reaction ( vec3 plane_normal ) {

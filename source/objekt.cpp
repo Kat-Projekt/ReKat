@@ -106,6 +106,12 @@ bool Objekt::Has_Child
 	return false;
 }
 
+bool Objekt::Has_Child
+( std::string name )
+{
+	return Has_Child ( Manager::Objekt_Get ( name ) );
+}
+
 List < std::shared_ptr < Objekt > > & Objekt::Get_Children
 ( ) { return _children; }
 
