@@ -216,8 +216,8 @@ void Text::Delete
 Text * Text::Set (
 	std::string font,
 	std::string shader,
-	std::string camera = "",
-	vec4 color = {1,1,1,1}
+	std::string camera,
+	vec4 color
 ) {
 	_font = font;
 	_shader = shader;
@@ -226,11 +226,11 @@ Text * Text::Set (
 	return this;
 }
 
-Text * Set (
+Text * Text::Set (
 	std::string text,
 	ALIGNMENT al_horizontal,
-	ALIGNMENT al_vertical = ALIGNMENT::CENTER,
-	bool x_warp = false
+	ALIGNMENT al_vertical,
+	bool x_warp
 ) {
 	_text = text;
 	_text_align_h = al_horizontal;
@@ -240,14 +240,14 @@ Text * Set (
 	return this;
 }
 
-Text * Set
+Text * Text::Set
 ( vec4 color ) 
 {
 	_color = color;
 	return this;
 }
 
-Text * Set
+Text * Text::Set
 ( std::string text )
 {
 	_text = text;
@@ -255,13 +255,13 @@ Text * Set
 	return this;
 }
 
-std::string * Get
+std::string * Text::Get
 ( )
 {
 	return &_text;
 }
 
-vec4 * Expose_Color
+vec4 * Text::Expose_Color
 ( )
 {
 	return &_color;
