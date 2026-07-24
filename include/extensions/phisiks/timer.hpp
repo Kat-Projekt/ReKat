@@ -3,33 +3,31 @@
 
 #include <chrono>
 
-#if (defined (LINUX) || defined (__linux__)) // unix implementation
-	#define TIME_SCALING 1/1000000000.0
-#elif (defined (_WIN32) || defined (_WIN64)) // windows implementaion
-	#define TIME_SCALING 1/10000000.0
-#elif (defined (__APPLE__))
-    #define TIME_SCALING 1/1000000.0
-#endif
-
 namespace Timer {
-	auto start = std::chrono::system_clock::now ( );
+	auto inline start = std::chrono::steady_clock::now();
 	double inline delta_time = 0;
 	double inline fixed_delta_time = 0;
 	double inline current_time = 0;
 	double inline current_fixed_time = 0;
 
-	inline double Get_Time_d
-	( ) {
-		return (double)
-		( std::chrono::system_clock::now ( ) - start ).count( )
-		* TIME_SCALING;
+	inline double Get_Time_d() 
+	{
+		auto now = std::chrono::steady_clock::now();
+		std::chrono::duration<double> elapsed = now - start;
+		return elapsed.count();
 	}
+
 	inline float Get_Time ( ) 
 	{ return (float)(Get_Time_d ( )); }
 
 	inline float Get_Delta ( )
 	{
-		return delta_time;
+		return static_cast<float>(delta_time);
+	}
+
+	inline float Get_Fixed_Delta()
+	{
+		return static_cast<float>(fixed_delta_time);
 	}
 	
 	inline void Update ( )

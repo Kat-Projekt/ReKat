@@ -98,6 +98,11 @@ void Input::Keyboard
 		if ( key == GLFW_KEY_DELETE || key == GLFW_KEY_BACKSPACE ) { keys["Del"] = InputMode::PRESSED; return; }
 		if ( key == GLFW_KEY_ENTER ) { keys["Enter"] = InputMode::PRESSED; return; }
 		if ( key == GLFW_KEY_ESCAPE ) { keys["Esc"] = InputMode::PRESSED; return; }
+		if ( key == GLFW_KEY_LEFT )  { keys["Left"]  = InputMode::PRESSED; return; }
+		if ( key == GLFW_KEY_RIGHT ) { keys["Right"] = InputMode::PRESSED; return; }
+		if ( key == GLFW_KEY_UP )    { keys["Up"]    = InputMode::PRESSED; return; }
+		if ( key == GLFW_KEY_DOWN )  { keys["Down"]  = InputMode::PRESSED; return; }
+		if ( key == GLFW_KEY_SPACE )  { keys["Space"]  = InputMode::PRESSED; return; }
 	}
 	if ( action == GLFW_RELEASE ) {
 		if ( key == GLFW_KEY_LEFT_CONTROL || key == GLFW_KEY_RIGHT_CONTROL ) { keys["Ctrl"] = InputMode::RELEASED; return; }
@@ -106,11 +111,15 @@ void Input::Keyboard
 		if ( key == GLFW_KEY_DELETE || key == GLFW_KEY_BACKSPACE ) { keys["Del"] = InputMode::RELEASED; return; }
 		if ( key == GLFW_KEY_ENTER ) { keys["Enter"] = InputMode::RELEASED; return; }
 		if ( key == GLFW_KEY_ESCAPE ) { keys["Esc"] = InputMode::RELEASED; return; }	
+		if ( key == GLFW_KEY_LEFT )  { keys["Left"]  = InputMode::RELEASED; return; }
+		if ( key == GLFW_KEY_RIGHT ) { keys["Right"] = InputMode::RELEASED; return; }
+		if ( key == GLFW_KEY_UP )    { keys["Up"]    = InputMode::RELEASED; return; }
+		if ( key == GLFW_KEY_DOWN )  { keys["Down"]  = InputMode::RELEASED; return; }
+		if ( key == GLFW_KEY_SPACE )  { keys["Space"]  = InputMode::RELEASED; return; }
 	}
 
 	if ( ( GLFW_KEY_A <= key && key <= GLFW_KEY_Z ) || 
-			( key >= GLFW_KEY_0 && key <= GLFW_KEY_9 ) ||
-			( key == GLFW_KEY_SPACE )) { 
+			( key >= GLFW_KEY_0 && key <= GLFW_KEY_9 )) { 
 		if ( action == GLFW_PRESS ) { keys[std::string(1,(char)key)] = InputMode::PRESSED; }
 		if ( action == GLFW_RELEASE ) { keys[std::string(1,(char)key)] = InputMode::RELEASED; }
 	}
