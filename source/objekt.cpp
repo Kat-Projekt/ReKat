@@ -47,6 +47,10 @@ void Objekt::Set_Father
 {
 	DEBUG ( 4,"linking father: ", father->Get_Name (), " to: ", Get_Name ( ) );
 	this->_transform->Set_Father ( father->Get_Transform_ptr ( ) );
+	if ( _father )
+	{
+		this->_father->Rem_Child ( Get_Name ( ) );
+	}
 	this->_father = father;
 }
 std::shared_ptr < Objekt > Objekt::Get_Father
