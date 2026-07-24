@@ -152,6 +152,11 @@ Transform::mono_axis_rotation Transform::Get_Rot_Mono
 mat4 Transform::Get_Model_Mat
 ( )
 {
+	if ( _father != nullptr && _father_pos != _father->Get_Pos ( ) )
+	{
+		_father_pos = _father->Get_Pos ( );
+		_recalcutate = true;
+	}
 	if ( _pos != _exposable_pos )
 	{
 		_pos = _exposable_pos;

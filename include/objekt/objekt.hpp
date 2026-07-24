@@ -25,7 +25,7 @@ protected:
 	bool _active = true;
 	bool _started = false;
 
-	Transform _transform;
+	std::shared_ptr < Transform > _transform;
 
 	std::shared_ptr < Objekt > _father = nullptr;
 	List < std::shared_ptr < Objekt > > _children = { };
@@ -59,7 +59,6 @@ private:
 	std::shared_ptr < Behaviour > Rem_Component_Aux ( std::string type );
 	template < class C > std::shared_ptr < C > Rem_Components_Aux ( );
 
-
 public:
 	Objekt ( void );
 
@@ -79,6 +78,7 @@ public:
 
 	Transform& Get_Transform ( );
 	const Transform& Get_Transform ( ) const;
+	const std::shared_ptr < Transform > Get_Transform_ptr ( ) const;
 
 	Objekt& Add_Child ( std::shared_ptr < Objekt > child );
 	Objekt& Add_Child ( std::string name );

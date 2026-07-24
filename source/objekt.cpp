@@ -3,8 +3,10 @@
 
 Objekt::Objekt
 ( void )
+: _transform ( std::make_shared < Transform > ( ) )
 {
 	DEBUG ( 4, "Inizializing void Objekt" );
+	_transform = std::make_shared < Transform > ( );
 }
 
 Objekt::Objekt (
@@ -15,13 +17,12 @@ Objekt::Objekt (
 ) 
 :
 	_name(name),
-	_transform (pos,size,rot_pivot)
+	_transform ( std::make_shared < Transform > ( pos,size,rot_pivot ) )
 {
 	DEBUG ( 4,
 		"Inizializing Objekt: ", name,
 		", pos: ", pos, 
 		", size: ", size,
-		// ", rot: ", rot,
 		", rot_pivot: ", rot_pivot
 	);
 }
@@ -45,6 +46,7 @@ void Objekt::Set_Father
 ( std::shared_ptr < Objekt > father )
 {
 	DEBUG ( 4,"linking father: ", father->Get_Name (), " to: ", Get_Name ( ) );
+	this->_transform->Set_Father ( father->Get_Transform_ptr ( ) );
 	this->_father = father;
 }
 std::shared_ptr < Objekt > Objekt::Get_Father
@@ -333,70 +335,72 @@ bool Objekt::Has_Component ( std::string type )
 
 Transform& Objekt::Get_Transform
 ( )
-{ return _transform; }
+{ return *_transform; }
 
 const Transform& Objekt::Get_Transform
 ( ) const
-{ return _transform; }
+{ return *_transform; }
 
+const std::shared_ptr < Transform > Objekt::Get_Transform_ptr
+( ) const
+{ return _transform; }
 
 Objekt& Objekt::Set_Pos
 ( vec3 pos )
-{ _transform.Set_Pos ( pos ); return *this; }
+{ _transform->Set_Pos ( pos ); return *this; }
 
 Objekt& Objekt::Set_Pos
 ( float z )
-{ _transform.Set_Pos ( z ); return *this; }
+{ _transform->Set_Pos ( z ); return *this; }
 
 Objekt& Objekt::Inc_Pos
 ( vec3 pos )
-{ _transform.Inc_Pos ( pos ); return *this; }
+{ _transform->Inc_Pos ( pos ); return *this; }
 
 Objekt& Objekt::Set_Size
 ( vec3 size )
-{ _transform.Set_Size ( size ); return *this; }
+{ _transform->Set_Size ( size ); return *this; }
 
 Objekt& Objekt::Set_Rot
 ( vec3 rot )
-{ _transform.Set_Rot ( rot ); return *this; }
+{ _transform->Set_Rot ( rot ); return *this; }
 
 Objekt& Objekt::Set_2D_Rot
 ( float rot )
-{ _transform.Set_2D_Rot ( rot ); return *this; }
+{ _transform->Set_2D_Rot ( rot ); return *this; }
 
 Objekt& Objekt::Set_Rot_Pivot
 ( vec3 rot_pivot )
-{ _transform.Set_Rot_Pivot ( rot_pivot ); return *this; }
-
+{ _transform->Set_Rot_Pivot ( rot_pivot ); return *this; }
 
 const vec3 Objekt::Get_Pos
 ( ) const
-{ return _transform.Get_Pos ( ); }
+{ return _transform->Get_Pos ( ); }
 
 const vec3 Objekt::Get_Size
 ( ) const
-{ return _transform.Get_Size ( ); }
+{ return _transform->Get_Size ( ); }
 
 const vec3 Objekt::Get_Rot
 ( ) const
-{ return _transform.Get_Rot ( ); }
+{ return _transform->Get_Rot ( ); }
 
 const vec3 Objekt::Get_Rot_Pivot
 ( ) const
-{ return _transform.Get_Rot_Pivot ( ); }
+{ return _transform->Get_Rot_Pivot ( ); }
 
 const Transform::mono_axis_rotation Objekt::Get_Rot_Mono
 ( ) const
-{ return _transform.Get_Rot_Mono ( ); }
+{ return _transform->Get_Rot_Mono ( ); }
 
 mat4 Objekt::Get_Model_Mat
 ( )
-{ return _transform.Get_Model_Mat ( ); }
+{ return _transform->Get_Model_Mat ( ); }
 
 
 vec3* Objekt::Expose_Pos
 ( )
-{ return & ( _transform.Expose_Pos ( ) ); }
+{ return & ( _transform->Expose_Pos ( ) ); }
 
 
 void Objekt::Print_Tree
