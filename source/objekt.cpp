@@ -402,7 +402,7 @@ vec3* Objekt::Expose_Pos
 void Objekt::Print_Tree
 ( std::string level )
 {
-	DEBUG ( 4, level, Get_Name ( ) );
+	DEBUG ( 4, level, Get_Name ( ), " ", *this );
 	level += "- ";
 	for ( auto C : _children )
 	{ C->Print_Tree ( level ); }

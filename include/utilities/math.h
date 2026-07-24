@@ -37,11 +37,7 @@ vec2 Normalize ( vec2 a ) {
 }
 
 float angle ( vec2 v ) {
-	float angle = 0;
-	float X = v.x / sqrt( v.x * v.x + v.y *v.y );
-	if ( v.y > 0 ) { angle = 3.1415+std::asin ( X ); } 
-	else { angle = -std::asin ( X ); }
-	return 3.1415 -angle;
+	return atan2 ( v.x,v.y );
 }
 
 #endif

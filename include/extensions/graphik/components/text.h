@@ -32,6 +32,11 @@ private:
 	std::string _font = "";
 
 public:
+	Text ( )
+	{
+		Informations = { "Text", 1.0, "Renders the text on screen" };
+	}
+
 	void Update_Instance_Buffer ( ) {		
 		DEBUG ( 5, "Updating Instance buffer Text");
 

@@ -13,6 +13,11 @@ public:
 	float bouncy = 0.7f;
 	bool block_z = true;
 
+	Rigidbody ( )
+	{
+		Informations = { "Rigidbody", 1.0, "The rigidbody controller for movent and collision resolution" };
+	}
+
 	void Fixed_Update ( ) {
 		// implement verlet integration
 		// x_{n+1} = 2 x_n - x_{n+1} + acc_n * dt
@@ -20,7 +25,6 @@ public:
 		if ( acceleration != vec3{0,0,0} )
 		{ velocity += acceleration * Timer::Get_Delta ( ) * time_scale; }
 		obj->Inc_Pos ( velocity * Timer::Get_Delta ( ) * time_scale );
-		DEBUG ( 3, "vel: ", velocity );
 	}
 
 	void Vincolar_Reaction ( vec3 plane_normal ) {

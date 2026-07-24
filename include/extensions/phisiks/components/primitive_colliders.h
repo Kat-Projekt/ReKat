@@ -10,6 +10,11 @@ private:
 	bool _static = true;
 	vec3 _offset;
 public:
+	Collider ( )
+	{
+		Informations = { "Collider", 1.0, "The basic collider" };
+	}
+
 	virtual void _Start ( );
 	virtual void Start ( ) { _static = ! obj->Has_Component < Rigidbody > ( ); _Start( ); }
 

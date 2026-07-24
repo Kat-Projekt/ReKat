@@ -55,8 +55,10 @@ std::ostream& operator << ( std::ostream& os,
 }
 
 class Collision_Narrower {
-    void Set_Colliders ( List < Collider* > &colliders ) { }
-	List < collision_check > Get_Collisions_To_Check ( ) { }
+	void Set_Colliders ( List < Collider* > &colliders ) { }
+	List < collision_check > Get_Collisions_To_Check ( ) {
+		return List < collision_check > ( );
+	}
 };
 
 class Hash_Map : public Collision_Narrower {

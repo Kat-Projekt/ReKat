@@ -171,7 +171,7 @@ public:
 
 		return { out_vector != vec3{0,0,0}, out_vector };
 	}
-	Collision_Result Check_Collision(Tilemap_Collider* T) { T;  return { false, {0,0,0} }; }
+	Collision_Result Check_Collision(Tilemap_Collider* T) { (void)T; return { false, {0,0,0} }; }
 };
 
 template < typename C >
