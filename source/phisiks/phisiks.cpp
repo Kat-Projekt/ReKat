@@ -1,221 +1,258 @@
+#define DIAGNOSTIC
 #include "extensions/phisiks/phisiks.hpp"
-#include <objekt/manager.hpp>
-
-bool operator== ( const collision_check&_lt, const collision_check&_rt) {
-    return ( _rt.collider1 == _lt.collider1 && _rt.collider2 == _lt.collider2 ) ||
-           ( _rt.collider1 == _lt.collider2 && _rt.collider2 == _lt.collider1 );
-}
-
-std::ostream& operator << ( std::ostream& os, 
-    std::unordered_map < collision_check, Collision_Result, collision_hash > m ) {
-    for ( auto e : m ) {
-        os << e.first << " " << e.second << '\n';
-    }
-    return os;
-}
 
 namespace ReKat {
 namespace phisiks {
-    float _last_phisik_update;
-    float _phisik_update_ratio;
-    int _phisik_fps;
-    List < Collider* > Colliders;
-    List < Rigidbody* > Rigidbodys;
-    std::string Active;
-    // trace old collision for specific interactions like exit and enter
-    std::unordered_map < collision_check, Collision_Result, collision_hash > Collision_History;
+	float _last_phisik_update;
+	float _phisik_update_ratio;
+	int _phisik_fps;
+	// gets colliders every Fixed_Update
+	std::string _active = "";
+	// trace old collision for specific interactions like exit and enter
+	std::unordered_map < collision_check, collision_result, collision_hash > _collision_history;
 
-    int Start ( int phisik_fps ) {
-        _phisik_fps = phisik_fps; 
-        _phisik_update_ratio = 1 / _phisik_fps;
+	extern void Start ( int phisik_fps ) {
+		_phisik_fps = phisik_fps; 
+		_phisik_update_ratio = 1 / _phisik_fps;
 
-        Timer::Update ( );
-        _last_phisik_update = Timer::Get_Time ( ) - _phisik_update_ratio;
-        return 0;
-    }
+		Timer::Update ( );
+		_last_phisik_update = Timer::Get_Time ( ) - _phisik_update_ratio;
+	}
 
-    void Update ( ) {
-        DEBUG ( 4, "Updating Phisiks" );
-        Timer::Update ( );
+	extern void Fixed_Update ( )
+	{
+		auto Active = Manager::Objekt_Get ( _active );
 
-        DEBUG ( 5, "Updating Fixed Updates" );
-        DEBUG ( 6, _last_phisik_update );
+		if ( !Active )
+		{ return; }
 
-        if ( _phisik_fps > 0 ) { 
-        if ( _last_phisik_update + _phisik_update_ratio <= Timer::Get_Time ( ) ) {
-            _last_phisik_update = Timer::Get_Time ( );
-            Timer::Fixed_Update ( );
-            Manager::Objekt_Get ( Active )->Fixed_Update ( );
-            DEBUG ( 3, "Running Fixed Update" );
-        } else { return; } }
+		_last_phisik_update = Timer::Get_Time ( );
+		Timer::Fixed_Update ( );
+		Active->Fixed_Update ( );
 
-        // this code is only run durung Fixed_Updates;
+		DEBUG ( 5, "Getting Active Colliders" );
 
-        // check if every collider is active
-        DEBUG ( 5, "Getting Active Colliders" );
-        List < Collider *> active_colliders;
-        for ( auto C : Colliders ) {
-            if ( C->Get_Active ( ) && C->obj->Get_Active ( ) ) {
-            if ( Manager::Objekt_Get ( Active )->Has_Child ( C->obj->Get_Name ( ) ) )
-            { active_colliders.append ( C ); } }
-        }
+		List < Collider* > colliders = Active->Get_Component_Recursive < Collider > ( );
+		List < Collider* > active_colliders;
 
-        DEBUG ( 4, " Colliders to check: ", active_colliders );
+		for ( auto coll : colliders )
+		{
+			if ( coll->Get_Active ( ) && coll->obj->Get_Active ( ) )
+			{
+				active_colliders.append ( coll );
+			}
+		}
 
-        DEBUG ( 5, "Inizializing Spacial Map" );
+		DEBUG ( 4, " Colliders to check: ", active_colliders );
 
-        Brute_Force map;
-        // Hash_Map map ( 200 );
-        map.Set_Colliders ( active_colliders );
-        auto checks = map.Get_Collisions_To_Check ( );
+		Brute_Force map;
+		map.Set_Colliders ( active_colliders );
+		auto checks = map.Get_Collisions_To_Check ( );
 
-        DEBUG ( 4, "checks: ", checks );
+		DEBUG ( 4, "checks: ", checks );
 
-        for ( auto C : checks ) {
-            // convert colliders
-            Collision_Result result;
 
-            DEBUG (4, "Checking collision between: ", C );
+		for ( auto check : checks ) {
+			// convert colliders
+			collision_result result;
+			
+			DEBUG (4, "Checking collision between: ", check );
 
-            switch ( C.collider1->Collider_Type ( ) ) {
-                case 1: // box collider
-                    switch ( C.collider2->Collider_Type ( ) ) {
-                        case 1: // box collider
-                        result = Check_Collision ( ( Box_Collider* ) C.collider1, ( Box_Collider* ) C.collider2 );
-                        break;
-                        case 2: // sfere collider
-                        result = Check_Collision ( ( Box_Collider* ) C.collider1, ( Sfere_Collider* ) C.collider2 );
-                        break;
-                        case 3: // tilemap collider
-                        result = Check_Collision ( ( Tilemap_Collider* ) C.collider2, ( Box_Collider* ) C.collider1 );
-                        break;
-                    }
-                break;
-                case 2: // sfere collider
-                    switch ( C.collider2->Collider_Type ( ) ) {
-                        case 1: // box collider
-                        result = Check_Collision ( ( Box_Collider* ) C.collider2, ( Sfere_Collider* ) C.collider1 );
-                        break;
-                        case 2: // sfere collider
-                        result = Check_Collision ( ( Sfere_Collider* ) C.collider1, ( Sfere_Collider* ) C.collider2 );
-                        break;
-                        case 3: // tilemap collider
-                        result = Check_Collision ( ( Tilemap_Collider* ) C.collider1, ( Sfere_Collider* ) C.collider2 );
-                        break;
-                    }
-                break;
-                case 3: // tilemap collider
-                    switch ( C.collider2->Collider_Type ( ) ) {
-                        case 1: // box collider
-                        result = Check_Collision ( ( Tilemap_Collider* ) C.collider1, ( Box_Collider* ) C.collider2 );
-                        break;
-                        case 2: // sfere collider
-                        result = Check_Collision ( ( Tilemap_Collider* ) C.collider1, ( Sfere_Collider* ) C.collider2 );
-                        break;
-                        case 3: // tilemap collider
-                        result = Check_Collision ( ( Tilemap_Collider* ) C.collider1, ( Tilemap_Collider* ) C.collider2 );
-                        break;
-                    }
-                break;
-            }
+			switch ( check.collider1->Collider_Type ( ) )
+			{
+			case COLLIDER_TYPE::BOX:
+				switch ( check.collider2->Collider_Type ( ) )
+				{
+				case COLLIDER_TYPE::BOX:
+				result = Check_Collision ( ( Box_Collider* ) check.collider1, ( Box_Collider* ) check.collider2 );
+				break;
+				case COLLIDER_TYPE::SPHERE:
+				result = Check_Collision ( ( Box_Collider* ) check.collider1, ( Sphere_Collider* ) check.collider2 );
+				break;
 
-            DEBUG ( 5, "Collison Result: ", result );
-            // std::cout << Collision_History;
+				default: break;
+				}
+			break;
 
-            // Collision type == Enter
-            if ( result.triggered ) {
-                // check if of type enter
-                if ( auto C_poisiton = Collision_History.find ( C );
-                    C_poisiton == Collision_History.end ( ) || // new pointer
-                    (*C_poisiton).second.triggered == false // old collision was not triggered
-            ) {
-            // collision category
-            if ( C.collider1->Is_Trigger( ) || C.collider2->Is_Trigger( ) ) {
-                // trigger
-                C.collider1->obj->Handle_Collisions ( C.collider2->obj, true, collision_type::Enter );
-                C.collider2->obj->Handle_Collisions ( C.collider1->obj, true, collision_type::Enter );
-            } else {
-                // not trigger
-                C.collider1->obj->Handle_Collisions ( C.collider2->obj, false, collision_type::Enter );
-                C.collider2->obj->Handle_Collisions ( C.collider1->obj, false, collision_type::Enter );
-            } } }
+			case COLLIDER_TYPE::SPHERE:
+				switch ( check.collider2->Collider_Type ( ) )
+				{
+				case COLLIDER_TYPE::BOX:
+				result = Check_Collision ( ( Box_Collider* ) check.collider2, ( Sphere_Collider* ) check.collider1 );
+				break;
+				case COLLIDER_TYPE::SPHERE:
+				result = Check_Collision ( ( Sphere_Collider* ) check.collider1, ( Sphere_Collider* ) check.collider2 );
+				break;
 
-            // inside collision => trigger stay collision always
-            if ( result.triggered ) {
-                if ( ! C.collider1->Is_Trigger( ) && ! C.collider2->Is_Trigger( ) ) { // reaction
-                    if ( ! C.collider1->Is_Static ( ) ) { // first dinamic
-                        if ( ! C.collider2->Is_Static ( ) ) { // both dinamic
-                            float M1 = C.collider1->obj->template Get_Component < Rigidbody > ()->mass;
-                            float M2 = C.collider2->obj->template Get_Component < Rigidbody > ()->mass;
-                            float M = M1 + M2;
-                            M1 = M1 / M;
-                            M2 = M2 / M;
+				default: break;
+				}
+			break;
+			
+			default: break;
+			}
 
-                            C.collider1->obj->Inc_Pos ( result.exit_direction * ( 1 - M1 ) );
-                            C.collider2->obj->Inc_Pos ( - result.exit_direction * ( 1 - M2 ) );
+			DEBUG ( 5, "Collison Result: ", result );
 
-                            // vincolar reaction
-                            if ( result.exit_direction == vec3{0,0,0} ) { goto prereturn; }
-                            vec3 normalize_exit = normalize(result.exit_direction);
+			collision_type type_of_collison = collision_type::Stay;
 
-                            C.collider1->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction( normalize_exit );
-                            C.collider2->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction( -normalize_exit );
-                            goto prereturn;
-                        }
-                        C.collider1->obj->Inc_Pos ( result.exit_direction );
-                        if ( result.exit_direction == vec3{0,0,0} ) { goto prereturn; }
-                        vec3 normalize_exit = normalize(result.exit_direction);
-                        C.collider1->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction(normalize_exit);
-                    }
-                    if ( ! C.collider2->Is_Static ( ) ){ // second dinamic 
-                        C.collider2->obj->Inc_Pos ( -result.exit_direction );
-                        if ( result.exit_direction == vec3{0,0,0} ) { goto prereturn; }
-                        vec3 normalize_exit = normalize(result.exit_direction);
-                        C.collider2->obj->template Get_Component < Rigidbody >()->Vincolar_Reaction(-normalize_exit);
-                    }
+			auto old_check = _collision_history.find ( check );
 
-                    C.collider1->obj->Handle_Collisions ( C.collider2->obj, false );
-                    C.collider2->obj->Handle_Collisions ( C.collider1->obj, false );
-                } else {
-                    C.collider1->obj->Handle_Collisions ( C.collider2->obj, true );
-                    C.collider2->obj->Handle_Collisions ( C.collider1->obj, true );
-                }
-            }
+			// new event
+			if ( old_check == _collision_history.end ( ) )
+			{
+				if ( result.triggered ) {
+					type_of_collison = collision_type::Enter;
+				} else {
+					// no collision appened
+					_collision_history[check] = result;
+					continue;
+				}
+			}
+			else // old event
+			{
+				// both true
+				if ( old_check->second.triggered && result.triggered )
+				{
+					type_of_collison = collision_type::Stay;
+				}
+				
+				// old true new false
+				if ( old_check->second.triggered && !result.triggered )
+				{
+					type_of_collison = collision_type::Exit;
+				}
 
-            // Collision type == Exit
-            if ( result.triggered == false ) {
-                // check if of type exit
-                if ( auto C_poisiton = Collision_History.find ( C );
-                    ! ( C_poisiton == Collision_History.end ( ) ) && // not a new collision
-                    (*C_poisiton).second.triggered == true // old collision was triggered
-            ) {
-            // collision category
-            if ( C.collider1->Is_Trigger( ) || C.collider2->Is_Trigger( ) ) {
-                // trigger
-                C.collider1->obj->Handle_Collisions ( C.collider2->obj, true, collision_type::Exit );
-                C.collider2->obj->Handle_Collisions ( C.collider1->obj, true, collision_type::Exit );
-            } else {
-                // not trigger
-                C.collider1->obj->Handle_Collisions ( C.collider2->obj, false, collision_type::Exit );
-                C.collider2->obj->Handle_Collisions ( C.collider1->obj, false, collision_type::Exit );
-            } } }
+				// old false new true
+				if ( !old_check->second.triggered && result.triggered )
+				{
+					type_of_collison = collision_type::Enter;
+				}
 
-            // add collision to pool
-        prereturn: // sorry for goto crime
-            // std::cout << "R: " << result << '\n';
-            Collision_History[C] = result;
-        }
+				// old false new false -> no collision apened recently
+				if ( !old_check->second.triggered && !result.triggered )
+				{
+					_collision_history[check] = result;
+					continue;
+				}
+			}
 
-        // rigidbodies are rendered by the objekt
-        DEBUG ( 3, "Fixed Debug Ended" );
-    }
+			// check is is trigger
+			bool is_a_trigger_collsion = false;
+			if ( check.collider1->Is_Trigger ( ) || check.collider2->Is_Trigger ( ) )
+			{
+				is_a_trigger_collsion = true;
+			}
 
-    void Set_Active ( Objekt& new_Active ) 
-    { Active = new_Active.Get_Name ( ); }
-    void Set_Active (std::string new_Active ) 
-    { Active = new_Active; }
+			switch ( type_of_collison )
+			{
+				case collision_type::Enter:
+				DEBUG ( 5, "Entering collision, ", 
+					( is_a_trigger_collsion ? "[triggered]" : "[solid]"));
+				break;
+
+				case collision_type::Stay:
+				DEBUG ( 5, "Staing collision, ", 
+					( is_a_trigger_collsion ? "[triggered]" : "[solid]"));
+				break;
+
+				case collision_type::Exit:
+				DEBUG ( 5, "Exiting collision, ", 
+					( is_a_trigger_collsion ? "[triggered]" : "[solid]"));
+				break;
+			}
+
+			// send collision check to objekts involved
+			check.collider1->obj->Handle_Collisions ( check.collider2->obj, is_a_trigger_collsion, type_of_collison );
+			check.collider2->obj->Handle_Collisions ( check.collider1->obj, is_a_trigger_collsion, type_of_collison );
+
+			// collision finished to be handled
+			if ( is_a_trigger_collsion )
+			{
+				DEBUG ( 6, "TRIGGER COLLISION" );
+				_collision_history[check] = result;
+				continue;
+			}
+
+			// both static notthin appened
+			if ( check.collider1->Is_Static( ) && check.collider2->Is_Static( ) )
+			{
+				DEBUG ( 6, "STATIC COLLISION" );
+				_collision_history[check] = result;
+				continue;
+			}
+
+			// no compenetration
+			if ( result.exit_direction == vec3{0,0,0} )
+			{
+				DEBUG ( 6, "NO COLLISION" );
+				_collision_history[check] = result;
+				continue;
+			}
+
+			// first is dinamic
+			if ( !check.collider1->Is_Static( ) && check.collider2->Is_Static( )  )
+			{
+				DEBUG ( 6, "FIRST DINAMIC" );
+				check.collider1->obj->Inc_Pos ( result.exit_direction );
+				vec3 normalized_exit = normalize ( result.exit_direction );
+				check.collider1->obj->Get_Component < Rigidbody > ( )->Vincolar_Reaction ( normalized_exit );
+			}
+
+			// second is dinamic
+			if ( check.collider1->Is_Static( ) && !check.collider2->Is_Static( )  )
+			{
+				DEBUG ( 6, "SECOND DINAMIC" );
+				check.collider2->obj->Inc_Pos ( result.exit_direction );
+				vec3 normalized_exit = normalize ( result.exit_direction );
+				check.collider2->obj->Get_Component < Rigidbody > ( )->Vincolar_Reaction ( normalized_exit );
+			}
+
+			// both dinamic
+			if ( !check.collider1->Is_Static( ) && !check.collider2->Is_Static( )  )
+			{
+				DEBUG ( 6, "BOTH DINAMIC" );
+				float M1 = check.collider1->obj->Get_Component < Rigidbody > ( )->mass;
+				float M2 = check.collider2->obj->Get_Component < Rigidbody > ( )->mass;
+				float M = M1 + M2;
+				M1 = M1 / M;
+				M2 = M2 / M;
+
+				check.collider1->obj->Inc_Pos ( result.exit_direction * ( 1 - M1 ) );
+				check.collider2->obj->Inc_Pos ( - result.exit_direction * ( 1 - M2 ) );
+
+				// vincolar reaction
+				vec3 normalize_exit = normalize(result.exit_direction);
+
+				check.collider1->obj->Get_Component < Rigidbody > ( )->Vincolar_Reaction( normalize_exit );
+				check.collider2->obj->Get_Component < Rigidbody > ( )->Vincolar_Reaction( -normalize_exit );
+			}
+
+			_collision_history[check] = result;
+		}
+	}
+
+	extern void Update ( )
+	{
+	        Timer::Update ( );
+
+		if ( _active == "" )
+		{ return; }
+
+		if ( _phisik_fps > 0 )
+		{ 
+			if ( _last_phisik_update + _phisik_update_ratio <= Timer::Get_Time ( ) )
+			{
+				Fixed_Update ( );
+			}
+		}
+	}
+
+	extern void Set_Active
+	( Objekt& new_Active ) 
+	{ _active = new_Active.Get_Name ( ); }
+	extern void Set_Active
+	( std::string new_Active ) 
+	{ _active = new_Active; }
 } // namespace phisiks
 } // namespace ReKat 
 
-void Collider::_Start ( ) { ReKat::phisiks::Add_Collider ( this ); }
-void Collider::Delete ( ) { ReKat::phisiks::Rem_Collider ( this ); }

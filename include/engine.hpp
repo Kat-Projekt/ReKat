@@ -2,7 +2,7 @@
 
 #include "extensions/graphik/manager.hpp"
 #include "extensions/logik/components.hpp"
-    #include "extensions/phisiks/components.hpp"
+#include "extensions/phisiks/phisiks.hpp"
 
 #include "extensions/graphik/components/button.h"
 #include "extensions/graphik/components/camera.h"

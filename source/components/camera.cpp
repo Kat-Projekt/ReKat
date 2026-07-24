@@ -8,7 +8,6 @@ glm::mat4 Camera::Projkection
 	X *= 500.0f * Scale;
 	float Y = 500.0f * Scale;
 	vec3 pos = obj->Get_Pos ( );
-	// std::cout << "fb: " << X << '\n';
 	return glm::ortho ( pos.x - X, pos.x + X, pos.y - Y, pos.y + Y, -1.0f, 1.0f );
 }
 

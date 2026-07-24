@@ -60,7 +60,8 @@ List < std::shared_ptr < C > > Objekt::Get_Component_Recursive_Aux ( )
 template < class C > 
 bool Objekt::Has_Component ( )
 {
-	return Has_Component ( typeid (C).name ( ) );
+	C _p;
+	return Has_Component ( _p.Get_Type ( ) );
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////

@@ -35,6 +35,13 @@ namespace Manager {
 		return loaded;
 	}
 
+	extern int Camera_Rename (
+		std::string name,
+		Camera* camera
+	) {
+		_cameras [name] = camera;
+	}
+
 	extern int Camera_Bind (
 		std::string name,
 		std::string objekt,

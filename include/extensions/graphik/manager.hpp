@@ -19,6 +19,7 @@ namespace Manager {
 
 	extern int Defaults_Load ( void );
 
+	extern int Camera_Rename ( std::string name, Camera* camera );
 	extern int Camera_Bind ( std::string name, std::string objekt, Framebuffer* framebuffer = nullptr );
 	extern Camera* Camera_Get ( std::string name );
 };

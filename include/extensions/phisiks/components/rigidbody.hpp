@@ -6,11 +6,11 @@
 
 class Rigidbody : public Behaviour {
 public:
-	vec3 acceleration = {0,0,0};
-	vec3 velocity = {0,0,0};
+	glm::vec3 acceleration = {0,0,0};
+	glm::vec3 velocity = {0,0,0};
 	float mass = 1;
 	float time_scale = 1;
-	float bouncy = 0.7f;
+	float bouncy = 0.7f; // positive in [0,1]
 	bool block_z = true;
 
 	Rigidbody ( )
@@ -22,8 +22,10 @@ public:
 		// implement verlet integration
 		// x_{n+1} = 2 x_n - x_{n+1} + acc_n * dt
 		if ( block_z ) { velocity.z = 0; acceleration.z = 0;}
+
 		if ( acceleration != vec3{0,0,0} )
 		{ velocity += acceleration * Timer::Get_Delta ( ) * time_scale; }
+
 		obj->Inc_Pos ( velocity * Timer::Get_Delta ( ) * time_scale );
 	}
 
