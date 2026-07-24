@@ -25,7 +25,7 @@ namespace Timer {
 		return static_cast<float>(delta_time);
 	}
 
-	inline float Get_Fixed_Delta()
+	inline float Get_Fixed_Delta ( )
 	{
 		return static_cast<float>(fixed_delta_time);
 	}
