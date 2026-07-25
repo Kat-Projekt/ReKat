@@ -24,7 +24,7 @@ public:
 	void Update ( );
 	void Delete ( );
 
-	Sprite& Set (
+	Sprite* Set (
 		std::string texture,
 		std::string shader = "",
 		std::string camera = "",
@@ -34,10 +34,10 @@ public:
 		bool UI_sprite = false,
 		std::string instancer = ""
 	);
-	Sprite& Set ( const char* texture );
-	Sprite& Set ( bool UI_sprite );
-	Sprite& Set ( int frame );
-	Sprite& Set ( vec4 color );
+	Sprite* Set ( const char* texture );
+	Sprite* Set ( bool UI_sprite );
+	Sprite* Set ( int frame );
+	Sprite* Set ( vec4 color );
 
 	vec4 * Expose_Color ( );
 };

@@ -50,7 +50,8 @@ void Sprite::Update
 			"' Texture: '", _texture, 
 			"' Camera: '", _camera, 
 			"' UI rendered '", (_UI_render?"true":"false"), 
-			"' 'Insancer: '", _instacer, '\'' );
+			"' Insancer: '", _instacer,
+			"' Frame: '", _frame , '\'' );
 
 	if ( _shader == "" || ( _camera == "" && !_UI_render ) )
 	{ DEBUG ( 2, "Component not set Correctly" ); return; }
@@ -91,7 +92,7 @@ void Sprite::Update
 
 	glBindVertexArray(0); GL_CHECK_ERROR;
 	
-	DEBUG (5, "Drawn Sprite");
+	DEBUG (5, "Drawn Sprite" );
 }
 
 void Sprite::Delete ( ) {
@@ -99,7 +100,7 @@ void Sprite::Delete ( ) {
 	glDeleteBuffers(1, &VBO);
 }
 
-Sprite&	 Sprite::Set  (
+Sprite* Sprite::Set  (
 	std::string texture,
 	std::string shader,
 	std::string camera,
@@ -118,21 +119,21 @@ Sprite&	 Sprite::Set  (
 	_color = color;
 	_UI_render = UI_sprite;
 
-	return *this;
+	return this;
 }
 
-Sprite& Sprite::Set ( const char* texture ) {
+Sprite* Sprite::Set ( const char* texture ) {
 	_texture = (std::string)texture;
-	return *this;
+	return this;
 }
 
-Sprite& Sprite::Set
+Sprite* Sprite::Set
 ( bool UI_sprite )
-{ _UI_render = UI_sprite; return *this; }
-Sprite& Sprite::Set ( int frame )
-{ this->_frame = frame; return *this; }
-Sprite& Sprite::Set ( vec4 color ) 
-{ _color = color; return *this; }
+{ _UI_render = UI_sprite; return this; }
+Sprite* Sprite::Set ( int frame )
+{ this->_frame = frame; return this; }
+Sprite* Sprite::Set ( vec4 color ) 
+{ _color = color; return this; }
 
 vec4 * Sprite::Expose_Color
 ( ) { return &_color; }

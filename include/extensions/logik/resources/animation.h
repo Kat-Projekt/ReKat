@@ -110,28 +110,30 @@ public:
 
 		// getting current_frame_index
 		size_t current_frame_index = 0;
-		for ( auto& _frame : _frames )
+		for (size_t i = 0; i < _frames.size(); ++i)
 		{
-			if ( _frame.enter_time > when_to_animate )
-			{ break; }
+			if (when_to_animate >= _frames[i].enter_time)
+			{ current_frame_index = i; }
 			else
-			{ current_frame_index ++; }
+			{ break; }
 		}
 
-		DEBUG ( 3, "animating ", current_frame_index, " time: ", when_to_animate );
+		DEBUG ( 4, "animating: ", current_frame_index, " time: ", when_to_animate );
 
 		// get interpolation parameters
 		frame current_frame = _frames[current_frame_index];
 		float interpolator_value  = ( when_to_animate - current_frame.enter_time ) / current_frame.duration;
 
+		DEBUG ( 3, "interpolating: ", current_frame.initial_state, " -> ", current_frame.final_state );
 		// begin interpolation
-		
-		*_parameter = current_frame.interpolator
+		*_parameter = Lerp
 		(
 			current_frame.initial_state,
 			current_frame.final_state,
-			_time
+			interpolator_value
 		);
+
+		DEBUG ( 5, "new_value: ", *_parameter );
 	}
 
 	void End ( ) override
