@@ -50,7 +50,7 @@ public:
 	const vec3 Get_Size ( ) const;
 	const vec3 Get_Rot ( ) const;
 	const vec3 Get_Rot_Pivot ( ) const;
-	const float Get_2D_Rot ( ) const;
+	float Get_2D_Rot ( ) const;
 
 	// position in local space
 	vec3& Expose_Pos ( );

@@ -126,7 +126,7 @@ const vec3 Transform::Get_Rot
 	return vec3 { roll, pitch, yaw };
 }
 
-const float Transform::Get_2D_Rot
+float Transform::Get_2D_Rot
 ( ) const
 { return _rot_z + ( _father != nullptr ? _father->Get_2D_Rot ( ) : 0 ); }
 

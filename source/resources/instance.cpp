@@ -82,6 +82,8 @@ void Instance::Configure_Atributes
 	_index = index;
 	_changed = true;
 }
+int Make ( )
+{ return 1; }
 // first thing to call to confingure data dimensions
 // then call Add_Data
 // then call Configure_Attributes

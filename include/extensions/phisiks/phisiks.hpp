@@ -6,6 +6,7 @@
 #include "components/sphere_collider.hpp"
 #include "collision_handle/brute_force.hpp"
 #include "collision_handle/primitive_collision.hpp"
+#include "collision_handle/tilemap_collider.h"
 #include <unordered_map>
 
 #include "timer.hpp"

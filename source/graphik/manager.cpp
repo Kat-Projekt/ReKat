@@ -40,6 +40,8 @@ namespace Manager {
 		Camera* camera
 	) {
 		_cameras [name] = camera;
+		
+		return 0;
 	}
 
 	extern int Camera_Bind (

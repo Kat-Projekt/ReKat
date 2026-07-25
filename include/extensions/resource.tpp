@@ -17,8 +17,9 @@ namespace Manager {
 	inline std::string Format_Name
 	( std::string name )
 	{
-		static_assert ( std::is_base_of<Resource, R>::value, "R must derive from Resource" );
-		return name + std::string ( typeid(R).name ( ) );
+		// static_assert ( std::is_base_of<Resource, R>::value, "R must derive from Resource" );
+		// return name + std::string ( typeid(R).name ( ) );
+		return name;
 	}
 
 	template < class R, typename ... Args>

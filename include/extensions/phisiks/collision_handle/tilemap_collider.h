@@ -1,7 +1,7 @@
 #ifndef TILEMAP_COLLIDER_H
 #define TILEMAP_COLLIDER_H
 
-#include "primitive_colliders.h"
+#include "primitive_collision.hpp"
 #include <vector>
 #include <fstream>
 #include <sstream>
@@ -48,7 +48,7 @@ public:
 
 	void Set ( std::string path ) { _path = path; }
 
-	Collision_Result Check_Collision ( Box_Collider * B ) {
+	collision_result Check_Collision ( Box_Collider * B ) {
 		vec2 half_size = B->Get_Size ( ) * 0.5f;
 		vec2 pos = B->Get_Pos ( );
 		vec2 X_limit = { pos.x - half_size.x, pos.x + half_size.x };
@@ -106,7 +106,7 @@ public:
 
 		return { out_vector != vec3{0,0,0}, out_vector };
 	}
-	Collision_Result Check_Collision ( Sfere_Collider * S ) {
+	collision_result Check_Collision ( Sphere_Collider * S ) {
 		vec2 half_size = vec2(S->Get_Size ( )) * 0.5f;
 		vec2 pos = S->Get_Pos ( );
 		vec2 X_limit = { pos.x - half_size.x, pos.x + half_size.x };
@@ -171,10 +171,10 @@ public:
 
 		return { out_vector != vec3{0,0,0}, out_vector };
 	}
-	Collision_Result Check_Collision(Tilemap_Collider* T) { (void)T; return { false, {0,0,0} }; }
+	collision_result Check_Collision ( Tilemap_Collider* T ) { (void)T; return { false, {0,0,0} }; }
 };
 
 template < typename C >
-Collision_Result Check_Collision ( Tilemap_Collider *T, C B ) 
+collision_result Check_Collision ( Tilemap_Collider *T, C B ) 
 { return T->Check_Collision ( B ); }
 #endif

@@ -80,12 +80,12 @@ void Sprite::Update
 
 	if ( _texture != "" ) 
 	{ Manager::Get < Texture > ( _texture )->Use(); }
-		
+
 	if ( _instacer != "" ) {
-		//auto I = Manager::Get < Instance > ( _instacer );
-		//I->Use ( );
-		//glDrawArraysInstanced(GL_TRIANGLES, 0, 6, I->Instances ( ) ); GL_CHECK_ERROR;
-		//DEBUG ( 4,"Drawing ", I->Instances( ), " instances");
+		auto I = Manager::Get < Instance > ( _instacer );
+		I->Use ( );
+		glDrawArraysInstanced(GL_TRIANGLES, 0, 6, I->Instances ( ) ); GL_CHECK_ERROR;
+		DEBUG ( 4,"Drawing ", I->Instances( ), " instances");
 	} else {
 		glDrawArrays(GL_TRIANGLES, 0, 6); GL_CHECK_ERROR;
 	}

@@ -1,3 +1,5 @@
+#pragma once
+
 #include "collision_result.hpp"
 #include "../components/box_collider.hpp"
 #include "../components/sphere_collider.hpp"

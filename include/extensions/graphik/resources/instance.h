@@ -26,6 +26,8 @@ private:
 
 	std::vector < Attribute > _attributes;
 public:
+	Instance ( );
+
 	void Add_Data (
 		void * data,
 		unsigned int elements
