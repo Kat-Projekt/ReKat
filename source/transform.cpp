@@ -69,10 +69,8 @@ Transform& Transform::Set_Rot_Pivot
 Transform& Transform::Set_2D_Rot
 ( float rot )
 {
-	_rot.w = cos ( rot / 2 );
-	_rot.x = 0;
-	_rot.y = 0;
-	_rot.z = sin ( rot / 2 );
+	_rot_z = rot;
+	_exposable_rot_z = rot;
 
 	_recalcutate = true;
 
@@ -86,6 +84,10 @@ const vec3 Transform::Get_Pos
 vec3& Transform::Expose_Pos
 ( )
 { return _exposable_pos; }
+
+float& Transform::Expose_2D_Rot
+( )
+{ return _exposable_rot_z; }
 
 const vec3 Transform::Get_Size
 ( ) const
@@ -123,6 +125,10 @@ const vec3 Transform::Get_Rot
 
 	return vec3 { roll, pitch, yaw };
 }
+
+const float Transform::Get_2D_Rot
+( ) const
+{ return _rot_z + ( _father != nullptr ? _father->Get_2D_Rot ( ) : 0 ); }
 
 Transform::mono_axis_rotation Transform::Get_Rot_Mono
 ( ) const
@@ -162,8 +168,19 @@ mat4 Transform::Get_Model_Mat
 		_pos = _exposable_pos;
 		_recalcutate = true;
 	}
+	if ( _rot_z != _exposable_rot_z )
+	{
+		_rot_z = _exposable_rot_z;
+		_recalcutate = true;
+	}
 	if ( _recalcutate )
 	{
+		float rot = Get_2D_Rot ( );
+		_rot.w = cos ( rot / 2 );
+		_rot.x = 0;
+		_rot.y = 0;
+		_rot.z = sin ( rot / 2 );
+
 		// this is for centering during render trust me bro i know ( reduces 1 transation => good ) 
 		vec3 Pivot = { (_rot_pivot.x + 0.5) * _size.x, (_rot_pivot.y + 0.5) * _size.y, (_rot_pivot.z) * _size.z };
 		vec3 position = Get_Pos ( );

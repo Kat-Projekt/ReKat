@@ -22,9 +22,11 @@ private:
 	vec3 _pos = {0,0,0};
 	vec3 _father_pos = {0,0,0};
 	vec3 _exposable_pos = {0,0,0};
+	float _exposable_rot_z = 0;
 	vec3 _size = {100,100,100};
 	quat _rot = {1,0,0,0};
 	vec3 _rot_pivot = {0,0,0};
+	float _rot_z = 0;
 
 	bool _recalcutate = true;
 	mat4 _model = mat4(1.0f);
@@ -48,8 +50,12 @@ public:
 	const vec3 Get_Size ( ) const;
 	const vec3 Get_Rot ( ) const;
 	const vec3 Get_Rot_Pivot ( ) const;
+	const float Get_2D_Rot ( ) const;
 
+	// position in local space
 	vec3& Expose_Pos ( );
+	// rotation 2D in local space
+	float& Expose_2D_Rot ( );
 
 	mono_axis_rotation Get_Rot_Mono ( ) const;
 

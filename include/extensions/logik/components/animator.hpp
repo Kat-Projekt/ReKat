@@ -17,7 +17,7 @@ class Animator : public Behaviour {
 		template < typename A >
 		void Add_Animation ( std::shared_ptr < Animation < A > > anima ) 
 		{
-			animations.append ( static_cast< std::shared_ptr < Resource > >( anima ) );
+			animations.append ( static_cast< std::shared_ptr < Resource > > ( anima ) );
 		}
 
 		void Interpolate ( float _time ) {
@@ -26,41 +26,48 @@ class Animator : public Behaviour {
 		}
 	};
 	
-	Node* Active_Node;
-	Map < std::string, Node* > nodes;
+	std::shared_ptr < Node > Active_Node;
+	Map < std::string, std::shared_ptr < Node > > nodes;
 public:
-    Animator * Change_Animation ( std::string name ) {
-        auto New_Node = nodes.get_single ( name );
+	Animator * Change_Animation ( std::string name ) {
+		Active_Node = nodes.get_single ( name );
+		Metronome = Timer::Get_Time_d ( );
+		return this;
+	}
 
-        Active_Node = New_Node;
-        Metronome = Timer::Get_Time_d ( );
-        return this;
-    }
+	Animator * New_Node ( std::string name ) 
+	{
+		nodes.append ( { name, std::make_shared < Node > ( ) } );
+		return this;
+	}
 
-    Animator * New_Node ( std::string name ) 
-    { nodes.append ( { name, new Node ( ) } ); return this;}
+	template < typename A >
+	Animator * Add_Animation (
+		std::string node,
+		std::shared_ptr < Animation < A > > anim
+	) {
+		auto n = nodes.get_single ( node );
 
-    template < typename A >
-    Animator * Add_Animation ( std::string node, std::shared_ptr < Animation < A > > anim ) {
-        auto n = nodes.get_single ( node );
-        if ( n == nullptr )
-        { DEBUG (2, "node not found" ); return this; }
-        n->Add_Animation ( anim );
-        return this;
-    }
-
-    Animator * Add_Animation ( std::string node, std::string anim ) {
-        auto n = nodes.get_single ( node );
-        if ( n == nullptr )
-        { DEBUG (2, "node not found" ); return this; }
-        n->Add_Animation ( Manager::Get < Animation < int > > ( anim ) );
-        return this;
-    }
+		if ( n == nullptr )
+		{
+			DEBUG (2, "node not found" );
+			return this; 
+		}
+		n->Add_Animation ( anim );
+		return this;
+	}
 
 	void Start ( ) 
-	{ nodes = Map < std::string, Node * > ( true ); }
+	{
+		nodes = Map < std::string, std::shared_ptr < Node > > ( );
+	}
 
 	void Update ( ) {
+		if ( Active_Node == nullptr )
+		{
+			DEBUG ( 2, "ANIMATING NOTTING" );
+			return;
+		}
 		Active_Node->Interpolate ( Timer::Get_Time_d ( ) - Metronome );
 		DEBUG ( 3, "interpolating ", Timer::Get_Time_d ( ) - Metronome );
 	}
