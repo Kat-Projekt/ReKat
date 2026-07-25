@@ -7,120 +7,137 @@
 
 enum class PlayMode {
     LOOP,
-    ONCE
+    ONCE,
+    REVERSE
 };
 template < typename T >
 class Animation : public Resource {
-    T* _parameter;
 
-    struct frame {
-        T initial_state;
-        T final_state;
+	struct frame {
+		T initial_state;
+		T final_state;
 
-        float enter_time;
-        float duration;
-        // function that intrpolates between [T1,T2] and is given an input in [0,1]
-        T ( *interpolator ) ( T, T, float ) = nullptr;
-    };
+		float enter_time;
+		float duration;
+		// function that intrpolates between [T1,T2] and is given an input in [0,1]
+		T ( *interpolator ) ( T, T, float ) = nullptr;
+	};
 
-    float current_time;
-    float total_duration = 0;
-    int current_frame = 0;
+	std::vector < frame > _frames;
 
-    std::vector < frame > frames;
-
-    PlayMode _play;
-    
+	T* _parameter = nullptr;
+	float _total_duration = 0;
+	PlayMode _play = PlayMode::ONCE;
 public:
-    Animation ( ) { }
-    Animation ( T* parameter, PlayMode p ) { Make ( parameter, p ); }
+	Animation ( ) { }
+	Animation ( T* parameter, PlayMode p ) { Make ( parameter, p ); }
 
 	int Make ( T* parameter, PlayMode play ) {
-        _parameter = parameter;
-        _play = play;
+		_parameter = parameter;
+		_play = play;
+		_total_duration = 0;
 		return 0;
 	}
 
-	Animation* Add_Frame ( T initial, T final, float duration, T ( *interpolator ) ( T, T, float ) = Lerp < T >) {
+	Animation* Add_Frame (
+		T initial,
+		T final,
+		float duration,
+		T ( *interpolator ) ( T, T, float ) = Lerp < T >
+	) {
 		if ( duration <= 0 )
-		{ DEBUG (2, "the duration is not correct" ); return this; }
-
-		frame nframe;
-		nframe.initial_state = initial;
-		nframe.final_state = final;
-		nframe.duration = duration;
-		nframe.interpolator = interpolator;
-
-		total_duration += duration;
-
-		if ( frames.size ( ) == 0 ) {
-			nframe.enter_time = 0;
-			frames.push_back ( nframe );
-			DEBUG ( 4, "added first animation frame" );
+		{
+			DEBUG (2, "frame duration is not correct" );
 			return this;
 		}
 
-		frame lframe = * ( -- frames.end ( ) );
-		nframe.enter_time = lframe.enter_time + lframe.duration;
-		frames.push_back ( nframe );
-		DEBUG ( 4, "added animation frame, total frames: ", frames.size ( ) );
-		DEBUG ( 4, "inizio: ", nframe.enter_time, " dur: ", nframe.duration );
+		// configure new frame
+		frame nframe;
+		nframe.initial_state = initial;
+		nframe.final_state = final;
+
+		nframe.enter_time = _total_duration;
+		nframe.duration = duration;
+
+		nframe.interpolator = interpolator;
+
+		// new total duration
+		_total_duration += duration;
+
+		_frames.push_back ( nframe );
+
 		return this;
 	}
 
-	void Use ( float _time ) {
-		if ( frames.size() == 0 )
-		{ DEBUG (2, "trying to animate an empty animation" ); }
+	void Use ( float _time ) override {
+		if ( _frames.size() == 0 )
+		{
+			DEBUG (2, "NO ANIMATION FRAMES");
+			return;
+		}
 		if ( _time < 0 )
-		{ DEBUG (2, "NEGATIVE TIME"); return; }
-
-		if ( _play == PlayMode::ONCE )
-		{ 
-			if ( _time > total_duration ) {
-				DEBUG ( 4, "end of animation ", _time ); 
-				return;
-			}
+		{
+			DEBUG (2, "NEGATIVE TIME");
+			return;
+		}
+		if ( _parameter == nullptr )
+		{
+			DEBUG (2, "PARAMETER NOT SETTED");
+			return;
 		}
 
-		DEBUG ( 3, "animating ", current_frame, " time: ", _time, " frames: ", frames.size() );
+		// getting animation time
+		float when_to_animate = 0;
+		switch ( _play )
+		{
+			case PlayMode::ONCE:
+				if (  _time > _total_duration ) { return; }
+				else { when_to_animate = _time; }
+			break;
+		
+			case PlayMode::LOOP:
+				when_to_animate = std::fmod ( _time, _total_duration );
+			break;
 
-		_time = std::fmod ( _time, total_duration );;
-
-		DEBUG ( 3, "animating ", current_frame, " time: ", _time, " frames: ", frames.size() );
-
-		// get frame
-		auto F = frames[current_frame];
-		int i = 0;
-
-		while ( ! ( F.enter_time < _time && _time < F.enter_time + F.duration ) ) {
-			DEBUG ( 5, current_frame );
-			if ( _time < F.enter_time )
-			{ current_frame --; F = frames[current_frame]; continue; }
-			
-			current_frame ++;
-			F = frames[current_frame];
-
-			i++; // to prevent infinte 
-			if ( i > 10 ) { break; } 
+			case PlayMode::REVERSE:
+				when_to_animate = std::fmod ( _time, _total_duration * 2 );
+				// reverse in case on the second part
+				if (  when_to_animate > _total_duration )
+				{ when_to_animate -= _total_duration; }
+			break;
 		}
+
+		// getting current_frame_index
+		size_t current_frame_index = 0;
+		for ( auto& _frame : _frames )
+		{
+			if ( _frame.enter_time > when_to_animate )
+			{ break; }
+			else
+			{ current_frame_index ++; }
+		}
+
+		DEBUG ( 3, "animating ", current_frame_index, " time: ", when_to_animate );
+
+		// get interpolation parameters
+		frame current_frame = _frames[current_frame_index];
+		float interpolator_value  = ( when_to_animate - current_frame.enter_time ) / current_frame.duration;
 
 		// begin interpolation
-		_time = ( _time - F.enter_time ) / F.duration;
-		if ( _parameter != nullptr ) 
-		{
-			*_parameter = F.interpolator (
-				F.initial_state,
-				F.final_state,
-				_time );
-
-			DEBUG ( 6, "animated: ", *_parameter );
-		}
-
-		DEBUG ( 3, "animating ", current_frame, " time: ", _time );
+		
+		*_parameter = current_frame.interpolator
+		(
+			current_frame.initial_state,
+			current_frame.final_state,
+			_time
+		);
 	}
 
 	void End ( )
-	{ frames.clear ( ); }
+	{
+		_frames.clear ( );
+		_total_duration = 0;
+	}
 };
 
 #endif

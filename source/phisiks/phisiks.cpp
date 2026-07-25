@@ -1,4 +1,3 @@
-#define DIAGNOSTIC
 #include "extensions/phisiks/phisiks.hpp"
 
 namespace ReKat {
@@ -79,6 +78,7 @@ namespace phisiks {
 				{
 				case COLLIDER_TYPE::BOX:
 				result = Check_Collision ( ( Box_Collider* ) check.collider2, ( Sphere_Collider* ) check.collider1 );
+				result.triggered *= -1.0f;
 				break;
 				case COLLIDER_TYPE::SPHERE:
 				result = Check_Collision ( ( Sphere_Collider* ) check.collider1, ( Sphere_Collider* ) check.collider2 );
