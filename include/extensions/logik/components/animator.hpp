@@ -65,7 +65,7 @@ public:
 	void Update ( ) {
 		if ( Active_Node == nullptr )
 		{
-			DEBUG ( 2, "ANIMATING NOTTING" );
+			DEBUG ( 5, "ANIMATING NOTTING" );
 			return;
 		}
 		Active_Node->Interpolate ( Timer::Get_Time_d ( ) - Metronome );

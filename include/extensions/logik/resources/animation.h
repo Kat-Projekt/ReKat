@@ -69,7 +69,8 @@ public:
 		return this;
 	}
 
-	void Use ( float _time ) override {
+	void Use ( float _time ) override
+	{
 		if ( _frames.size() == 0 )
 		{
 			DEBUG (2, "NO ANIMATION FRAMES");
@@ -133,7 +134,7 @@ public:
 		);
 	}
 
-	void End ( )
+	void End ( ) override
 	{
 		_frames.clear ( );
 		_total_duration = 0;
