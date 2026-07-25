@@ -63,32 +63,72 @@ namespace phisiks {
 				switch ( check.collider2->Collider_Type ( ) )
 				{
 				case COLLIDER_TYPE::BOX:
-				result = Check_Collision ( ( Box_Collider* ) check.collider1, ( Box_Collider* ) check.collider2 );
+					result = Check_Collision ( ( Box_Collider* ) check.collider1, ( Box_Collider* ) check.collider2 );
+					DEBUG ( 4, "Collision BOX - BOX" );
 				break;
+
 				case COLLIDER_TYPE::SPHERE:
-				result = Check_Collision ( ( Box_Collider* ) check.collider1, ( Sphere_Collider* ) check.collider2 );
+					result = Check_Collision ( ( Box_Collider* ) check.collider1, ( Sphere_Collider* ) check.collider2 );
+					DEBUG ( 4, "Collision BOX - SPHERE" );
+				break;
+
+				case COLLIDER_TYPE::TILEMAP:
+					result = Check_Collision ( ( Tilemap_Collider* ) check.collider2, ( Box_Collider* ) check.collider1 );
+					result.triggered *= -1.0f;
+					DEBUG ( 4, "Collision TILEMAP - BOX" );
 				break;
 
 				default: break;
 				}
 			break;
+
 
 			case COLLIDER_TYPE::SPHERE:
 				switch ( check.collider2->Collider_Type ( ) )
 				{
 				case COLLIDER_TYPE::BOX:
-				result = Check_Collision ( ( Box_Collider* ) check.collider2, ( Sphere_Collider* ) check.collider1 );
-				result.triggered *= -1.0f;
+					result = Check_Collision ( ( Box_Collider* ) check.collider2, ( Sphere_Collider* ) check.collider1 );
+					result.triggered *= -1.0f;
+					DEBUG ( 4, "Collision BOX - SPHERE" );
 				break;
+
 				case COLLIDER_TYPE::SPHERE:
-				result = Check_Collision ( ( Sphere_Collider* ) check.collider1, ( Sphere_Collider* ) check.collider2 );
+					result = Check_Collision ( ( Sphere_Collider* ) check.collider1, ( Sphere_Collider* ) check.collider2 );
+					DEBUG ( 4, "Collision SPHERE - SPHERE" );
+				break;
+
+				case COLLIDER_TYPE::TILEMAP:
+					result = Check_Collision ( ( Tilemap_Collider* ) check.collider1, ( Sphere_Collider* ) check.collider2 );
+					result.triggered *= -1.0f;
+					DEBUG ( 4, "Collision TILEMAP - SPHERE" );
 				break;
 
 				default: break;
 				}
 			break;
-			
-			default: break;
+
+
+			case COLLIDER_TYPE::TILEMAP:
+				switch ( check.collider2->Collider_Type ( ) )
+				{
+				case COLLIDER_TYPE::BOX:
+					result = Check_Collision ( ( Tilemap_Collider* ) check.collider1, ( Box_Collider* ) check.collider2 );
+					DEBUG ( 4, "Collision TILEMAP - BOX" );
+				break;
+
+				case COLLIDER_TYPE::SPHERE:
+					result = Check_Collision ( ( Tilemap_Collider* ) check.collider1, ( Sphere_Collider* ) check.collider2 );
+					DEBUG ( 4, "Collision TILEMAP - SPHERE" );
+				break;
+
+				case COLLIDER_TYPE::TILEMAP:
+					result = Check_Collision ( ( Tilemap_Collider* ) check.collider1, ( Tilemap_Collider* ) check.collider2 );
+					DEBUG ( 4, "Collision TILEMAP - TILEMAP" );
+				break;
+
+				default: break;
+				}
+			break;
 			}
 
 			DEBUG ( 5, "Collison Result: ", result );

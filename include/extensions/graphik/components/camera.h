@@ -11,8 +11,8 @@ public:
 	float Scale = 1;
 	float fov = 90;
 
-	glm::mat4 Projkection ( );
-	glm::mat4 Prospective ( );
+	virtual glm::mat4 Projkection ( );
+	virtual glm::mat4 Prospective ( );
 	static glm::mat4 UI_Projkection ( );
 };
 

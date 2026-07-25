@@ -58,8 +58,10 @@ void Sprite::Update
 
 	auto shader = Manager::Get < Shader > ( _shader );
 
-	shader->setMat4  ( "projection", ( _UI_render ? 
-	Camera::UI_Projkection ( ) : obj->Get_Component < Camera > ( )->Projkection ( )) );
+	shader->setMat4  ( "projection", (
+		_UI_render ? 
+		Camera::UI_Projkection ( ) :
+		Manager::Camera_Get ( _camera )->Projkection ( )) );
 	DEBUG ( 6, "Updated Camera uniform");
 
 	shader->setFloat ( "SPRITE_COLUMNS", (int)_frames.x );

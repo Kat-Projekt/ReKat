@@ -15,38 +15,44 @@ private:
 
 public:
 	void Start ( ) {
-        std::vector < std::string > Data;
-        std::ifstream Data_stream;
-        // ensure ifstream objects can throw exceptions:
-        Data_stream.exceptions (std::ifstream::failbit | std::ifstream::badbit);
-        try {
-            Data_stream.open ( _path );
-            std::string intermediate;
-            std::stringstream sData_stream;
-            sData_stream << Data_stream.rdbuf();
-            Data_stream.close ();
-            // Tokenizing 
-            H = 0;
-            while ( getline ( sData_stream, intermediate, '\n' ) ) { H++; Data.push_back(intermediate); }
-        }
-        catch(const std::exception& e) { std::cerr << e.what() << '\n'; }
-        
+		std::vector < std::string > Data;
+		std::ifstream Data_stream;
+		// ensure ifstream objects can throw exceptions:
+		Data_stream.exceptions (std::ifstream::failbit | std::ifstream::badbit);
+		try {
+			Data_stream.open ( _path );
+			std::string intermediate;
+			std::stringstream sData_stream;
+			sData_stream << Data_stream.rdbuf();
+			Data_stream.close ();
+			// Tokenizing 
+			H = 0;
+			while ( getline ( sData_stream, intermediate, '\n' ) )
+			{ H++; Data.push_back(intermediate); }
+
+		}
+		catch(const std::exception& e)
+		{ std::cerr << e.what() << '\n'; }
+			
 		D.reserve ( Data.size( ) );
-        for ( std::string s : Data ) {
-            std::string intermediate;
-            std::stringstream sData_stream;
-            sData_stream << s;
-            // Tokenizing 
-            W = 0;
-            while ( getline ( sData_stream, intermediate, ',' ) ) { W++; D.push_back( std::stoi(intermediate) > 0 ); }
-        }
+		for ( std::string s : Data )
+		{
+			std::string intermediate;
+			std::stringstream sData_stream;
+			sData_stream << s;
+			// Tokenizing 
+			W = 0;
+			while ( getline ( sData_stream, intermediate, ',' ) )
+			{ W++; D.push_back( std::stoi(intermediate) > 0 ); }
+		}
 
 		HH = H * obj->Get_Size().y;
 		WW = W * obj->Get_Size().x;
-		// std::cout << D << '\n' << HH << '\t' << WW;
 	}
 
 	void Set ( std::string path ) { _path = path; }
+
+	COLLIDER_TYPE Collider_Type ( ) { return COLLIDER_TYPE::TILEMAP; }
 
 	collision_result Check_Collision ( Box_Collider * B ) {
 		vec2 half_size = B->Get_Size ( ) * 0.5f;

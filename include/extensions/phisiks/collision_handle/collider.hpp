@@ -6,7 +6,8 @@ enum class COLLIDER_TYPE
 {
 	BOX,
 	SPHERE,
-	NONE
+	NONE,
+	TILEMAP
 };
 
 class Collider : public Behaviour {
