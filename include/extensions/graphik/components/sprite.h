@@ -9,7 +9,6 @@ class Sprite : public Behaviour {
 private:
 	unsigned int _quad;
 	unsigned int VBO;
-	int _frame = 0;
 	ivec2 _frames = {1,1};
 	vec4 _color = {1,1,1,1};
 	std::string _instacer = "";
@@ -18,6 +17,7 @@ private:
 	std::string _camera = "";
 	bool _UI_render = true;
 public:
+	int _frame = 0;
 	Sprite ( );
 
 	void Start ( );
