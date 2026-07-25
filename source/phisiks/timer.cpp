@@ -1,7 +1,7 @@
 #include "extensions/phisiks/timer.hpp"
 
 namespace Timer {
-	auto start = std::chrono::steady_clock::now();
+	std::chrono::steady_clock::time_point start = std::chrono::steady_clock::now();
 	double delta_time = 0;
 	double fixed_delta_time = 0;
 	double current_time = 0;
