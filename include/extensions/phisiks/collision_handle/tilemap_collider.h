@@ -64,13 +64,14 @@ public:
 		vec2 _pos = obj->Get_Pos();
 		vec2 _size = obj->Get_Size();
 		float _Min_X = ( (X_limit.x - _pos.x) / _size.x + 0.5f ), _Max_X = ( (X_limit.y - _pos.x) / _size.x + 0.5f );
-		float _Min_Y = ( (_pos.y - Y_limit.y) / _size.y + 0.5f ), _Max_Y = ( (_pos.y - Y_limit.x) / _size.y + 0.5f );
+		float _Min_Y = ( (Y_limit.x - _pos.y) / _size.y + 0.5f ), _Max_Y = ( (Y_limit.y - _pos.y) / _size.y + 0.5f );
 
 		// Min_ < Max_
 		int Min_X = ( _Min_X >= 0 ? (int)_Min_X : (int) (_Min_X-1.0f));
 		int Max_X = ( _Max_X >= 0 ? (int)_Max_X : (int) (_Max_X-1.0f));
 		int Min_Y = ( _Min_Y >= 0 ? (int)_Min_Y : (int) (_Min_Y-1.0f));
 		int Max_Y = ( _Max_Y >= 0 ? (int)_Max_Y : (int) (_Max_Y-1.0f));
+
 
 		// work on rasterized collider
 		// // everyting out
@@ -88,7 +89,7 @@ public:
 		for ( int x = Min_X; x <= Max_X; x++ ) {
 			for ( int y = Min_Y; y <= Max_Y; y++ ) {
 				if ( D[x + y * W] != 1 ) { continue; }
-				vec2 tile_pos = obj->Get_Pos() + vec3{ obj->Get_Size().x * x, -obj->Get_Size().y * y, 0 };
+				vec2 tile_pos = obj->Get_Pos() + vec3{ obj->Get_Size().x * x, obj->Get_Size().y * y, 0 };
 				vec2 P_Delta = tile_pos - (vec2)B->Get_Pos();
 				vec2 Delta = abs(P_Delta) - (vec2)(obj->Get_Size() + B->Get_Size()) * 0.5f;
 
@@ -122,7 +123,7 @@ public:
 		vec2 _pos = obj->Get_Pos();
 		vec2 _size = obj->Get_Size();
 		float _Min_X = ( (X_limit.x - _pos.x) / _size.x + 0.5f ), _Max_X = ( (X_limit.y - _pos.x) / _size.x + 0.5f );
-		float _Min_Y = ( (_pos.y - Y_limit.y) / _size.y + 0.5f ), _Max_Y = ( (_pos.y - Y_limit.x) / _size.y + 0.5f );
+		float _Min_Y = ( (Y_limit.x - _pos.y) / _size.y + 0.5f ), _Max_Y = ( (Y_limit.y - _pos.y) / _size.y + 0.5f );
 
 		// Min_ < Max_
 		int Min_X = ( _Min_X >= 0 ? (int)_Min_X : (int) (_Min_X-1.0f));
@@ -147,7 +148,7 @@ public:
 			for ( int y = Min_Y; y <= Max_Y; y++ ) {
 				if ( D[x + y * W] != 1 ) { continue; }
 
-				vec3 tile_pos = obj->Get_Pos() + vec3{ obj->Get_Size().x * x, -obj->Get_Size().y * y, 0 };
+				vec3 tile_pos = obj->Get_Pos() + vec3{ obj->Get_Size().x * x, obj->Get_Size().y * y, 0 };
 
 				// get center point circle first 
 				glm::vec3 center = S->Get_Pos ( );
