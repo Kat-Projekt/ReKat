@@ -5,7 +5,7 @@
 #ifndef DEBUG_SYNTH
 #define DEBUG_SYNTH
 
-#include "../debugger.hpp"
+#include <utilities/debugger.hpp>
 #include <AL/al.h>
 #include <AL/alc.h>
 

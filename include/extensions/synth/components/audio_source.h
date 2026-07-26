@@ -1,12 +1,12 @@
 #ifndef AUDIO_SOUCE_H
 #define AUDIO_SOUCE_H
 
-#include "../../objekt.hpp"
+#include "objekt/objekt.hpp"
 #include "../resources/manager.hpp"
 
 class Audio_Source : public Behaviour {
-	Source* source = nullptr;
-	List < Buffer* > buffers;
+	std::shared_ptr < Source > source = nullptr;
+	List < std::shared_ptr < Buffer > > buffers;
 public:
 	// create context
 	void Start ( ) {
@@ -19,22 +19,29 @@ public:
 		DEBUG ( 5, "Updated Audio Source Position");
 	}
 
-	void Play ( int what ) {		
-		if ( source->Is_Busy ( ) ) { DEBUG (3, "Trying to play a busy source"); return; }
-		if ( what >= buffers.size( ) ) { DEBUG (3, "Trying to play an non existing buffer"); return; }
+	void Play ( int what )
+	{		
+		if ( source->Is_Busy ( ) )
+		{ DEBUG (3, "Trying to play a busy source"); return; }
+		if ( what >= buffers.size( ) )
+		{ DEBUG (3, "Trying to play an non existing buffer"); return; }
+
 		alSourcei( source->Get_Source ( ), AL_BUFFER, buffers[what]->Get_Buffer ( ) ); AL_CHECK_ERROR;
 		alSourcePlay( source->Get_Source ( ) ); AL_CHECK_ERROR;
 	}
 
-	Audio_Source* Set ( Source* _source, Buffer* _buffer )
-	{ source = _source; buffers.append ( _buffer ); return this; }
 	Audio_Source* Set ( std::string _source, std::string _buffer ) 
-	{ source = Manager::Source_Get ( _source ); buffers.append ( Manager::Buffer_Get ( _buffer ) ); return this; }
+	{
+		source = Manager::Get < Source >  ( _source );
+		buffers.append ( Manager::Get < Buffer > ( _buffer ) );
+		return this;
+	}
 
-	Audio_Source* Set ( Buffer* _buffer ) 
-	{ buffers.append ( _buffer ); return this; }
 	Audio_Source* Set ( std::string _buffer ) 
-	{ buffers.append ( Manager::Buffer_Get ( _buffer ) ); return this; }
+	{
+		buffers.append ( Manager::Get < Buffer > ( _buffer ) );
+		return this;
+	}
 };
 
 #endif

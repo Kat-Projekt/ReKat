@@ -13,3 +13,6 @@
 #include "extensions/graphik/components/tilemap.h"
 
 #include "extensions/logik/components/animator.hpp"
+
+#include "extensions/synth/components.hpp"
+
