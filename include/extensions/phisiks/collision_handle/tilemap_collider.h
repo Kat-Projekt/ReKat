@@ -90,7 +90,7 @@ public:
 			for ( int y = Min_Y; y <= Max_Y; y++ ) {
 				if ( D[x + y * W] != 1 ) { continue; }
 				vec2 tile_pos = obj->Get_Pos() + vec3{ obj->Get_Size().x * x, obj->Get_Size().y * y, 0 };
-				vec2 P_Delta = tile_pos - (vec2)B->Get_Pos();
+				vec2 P_Delta =  (vec2)B->Get_Pos() - tile_pos;
 				vec2 Delta = abs(P_Delta) - (vec2)(obj->Get_Size() + B->Get_Size()) * 0.5f;
 
 				// collision not appeing
