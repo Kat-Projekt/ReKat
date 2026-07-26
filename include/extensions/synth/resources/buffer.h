@@ -43,7 +43,7 @@ public:
 		ALsizei _sample_rate = a.getSampleRate ( );
 		double * data = a.samples[0].data();
 
-		return Make ( data, _len, _sample_freq );
+		return Make ( data, _len, _sample_rate );
 	}
 
 	ALuint Get_Buffer ( ) { return buffer; }
