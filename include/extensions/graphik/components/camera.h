@@ -12,11 +12,7 @@ public:
 	float fov = 90;
 
 	virtual glm::mat4 Projkection ( );
-<<<<<<< HEAD
-	virtual glm::mat4 Prospective ( );
-=======
 	glm::mat4 Prospective ( );
->>>>>>> ee20bdd (fixed compilation issue in openal again, fixed compilation error in camera.h and fixed segfault in sprite.cpp)
 	static glm::mat4 UI_Projkection ( );
 };
 

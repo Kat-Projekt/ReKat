@@ -58,15 +58,8 @@ void Sprite::Update
 
 	auto shader = Manager::Get < Shader > ( _shader );
 
-<<<<<<< HEAD
-	shader->setMat4  ( "projection", (
-		_UI_render ? 
-		Camera::UI_Projkection ( ) :
-		Manager::Camera_Get ( _camera )->Projkection ( )) );
-=======
 	shader->setMat4  ( "projection", ( _UI_render ? 
 	Camera::UI_Projkection ( ) : Manager::Camera_Get ( _camera )->Projkection ( )) );
->>>>>>> ee20bdd (fixed compilation issue in openal again, fixed compilation error in camera.h and fixed segfault in sprite.cpp)
 	DEBUG ( 6, "Updated Camera uniform");
 
 	shader->setFloat ( "SPRITE_COLUMNS", (int)_frames.x );
