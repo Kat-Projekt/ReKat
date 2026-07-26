@@ -11,6 +11,7 @@ public:
 		for ( auto collider1 : _colliders )
 		{
 			// have at least one movable collider
+			if ( collider1->Is_Static ( ) ) { continue; }
 			for ( auto collider2 : _colliders ) {
 
 				if ( collider1 == collider2 ) { continue; }

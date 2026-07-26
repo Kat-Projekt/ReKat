@@ -32,8 +32,9 @@ struct collision_check {
 
 struct collision_hash {
 	size_t operator ( ) ( const collision_check& c ) const {
-		// Combine hashes of x and y using the bitwise XOR
-		return std::hash<size_t>()((size_t)c.collider1) ^ (std::hash<size_t>()((size_t)c.collider2) << 1);
+		size_t h1 = std::hash<size_t>()((size_t)c.collider1);
+		size_t h2 = std::hash<size_t>()((size_t)c.collider2);
+		return h1 ^ h2;
 	}
 };
 
