@@ -1,3 +1,5 @@
 .vscode/
 **/.vscode/
 *.DS_Store
+html
+latex

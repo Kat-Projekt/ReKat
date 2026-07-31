@@ -11,11 +11,12 @@ This engine implements 2 main types:
 - **Objekts**: This are the building blocks and form the hieratical structure of the program.
 - **Components**: This are stickers that you attach to objekts to make them do things.
 
-And 4 extension or systems:
+And 5 extension or systems:
 - **Phisiks**: Phisiks system that implements collision, rigidbody logic and friction
 - **Grapik**: Basic 2D visualizare based on OpenGL ( 3D will come in the future )
-- **Audio**: Audio module based on OpenAL for adding sounds, background music and feedback
-- **Online**: Peer to Peer module for comunication and objekt/component sharing
+- **Musik**: Audio module based on OpenAL for adding sounds, background music and feedback
+- **Connekt**: Peer to Peer module for comunication and objekt/component sharing
+- **Logik**: A system to manage other systems
 
 ## Download
 
@@ -102,3 +103,16 @@ add_subdirectory(engine)
 
 KAT_project ( YourProjekt ALL_COMPONENTS ${CMAKE_SOURCE_DIR}/main.cpp )
 ```
+
+## Documentation
+
+If you want to build the documentation for the projekt you can use
+```bash
+doxygen
+```
+
+If you want to know how the engine works on a higher level you can read the docs in **docs**
+
+## Additional notes
+
+If you are using an LLM you can use the files in **machine_use** to get it up to date with the implmentation.
