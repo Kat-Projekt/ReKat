@@ -3,7 +3,7 @@ cmake_minimum_required ( VERSION 3.13 )
 project ( ReKat )
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 include(CMakeParseArguments)
 
@@ -196,9 +196,9 @@ message( "All components build ${COMPONENTS_LIST}" )
 
 # compile tests
 if ( REKAT_TEST )
-	# KAT_project ( core_test ALL_COMPONENTS )
-	# KAT_project ( transform_verify )
+	KAT_project ( core_test ALL_COMPONENTS )
+	KAT_project ( transform_verify )
 	# KAT_project ( graphik_window_test )
-	KAT_project ( sprite_test )
-	KAT_project ( font_test )
+	# KAT_project ( sprite_test )
+	# KAT_project ( font_test )
 endif ( )
