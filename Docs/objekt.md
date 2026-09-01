@@ -57,3 +57,9 @@ The following are similar but are called only if al least one of the colliders i
 - void Collision_Trigger ( Objekt* collider );
 - void Collision_Trigger_Enter ( Objekt* collider );
 - void Collision_Trigger_Exit( Objekt* collider );
+
+## Transform 
+
+The transformation of a objekt is relative to it's local space so if the father objekt is with position (100,0,0) the child objekt if it has position (0,0,0) it's world position will be (100,0,0), same for rotation and scale.
+
+The child model mathix will be the composition of it's father matrix.

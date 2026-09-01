@@ -82,7 +82,7 @@ int frame;
 extern std::unordered_map < std::string int > map;
 ```
 
-### methos definitions
+### methos definitions and API functions
 ```cpp
 int VoidFunction ( void );
 
@@ -102,7 +102,33 @@ void Templated (
 
 void FunctionWithDefaults ( char * memory_pointer = nullptr );
 
-void MultiFunctionWithDefaults (
+void Multi_Function_With_Defaults (
+	char * memory_pointer = nullptr,
+	int size = 0,
+);
+```
+
+### Normal function definition for internal usage
+```cpp
+int void_function ( void );
+
+bool single_parameter ( bool value );
+
+char * multiple_parameter (
+	char * memory_pointer,
+	int size
+);
+
+template < typename T >
+void templated (
+	char * memory_pointer,
+	int size,
+	T default_value
+);
+
+void function_with_defaults ( char * memory_pointer = nullptr );
+
+void multi_defaults (
 	char * memory_pointer = nullptr,
 	int size = 0,
 );
@@ -114,16 +140,21 @@ class NewComponent : public Behaviour;
 class NewResource : public Resource;
 ```
 
-### private
-for signaling that something is private use an underscore before it's name
+### Enumerators
+```cpp
+enum class EnumeratorForSomething;
+```
+
+### private, implementatin details and helpers
+Use the underscore prefix for elements that are not supposed to pe accesible
 ```cpp
 bool _active;
 int _frame;
 extern std::unordered_map < std::string int > _map;
 
-void _FunctionWithDefaults ( char * memory_pointer = nullptr );
+void _Function_With_Defaults ( char * memory_pointer = nullptr );
 
-void _MultiFunctionWithDefaults (
+void _Multi_Function_With_Defaults (
 	char * memory_pointer = nullptr,
 	int size = 0
 );
@@ -132,20 +163,20 @@ void _MultiFunctionWithDefaults (
 ### on declarations
 when declaring a function use the sintax introduced before with the exceptions of
 ```cpp
-bool SingleParameterFunction
+bool Single_Parameter_Function
 ( bool value )
 {
 	/* Body */
 }
 
-char * MultipleParameters (
+char * Multiple_Parameters (
 	char * memory_pointer,
 	int size
 ) {
 	/* Body */
 }
 
-bool SingleLineBody
+bool Single_Line_Body
 ( void )
 { return true; }
 ```
@@ -178,18 +209,29 @@ for ( auto iterator : vector )
 
 ### function calls
 ```cpp
-VoidFunction ( );
-SingleParamFunction ( 2 );
-MultiParamFunction ( 1, 4, "string" );
+Void_Function ( );
+Single_Param_Function ( 2 );
+Multi_Param_Function ( 1, 4, "string" );
 ```
 
 in the case that the function call extensa over a screen you must:
 ```cpp
-LongParamFunction (
+Long_Param_Function (
 	1,
 	4,
 	"string"
 );
+```
+
+### include priority
+First include the imported libraries ( std, boost, freetype... ) with <>.
+Second include engine implementation with "". separated by a new line
+```cpp
+#include <string>
+#include <vector>
+
+#include "behaviour.h"
+#include "objekt.h"
 ```
 
 ## File naming
@@ -198,7 +240,7 @@ Components or Resources files should be named Exacly as the component/resource t
 
 Extensions must have a "components.hpp" that is the include manager that includes every component, resource and manager that the extension implements.
 
-Managers and Space Inizializers files must have a ".hpp" extension while implementations must have a ".h" file.
+Managers and NameSpace Inizializers files must have a ".hpp" extension while implementations must have a ".h" file.
 
 Template declarations must be put in a ".tpp" file for clarity
 
@@ -222,4 +264,15 @@ Example
     ├── manager.hpp
     ├── ...
     └── graphik.hpp
+```
+
+## Include libraires
+
+For include Gards use both
+```cpp
+#pragma once
+#ifndef FILE_H
+#define FILE_H
+
+#endif
 ```
