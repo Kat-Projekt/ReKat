@@ -1,0 +1,14 @@
+clang++ -std=c++17 \
+	-Weverything \
+	-Wno-c++98-compat \
+	-Wno-c++98-compat-pedantic \
+	-Wno-c++11-extensions \
+	-Wno-c++20-extensions \
+	-Wno-c++23-extensions \
+	-Wno-documentation \
+	-Wno-poison-system-directories \
+	-Wno-weak-vtables \
+	-Wno-padded \
+	-o processed.cpp -E main.cpp
+nvim processed.cpp
+rm processed.cpp
