@@ -1,5 +1,5 @@
 # The Objekt class
-
+( old version, but concepts are similar )
 An Objekt is the fondamental logic block
 
 

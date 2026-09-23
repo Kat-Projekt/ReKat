@@ -14,26 +14,26 @@ The script sould look something like this:
 
 class NewComponent : public Behaviour 
 {
-	NewComponent ( )
-	{
-		// name, version, description
-		Informations = {
-			"NewComponent",
-			1.3,
-			"It updates: We are so back" 
-		};
-	}
+private:
+	bool we_are_back = false;
+public:
+	REFLECT ( NewComponent );
+	METADATA ( "NewComponent", 1.0, "We are so back" );
+	PARAMETERS (
+		PARAMETER ( "we are back", we_are_back ),
+	);
 
 	void Update ( ) override 
 	{
-		DEBUG ( 3, "we are so back" );
+		if ( we_are_back )
+		{ DEBUG ( DebugLevel::Warn, "we are so back" ); }
 	}
 
 	...
 };
 ```
 
-!!! It is important that in the constructor you only define the Informations variable and notthing else this is because the engine will create an instance of your class when it is registered to run some preliminary checks so don't allocate notthing here do it only in the Start function !!!
+The reflection part, more described in the reflection.md file is used to expose the class to the scene serialization system.
 
 ## Methods
 The ```Behaviour``` class exposes the following ovveridable methods.
@@ -81,26 +81,25 @@ Given the example before you can write
 
 class NewComponent : public Behaviour 
 {
+	bool we_are_back = false;
 	std::string message = "It's so jover";
-	uint level = 0;
+	DebugLevel level = DebugLevel::Warn;
 public:
-
-	NewComponent ( )
-	{
-		// name, version, description
-		Informations = {
-			"NewComponent",
-			1.3,
-			"It updates: We are so back ?" 
-		};
-	}
+	REFLECT ( NewComponent );
+	METADATA ( "NewComponent", 1.0, "We are so back" );
+	PARAMETERS (
+		PARAMETER ( "we are back", we_are_back ),
+	);
 
 	void Update ( ) override 
 	{
-		DEBUG ( level, message );
+		if ( we_are_back )
+		{ DEBUG ( level, message ); }
+		else 
+		{ DEBUG ( DebugLevel::Error, "We are not so back" ); }
 	}
 
-	std::shared_ptr < Behaviour > Set ( std::string _message, uint _level )
+	Behaviour * Set ( std::string _message, DebugLevel _level )
 	{
 		message = _message;
 		level = _level;	
@@ -110,13 +109,13 @@ public:
 
 Then when you can do something like
 ```cpp
-	Objekt pino ( "pino" );
-	auto comp = pino.Add_Component < NewComponent > ( );
+	auto pino = Manager::Add < Objekt > ( "pino" );
+	auto comp = pino->Add_Component < NewComponent > ( );
 	
-	pino.Start ( );
-	pino.Update ( );
+	pino->Start ( );
+	pino->Update ( );
 
-	comp.set ( "We are so back", 3 );
+	comp.set ( "We are so back", DebugLevel::Warn );
 
 	pino.Update ( );
 ```
@@ -130,22 +129,14 @@ and the output will be
 
 You might have noticed that the defaul signature is
 ```cpp
-	std::shared_ptr < Behaviour > Set ( const std::vector < std::string > &Args = {} );
+	Behaviour * Set ( const ComponentArguments & );
 ```
 
-This is realy important to implement if you would like to use the interpreter.
+This is the reflection system at work. don't touch this.
 This particular function will be called as follows:
 
 ```cpp
-	Objekt pino ( "pino" );
-	auto comp = pino.Add_Component < NewComponent > ( );
-	
-	pino.Start ( );
-	pino.Update ( );
-
-	comp.set ( ["_message:We are so back", "_level:3"] );
-
-	pino.Update ( );
+	comp.set ( ComponentArguments ( ).Set ( "we are so back", true ) );
 ```
 
-It is the implementar role to know that to do with the parameters
+More information on reflection on the reflection.md document.
