@@ -1,8 +1,200 @@
-#include "objekt/objekt.hpp"
-#include "objekt/manager.hpp"
+#include "manager.hpp"
+
+// ------------------------------------------------------
+// ----------------- De / Constructors  -----------------
+// ------------------------------------------------------
+
+// constructor regsters the objekt
+Objekt::Objekt ( )
+{
+
+}
+
+Objekt::Objekt ( 
+	const std::string& name,
+	glm::vec3 pos,
+	glm::vec3 size,
+	glm::vec3 rot,
+	glm::vec3 rot_pivot
+)
+: _name ( name ), _transform ( pos, size, rot_pivot )
+{
+	_transform.Set_Rot ( rot );
+}
+
+// this removes the objekt from the manager
+Objekt::~Objekt ( )
+{
+
+}
+
+// ------------------------------------------------------------
+// ----------------- Hieratchy implementation -----------------
+// ------------------------------------------------------------
+
+void Objekt::_Set_Father
+( Objekt * father ) noexcept
+{
+
+}
+
+void Objekt::Mov_Child (
+	const std::string& name,
+	Objekt * new_father
+) {
+
+}
+
+Objekt * Objekt::Add_Child
+( std::unique_ptr < Objekt > child )
+{
+
+}
+
+Objekt * Objekt::Add_Child
+( const std::string& name )
+{
+
+}
+
+Objekt * Objekt::Get_Child
+( const std::string& name ) const
+{
+
+}
+
+bool Objekt::Has_Child
+( const std::string& name ) const
+{
+
+}
+
+std::unique_ptr < Objekt > Objekt::Rem_Child
+( const std::string& name )
+{
+
+}
+
+size_t Objekt::Count_Children
+( const std::string& name = "" ) const
+{
+
+}
+
+// --------------------------------------------------------
+// ----------------- Components Managers  -----------------
+// --------------------------------------------------------
+
+Behaviour * Objekt::Add_Component
+( const std::string& type )
+{
+
+}
+
+Behaviour * Objekt::Add_Component (
+	const std::string& type,
+	ComponentArguments args
+) {
+
+}
+
+Behaviour * Objekt::Get_Component
+( const std::string& type ) const
+{
+
+}
+
+std::list < Behaviour * > Objekt::Get_Components
+( const std::string& type ) const
+{
+
+}
+
+std::list < Behaviour * > Objekt::Get_Component_Recursive
+( const std::string& type ) const
+{
+
+}
+
+std::list < Behaviour * > Objekt::Get_Component_In_Children
+( const std::string& type ) const
+{
+
+}
+
+std::unique_ptr < Behaviour > Objekt::Rem_Component
+( const std::string& type )
+{
+
+}
+
+std::list < std::unique_ptr < Behaviour > > Objekt::Rem_Components
+( )
+{
+
+}
+
+bool Objekt::Has_Component
+( const std::string& type ) const
+{
+
+}
+
+// ------------------------------------------------------
+// ----------------- Behaviours Calling -----------------
+// ------------------------------------------------------
+
+void Objekt::Start ( const char* ind = "" )
+{
+
+}
+
+void Objekt::Early_Update ( const char* ind = "" )
+{
+
+}
+
+void Objekt::Update ( const char* ind = "" )
+{
+
+}
+
+void Objekt::Late_Update ( const char* ind = "" )
+{
+
+}
+
+// ---------------------------------------------------
+// ----------------- Printer Helpers -----------------
+// ---------------------------------------------------
+
+void Objekt::Print_Tree
+( std::string level = "" ) const
+{
+	DEBUG ( 4, level, Get_Name ( ), " ", *this );
+	level += "- ";
+	for ( auto& C : _children )
+	{ C->Print_Tree ( level ); }
+}
+
+std::ostream& operator <<
+( std::ostream& os, const Objekt& n )
+{
+	os << ( n._active ? "[ready] " : "[sleep] " ) << n.Get_Name ( );
+	if ( n._components.size ( ) == 0 )
+	{ return os; }
+	os << " < ";
+	// print components
+	for ( auto& C : n._components ) 
+	{ os << ( C->Get_Active () ? "[+]" : "[-]") << C->Get_Type ( ) << " "; }
+
+	os << ">";
+	
+	return os;
+}
 
 Objekt::Objekt
-( void )
+(  )
 : _transform ( std::make_shared < Transform > ( ) )
 {
 	DEBUG ( 4, "Inizializing void Objekt" );
@@ -10,10 +202,11 @@ Objekt::Objekt
 }
 
 Objekt::Objekt (
-	std::string name,
-	vec3 pos,
-	vec3 size,
-	vec3 rot_pivot
+	const std::string& name,
+	glm::vec3 pos,
+	glm::vec3 size,
+	glm::vec3 rot,
+	glm::vec3 rot_pivot
 ) 
 :
 	_name(name),
@@ -438,7 +631,6 @@ std::ostream & operator ,
 ( std::ostream & out, Objekt & n )
 { out << n; return out; }
 
-////////////////////////////////////////////////////////////////////////////////////////////////////
 Behaviour* Objekt::Add_Component
 ( std::string type )
 {
