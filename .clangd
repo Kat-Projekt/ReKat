@@ -1,0 +1,15 @@
+CompileFlags:
+  Add:
+    - -std=c++17
+    - -Weverything
+    - -Werror
+  Remove:
+    - -Wc++98-compat
+    - -Wc++98-compat-pedantic
+    - -Wc++11-extensions
+    - -Wc++20-extensions
+    - -Wc++23-extensions
+    - -Wdocumentation
+    - -Wpoison-system-directories
+    - -Wweak-vtables
+    - -Wpadded
