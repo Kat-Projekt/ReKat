@@ -1,0 +1,9 @@
+#pragma once
+#ifndef REFLECTIONS
+#define REFLECTIONS
+
+#include "parameters.h"
+#include "methods.h"
+#include "metadata.h"
+
+#endif
