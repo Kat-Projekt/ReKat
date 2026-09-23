@@ -1,0 +1,6 @@
+clang++ -Wall -Wextra -Wpedantic -Wshadow -Wconversion -Wdouble-promotion \
+  -Wformat=2 -Wnull-dereference -Wold-style-cast -Woverloaded-virtual \
+  -Wsign-conversion -Wunused -Werror \
+  -std=c++17 -o output main.cpp
+
+./output
