@@ -71,6 +71,16 @@ Then addin your documentation
  ***********************************/
 ```
 
+### Documenting Implemtation
+When you define functions you must devide them by category.
+( components -> adding -> string / template )
+Also in the cpp files of the implemntation you must comment every first level block like:
+```cpp
+// ----------------------------
+// ------ GameComponents ------
+// ----------------------------
+```
+
 ## Naming Conventions
 
 Always use Tabs for indentation
@@ -80,11 +90,12 @@ Always use Tabs for indentation
 bool active;
 int frame;
 extern std::unordered_map < std::string int > map;
+int* pointer;
 ```
 
 ### methos definitions and API functions
 ```cpp
-int VoidFunction ( void );
+int VoidFunction ( );
 
 bool SingleParameterFunction ( bool value );
 
@@ -110,7 +121,7 @@ void Multi_Function_With_Defaults (
 
 ### Normal function definition for internal usage
 ```cpp
-int void_function ( void );
+int void_function ( );
 
 bool single_parameter ( bool value );
 
@@ -176,8 +187,7 @@ char * Multiple_Parameters (
 	/* Body */
 }
 
-bool Single_Line_Body
-( void )
+bool Single_Line_Body ( )
 { return true; }
 ```
 
