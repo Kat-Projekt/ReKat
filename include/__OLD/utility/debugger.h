@@ -66,6 +66,7 @@ inline void _print_stack_backtrace ( void );
 
 #if ( defined (LINUX) || defined (__linux__) || defined (__APPLE__) ) // unix implementation
 	#include "printer.h"
+	#include <iostream>
 	#include <string>
 	#include <execinfo.h>
 	#include <stdio.h>

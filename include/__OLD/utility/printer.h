@@ -1,7 +1,8 @@
 #pragma once
-
-#ifndef PRINTER
-#define PRINTER
+/**********************************************************************
+ * @file printer.h
+ * @brief defines ostream for vec2, vec3, vec4, mat4, std::vector < T >
+ *********************************************************************/
 
 #include <iostream>
 #include <vector>
@@ -39,5 +40,3 @@ inline std::ostream& operator << ( std::ostream& os, const std::vector<T>& vec )
 	{ os << "{" << e << "} "; }
 	return os;
 }
-
-#endif

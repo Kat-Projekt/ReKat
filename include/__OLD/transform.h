@@ -33,6 +33,12 @@ public:
 		PARAMETER ( "pos", _pos ),
 		PARAMETER ( "size", _size ),
 		PARAMETER ( "rot_pivot", _rot_pivot ),
+		PROPERTY ( "_rot", Set_Rot, Get_Local_Rotation )
+	);
+
+	METHODS (
+		METHOD ( "Set 2D rot", Set_2D_Rot, float, rot_z );
+		METHOD ( "Set 2D rot", Set_2D_Rot );
 	);
 
 
