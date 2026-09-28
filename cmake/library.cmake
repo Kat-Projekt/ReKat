@@ -5,9 +5,13 @@ add_library( ReKat SHARED ${PROJECT_SOURCES} ${PROJECT_HEADERS} ${PROJECT_CONFIG
 ## for glfw and glad
 target_compile_definitions( ReKat PRIVATE GLFW_INCLUDE_NONE )
 
+## compilation warnings
+target_compile_options( ReKat PRIVATE ${REKAT_CXX_FLAGS} )
+
 ## for debugging symbols
 if ( REKAT_DEBUG )
 	target_compile_definitions( ReKat PUBLIC DIAGNOSTIC )
+	target_compile_options( ReKat PRIVATE -O0 )
 
 	if ( REKAT_DEBUG_EXPANCE )
 		target_compile_definitions( ReKat PUBLIC EXPANCE )
