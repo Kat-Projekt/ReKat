@@ -32,7 +32,7 @@ class Test : public Behaviour
 	}
 
 public:
-	METADATA ( Test, "semplice test di funzionalità", 1,0,0,true )
+	METADATA ( Test, "semplice test di funzionalità", 1,0,0,true );
 
 	PARAMETERS (
 		PARAMETER ( pino ),
