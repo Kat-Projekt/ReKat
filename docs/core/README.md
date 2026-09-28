@@ -3,6 +3,7 @@ This is an overview of the classes. For the specifics of every class read the ap
 
 ## Core Terms
 
+- **Or[K]estrator**: The coordinator of the Operas
 - **[O]pera**: The spectacle the other classes are performing.
 - **[A]ktor**: A character that lives in a Scene and performs Behaviours.
 - **[B]ehaviour**: An action performed by an Aktor during a scene.
@@ -12,18 +13,24 @@ This is an overview of the classes. For the specifics of every class read the ap
 
 ## Logical Structure
 
-- There is only 1 Director and 1 Maestro per Opera.
+- Orkestrator coordinates Operas like Direktor coordinates Scenes.
+- There is only 1 Orkestrator
+- There is only 1 Direktor and 1 Maestro per Opera.
+
 - Director recruits Aktors and assignes them to Scenes.
-- Behaviours can be ether active or inactive, all active behaviours will be performed during the scene.
-- Aktors act only inside scenes and can move between them.
+- Direktor controls which Scene is active and handles scene transitions.
+- Director is resposble for all actors.
+- When the scope of a scene ends, the next scene is played.
+
+- Scenes can refence assigned actors but are not resposible for them.
 - Scenes contain Aktors and define the environment for their Behaviours.
 - A single Scene can be marked as Active at any given time.
-- Direktor controls which Scene is active and handles scene transitions.
+
+- Aktors act only inside scenes and can move between them.
 - When an Aktor needs to do a Behaviour for the first time Maestro is resposible to teach him.
-- When the scope of a scene ends, the next scene is played.
 - An actor can be assigned to more than one scene.
-- Director is resposble for all actors.
-- Scenes can refence assigned actors but are not resposible for them.
+
+- Behaviours can be ether active or inactive, all active behaviours will be performed during the scene.
 
 ## Glossary
 
