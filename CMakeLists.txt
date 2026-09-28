@@ -28,7 +28,7 @@ set ( COMPONENTS Comp_Test )
 function ( component_package EXECUTABLE )
 	## set ( COMPONETDEF "{ " )
 	foreach ( COMPONENT ${ARGN} )
-		message ( VERBOSE "adding ${COMPONENT} to: ${EXECUTABLE}" )
+		message ( VERBOSE "adding component '${COMPONENT}' to projekt: '${EXECUTABLE}'" )
 		## list ( APPEND COMPONETDEF "\"${COMPONENT}\", ")
 		add_custom_command(
 			TARGET ${COMPONENT} POST_BUILD
@@ -52,20 +52,36 @@ endfunction ( )
 # 	<COMP> Name of the component.
 # 	<PATH> Where to find the component root.
 function ( component COMP PATH )
-	set ( WRAPPER_PATH "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/cmake/component_wrapper.cpp.in" )
-	message(STATUS "Template: ${WRAPPER_PATH}")
+	# Used for exposing the _factory to other translation units
+	set ( WRAPPER_HEADER_PATH "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/cmake/component_wrapper.h.in" )
+	# Wrapper for compiling the component
+	set ( WRAPPER_SOURCE_PATH "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/cmake/component_wrapper.cpp.in" )
+	
+	message ( STATUS "Wrapping component: ${COMP}" )
 
-	configure_file(
-		${WRAPPER_PATH}
+	configure_file (
+		${WRAPPER_HEADER_PATH}
+		${CMAKE_BINARY_DIR}/generated/${COMP}_wrapper.h
+		@ONLY
+	)
+
+	configure_file (
+		${WRAPPER_SOURCE_PATH}
 		${CMAKE_BINARY_DIR}/generated/${COMP}_wrapper.cpp
 		@ONLY
 	)
 
+	# Add only the source file
 	add_library ( ${COMP} SHARED ${CMAKE_BINARY_DIR}/generated/${COMP}_wrapper.cpp )
 
+	## compilation warnings
+	target_compile_options( ${COMP} PRIVATE ${REKAT_CXX_FLAGS} )
+
+	# Link the core library
 	target_link_libraries ( ${COMP} ReKat )
 
-	set_target_properties ( ${COMP} PROPERTIES
+	set_target_properties (
+		${COMP} PROPERTIES
 		RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/components/
 		LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/components/
 		PREFIX "" 
@@ -101,6 +117,8 @@ function ( KAT_project TARGET )
 	else ( )
 		file ( GLOB TARGET_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/tests/${TARGET}/main.cpp )
 	endif ( )
+
+	message ( STATUS "Building projekt: '${TARGET}' from ${TARGET_SOURCE}" )
 
 	add_executable( ${TARGET} ${TARGET_SOURCE} ${PROJECT_SOURCES}
 		${PROJECT_HEADERS} ${PROJECT_CONFIGS} ${LIBS_SOURCES} )
@@ -184,7 +202,7 @@ if ( REKAT_COMPONENT )
 	foreach ( PATH ${COMPONENTS} )
 		cmake_path ( GET PATH STEM COMP )
 		list ( APPEND COMPONENTS_LIST ${COMP} )
-		message( STATUS "Building '${COMP}' from: ${PATH}" )
+		message( STATUS "Building component: '${COMP}' from: ${PATH}" )
 		component (
 			${COMP}
 			${PATH}
@@ -196,9 +214,11 @@ message( "All components build ${COMPONENTS_LIST}" )
 
 # compile tests
 if ( REKAT_TEST )
-	KAT_project ( core_test ALL_COMPONENTS )
-	KAT_project ( transform_verify )
+	# KAT_project ( core_test ALL_COMPONENTS )
+	# KAT_project ( transform_verify )
 	# KAT_project ( graphik_window_test )
 	# KAT_project ( sprite_test )
 	# KAT_project ( font_test )
+	KAT_project ( reflection_test ALL_COMPONENTS )
+	KAT_project ( maestro_test ALL_COMPONENTS )
 endif ( )

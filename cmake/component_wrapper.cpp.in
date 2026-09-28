@@ -1,10 +1,17 @@
-#include "@PATH@"
+#include "@COMP@_wrapper.h"
 
-static_assert (
-	std::is_base_of<Behaviour, @COMP@>::value,
-	"@COMP@ must inherit from Behaviour"
-);
+extern "C" EXPORT
+Behaviour * _Construct ( )
+{
+	DEBUG ( DebugLevel::WARN, "constructing @COMP@" );
+	return new @COMP@ ( );
+}
 
-extern "C" BOOST_SYMBOL_VISIBLE
-std::shared_ptr < Behaviour > _Factory ( )
-{ return std::make_shared < @COMP@ > ( ); }
+extern "C" EXPORT
+void _Deconstruct ( Behaviour * b )
+{
+	delete b;
+}
+
+extern "C" EXPORT
+Reflection::Metadata _Metadata = @COMP@::metadata;

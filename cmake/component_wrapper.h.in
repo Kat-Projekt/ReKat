@@ -1,0 +1,15 @@
+#include "@PATH@"
+
+static_assert (
+	std::is_base_of<Behaviour, @COMP@>::value,
+	"@COMP@ must inherit from Behaviour"
+);
+
+extern "C" EXPORT
+Behaviour * _Construct ( );
+
+extern "C" EXPORT
+void _Deconstruct ( Behaviour * b );
+
+extern "C" EXPORT
+Reflection::Metadata _Metadata;
