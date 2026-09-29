@@ -66,21 +66,17 @@
 class Maestro
 {
 private:
-	// constructor type
-	typedef Behaviour * ( * constructor_t ) ( void );
-	// deconstructort type
-	typedef void ( * deconstructor_t ) ( Behaviour * );
 	// component container Factory struct
 	typedef struct {
-		std::shared_ptr < constructor_t > constructor;
-		std::shared_ptr < deconstructor_t > deconstructor;
+		std::function < Behaviour * ( void ) > constructor;
+		std::function < void ( Behaviour * ) > deconstructor;
 
 		Reflection::Metadata metadata;
 
 		std::shared_ptr < boost::dll::shared_library > lifeline;
 	} componentLibraryFunctions;
 	// unique Behviour pointer with custom deconstructor
-	typedef std::unique_ptr < Behaviour, deconstructor_t > uniqueBehaviour;
+	typedef std::unique_ptr < Behaviour, std::function < void ( Behaviour * ) > > uniqueBehaviour;
 
 	// Factory container for containers
 	std::unordered_map

@@ -10,6 +10,7 @@ Behaviour * _Construct ( )
 extern "C" EXPORT
 void _Deconstruct ( Behaviour * b )
 {
+	DEBUG ( DebugLevel::WARN, "deconstructing @COMP@" );
 	delete b;
 }
 

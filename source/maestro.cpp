@@ -115,11 +115,11 @@ std::size_t Maestro::Register
 		{ throw std::runtime_error ( "Missing symbol: _Metadata" ); }
 
 		// both parts of the unique_ptr
-		comp.constructor = boost::dll::import_symbol < constructor_t > (
+		comp.constructor = boost::dll::import_symbol < Behaviour * ( void ) > (
 			*( comp.lifeline ),
 			"_Construct" );
 			
-		comp.deconstructor = boost::dll::import_symbol < deconstructor_t > (
+		comp.deconstructor = boost::dll::import_symbol < void ( Behaviour * ) > (
 			*( comp.lifeline ),
 			"_Deconstruct" );
 
@@ -180,10 +180,17 @@ Maestro::Construct (
 	
 	DEBUG ( DebugLevel::NOTICE, "Constructing component: ", factory->second.metadata );
 
-	Behaviour* new_component = ( *factory->second.constructor ) ( );
+	Behaviour* new_component = nullptr;
+	try 
+	{ new_component = factory->second.constructor ( ); }
+	catch ( const std::exception& e )
+	{
+		DEBUG ( DebugLevel::WARN, "Error clarification: ", e.what ( ) );
+		DEBUG ( DebugLevel::ERROR, "Error during component ", factory->second.metadata, " construction" );
+	}
 
 	return uniqueBehaviour (
 		new_component,
-		*factory->second.deconstructor
+		factory->second.deconstructor
 	);
 }
