@@ -1,4 +1,4 @@
-cmake_minimum_required ( VERSION 3.13 )
+cmake_minimum_required ( VERSION 3.15 )
 
 project ( ReKat )
 set(CMAKE_POSITION_INDEPENDENT_CODE ON)
@@ -111,14 +111,19 @@ function ( KAT_project TARGET )
 		"${multiValueArgs}"
 	)
 
-	## Get Source for projekt
+	## Get Source path for projekt
 	if ( DEFINED KAT_PATH )
-		file ( GLOB TARGET_SOURCE ${KAT_PATH}/main.cpp )
+		set ( TARGET_PATH "${KAT_PATH}/main.cpp" )
 	else ( )
-		file ( GLOB TARGET_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/tests/${TARGET}/main.cpp )
+		message ( FATAL_ERROR "projekt does not have a path" )
 	endif ( )
 
-	message ( STATUS "Building projekt: '${TARGET}' from ${TARGET_SOURCE}" )
+	if ( NOT EXISTS "${TARGET_PATH}" )
+		message ( FATAL_ERROR "file: ${TARGET_PATH} does not exist" )
+	endif ( )
+
+	message ( STATUS "Building projekt: '${TARGET}' from ${TARGET_PATH}" )
+	file ( GLOB TARGET_SOURCE ${TARGET_PATH} )
 
 	add_executable( ${TARGET} ${TARGET_SOURCE} ${PROJECT_SOURCES}
 		${PROJECT_HEADERS} ${PROJECT_CONFIGS} ${LIBS_SOURCES} )
@@ -214,11 +219,11 @@ message( "All components build ${COMPONENTS_LIST}" )
 
 # compile tests
 if ( REKAT_TEST )
-	# KAT_project ( core_test ALL_COMPONENTS )
-	# KAT_project ( transform_verify )
-	# KAT_project ( graphik_window_test )
-	# KAT_project ( sprite_test )
-	# KAT_project ( font_test )
-	KAT_project ( reflection_test ALL_COMPONENTS )
-	KAT_project ( maestro_test ALL_COMPONENTS )
+	enable_testing ( )
+	add_subdirectory ( tests )
+
+	# KAT_test ( catch2_test )
+	# KAT_test ( reflection_test )
+	KAT_test ( maestro_test ALL_COMPONENTS )
+
 endif ( )
