@@ -33,10 +33,30 @@ inline std::ostream& operator << ( std::ostream& os, const glm::highp_mat4& mat 
 
 template < typename T > 
 inline std::ostream& operator << ( std::ostream& os, const std::vector<T>& vec ) {
-	os << vec.size ( );
-	if ( vec.size ( ) == 0 ) { return os; }
-	os << " : ";
-	for ( auto e : vec ) 
-	{ os << "{" << e << "} "; }
-	return os;
+	if ( vec.size ( ) == 0 )
+	{
+		os << "{ }";
+		return os;
+	} else {
+		os << "{ ";
+		for ( auto e : vec ) 
+		{ os << "{" << e << "} "; }
+		os << "}";
+		return os;
+	}
+}
+
+inline std::ostream& operator << ( std::ostream& os, const std::unordered_map < std::string, std::string > map )
+{
+	if ( map.size ( ) == 0 )
+	{
+		os << "{ }";
+		return os;
+	} else {
+		os << "{ ";
+		for ( auto e : map ) 
+		{ os << "{" << e.first << ", " << e.second << "} "; }
+		os << "}";
+		return os;
+	}
 }

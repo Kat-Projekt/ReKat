@@ -1,7 +1,7 @@
 #pragma once
 
 #if ( defined (LINUX) || defined (__linux__) || defined (__APPLE__) ) // unix includes
-	// #include "printer.h"
+	#include "printer.h"
 	#include <iostream>
 	#include <string>
 	#include <execinfo.h>
@@ -9,7 +9,7 @@
 	#include <stdlib.h>
 	#include <stdexcept>
 #elif ( defined (_WIN32) || defined (_WIN64) ) // windows includes
-	// #include "printer.h"
+	#include "printer.h"
 	#include <string>
 	#include <windows.h>
 	#include <dbghelp.h>
@@ -74,7 +74,7 @@ namespace Debug {
 /***************************
  * @brief The level of debug
  **************************/
-inline constexpr DebugLevel DefaultDebugLevel = DebugLevel::NOTICE;
+inline constexpr DebugLevel DefaultDebugLevel = DebugLevel::VERBOSE;
 #else
 inline constexpr DebugLevel DefaultDebugLevel = DEBUG_LEVEL;
 #endif
