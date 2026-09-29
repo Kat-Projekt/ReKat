@@ -1,6 +1,6 @@
 #include <engine.hpp>
 
-class Empty : public Behaviour {
+class Empty_v1 : public Behaviour {
 public:
 	METADATA ( Empty, "empty component", 1 );
 };
