@@ -8,6 +8,7 @@
 #include <functional>
 #include <memory>
 #include <unordered_map>
+#include <vector>
 #include <string>
 
 #include "behaviour.h"
@@ -149,6 +150,25 @@ public:
 		uint64_t minor = 0,
 		uint64_t patch = 0
 	);
+
+
+	/*******************************************************
+	 * \brief Gets the metadata of the registered components
+	 * 
+	 * Resturs a vector containing the components metadata
+	 * used for inspecting components registration
+	 * 
+	 * \return The metadata vector
+	 ******************************************************/
+	[[nodiscard]] std::vector < Reflection::Metadata >
+	Get_Registered_Components ( );
+	/********************************
+	 * \brief Gets the aliasses table
+	 * 
+	 * \return The aliasses table ref
+	 *******************************/
+	[[nodiscard]] const std::unordered_map < std::string, std::string > &
+	Get_Registered_Components_Aliases ( );
 };
 
 #endif

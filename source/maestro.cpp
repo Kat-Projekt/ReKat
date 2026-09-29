@@ -15,14 +15,12 @@ std::size_t Maestro::_Register
 		  std::string ( comp.metadata.name )
 		+ std::string ( "-stable" );
 
-	DEBUG ( DebugLevel::TRACE, "formatted name: ", formatted_name );
-	DEBUG ( DebugLevel::TRACE, "latest name: ", latest_name );
-	DEBUG ( DebugLevel::TRACE, "stable name: ", stable_name );
-	
+	DEBUG ( DebugLevel::INFO, "Registering component: ", formatted_name );
+
 	// duplicate version number
 	if ( _factories.find ( formatted_name ) != _factories.end ( ) )
 	{
-		DEBUG ( DebugLevel::NOTICE, "Duplicate found: ", formatted_name, " skipping" );
+		DEBUG ( DebugLevel::TRACE, "Duplicate found: ", formatted_name, " skipping" );
 		return 0;
 	} else {
 		// for uniqueness
@@ -40,7 +38,7 @@ std::size_t Maestro::_Register
 		return 1;
 	}
 	// new latest version?
-	if ( Is_Version_Major ( comp.metadata, _factories [ _aliases [ latest_name ] ].metadata ) )
+	if ( Is_Version_Major ( _factories [ _aliases [ latest_name ] ].metadata, comp.metadata ) )
 	{
 		DEBUG ( DebugLevel::NOTICE, "New latest version of: ", formatted_name );
 		_aliases [ latest_name ] = formatted_name;
@@ -50,7 +48,7 @@ std::size_t Maestro::_Register
 	if (
 		comp.metadata.stable
 		&&
-		Is_Version_Major ( comp.metadata, _factories [ _aliases [ stable_name ] ].metadata ) 
+		Is_Version_Major ( _factories [ _aliases [ stable_name ] ].metadata, comp.metadata ) 
 	)
 	{
 		DEBUG ( DebugLevel::NOTICE, "New stable version of: ", formatted_name );
@@ -93,7 +91,7 @@ std::size_t Maestro::Register
 	#endif
 
 	// get component lib
-	DEBUG ( DebugLevel::INFO, "Trying to load component: ", path );
+	DEBUG ( DebugLevel::NOTICE, "Trying to load component: ", path );
 	componentLibraryFunctions comp;
 	comp.constructor = nullptr;
 	comp.deconstructor = nullptr;
@@ -139,7 +137,6 @@ std::size_t Maestro::Register
 		DEBUG ( DebugLevel::WARN, "Error loading component '", path, "': ", e.what ( ) );
 		return 0;
 	}
-	DEBUG ( DebugLevel::NOTICE, "Loaded simbols for ", comp.metadata.name );
 	return _Register ( comp );
 }
 
@@ -193,4 +190,13 @@ Maestro::Construct (
 		new_component,
 		factory->second.deconstructor
 	);
+}
+
+std::vector < Reflection::Metadata >
+Maestro::Get_Registered_Components ( )
+{
+	std::vector < Reflection::Metadata > v;
+	for ( const auto & iter : _factories )
+	{ v.push_back ( iter.second.metadata ); }
+	return v;
 }
