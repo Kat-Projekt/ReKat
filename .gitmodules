@@ -20,3 +20,6 @@
 [submodule "Code/Lib/boost"]
 	path = libraries/boost
 	url = https://github.com/boostorg/boost.git
+[submodule "tests/Catch2"]
+	path = tests/Catch2
+	url = https://github.com/catchorg/Catch2.git
