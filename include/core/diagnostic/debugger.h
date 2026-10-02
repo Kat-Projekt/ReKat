@@ -74,9 +74,18 @@ namespace Debug {
 /***************************
  * @brief The level of debug
  **************************/
-inline constexpr DebugLevel DefaultDebugLevel = DebugLevel::VERBOSE;
+inline constexpr DebugLevel DefaultDebugLevel = DebugLevel::INFO;
 #else
 inline constexpr DebugLevel DefaultDebugLevel = DEBUG_LEVEL;
+#endif
+
+#ifndef DEBUG_SILENT_DEBUGGER
+/******************************
+ * @brief If errors are printed
+ *****************************/
+inline constexpr bool SilenceDebugger = false;
+#else
+inline constexpr bool SilenceDebugger =  DEBUG_SILENT_DEBUGGER;
 #endif
 
 /******************************************
@@ -229,6 +238,8 @@ inline void _debug_printer (
 	int line,
 	Args && ... args
 ) {
+	if ( SilenceDebugger && level > DebugLevel::ERROR )
+	{ return; }
 	if ( level > DefaultDebugLevel )
 	{ return; }
 
@@ -245,16 +256,19 @@ inline void _debug_printer (
 
 	auto level_info = level_descriptor [ static_cast < int > ( level ) ];
 
-	std::cout << "[";
-	_print_colored ( level_info.name, level_info.color );
-	std::cout << "] " << _strip_root_path ( file ) << ":" << line << " -> ";
-	( std::cout << ... << std::forward < Args > ( args ) );
-	std::cout << '\n';
+	if ( !SilenceDebugger ) {
+		std::cout << "[";
+		_print_colored ( level_info.name, level_info.color );
+		std::cout << "] " << _strip_root_path ( file ) << ":" << line << " -> ";
+		( std::cout << ... << std::forward < Args > ( args ) );
+		std::cout << '\n';
+	}
 
 	// in case of errors print the stack strace
 	if ( level == DebugLevel::FATAL )
 	{
-		_print_stack_backtrace ( );
+		if ( !SilenceDebugger )
+		{ _print_stack_backtrace ( ); }
 		throw std::runtime_error (
 			"FATAL ERROR on "
 			+ std::string ( _strip_root_path ( file ) ) +
@@ -264,7 +278,16 @@ inline void _debug_printer (
 	}
 
 	if ( level == DebugLevel::ERROR )
-	{ _print_stack_backtrace ( ); }
+	{
+		if ( !SilenceDebugger )
+		{ _print_stack_backtrace ( ); }
+		throw std::runtime_error (
+			"ERROR on "
+			+ std::string ( _strip_root_path ( file ) ) +
+			":"
+			+ std::to_string ( line )
+		);
+	}
 }
 
 } }

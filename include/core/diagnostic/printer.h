@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <vector>
+#include <unordered_map>
 #include <glm/glm.hpp>
 
 inline std::ostream& operator << ( std::ostream& os, const glm::vec2& vec ) {

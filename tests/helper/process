@@ -9,6 +9,6 @@ clang++ -std=c++17 \
 	-Wno-poison-system-directories \
 	-Wno-weak-vtables \
 	-Wno-padded \
-	-o processed.cpp -E main.cpp
+	-o processed.cpp -E $1
 nvim processed.cpp
 rm processed.cpp
