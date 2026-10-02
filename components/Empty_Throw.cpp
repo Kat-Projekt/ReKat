@@ -7,5 +7,5 @@ public:
 		DEBUG ( DebugLevel::FATAL, "This shouds throw" );
 	}
 
-	METADATA ( Empty, "empty component", 4,0,0,false );
+	METADATA ( Empty, "empty component that throws on cosntruction that throws on cosntruction", 4,0,0,false )
 };

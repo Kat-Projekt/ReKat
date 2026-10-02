@@ -2,5 +2,5 @@
 
 class Empty_v1 : public Behaviour {
 public:
-	METADATA ( Empty, "empty component", 1 );
+	METADATA ( Empty, "empty component", 1 )
 };
