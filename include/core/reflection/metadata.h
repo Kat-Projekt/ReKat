@@ -30,6 +30,10 @@ namespace Reflection
 /**
  * \brief metadata formatter
  */
-#define METADATA(name, description, ...) /* Version numers */	\
-	static constexpr Reflection::Metadata metadata = 	\
-	Reflection::Construct ( #name, description, __VA_ARGS__ )
+#define METADATA(name, description, ...) /* Version numers */		\
+	static constexpr Reflection::Metadata metadata = 		\
+	Reflection::Construct ( #name, description, __VA_ARGS__ );	\
+									\
+	Reflection::Metadata _Metadata					\
+	( ) const override						\
+	{ return metadata; }						\

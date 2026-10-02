@@ -17,10 +17,11 @@ public:
 		bool,
 		int,
 		float,
+		double,
 		std::string
 	> variant_type;
 private:
-	inline static constexpr const char * names [5] = {"mono","bool","int","float","string"};
+	inline static constexpr const char * names [6] = {"mono","bool","int","float","double","string"};
 	variant_type _value;
 public:
 	EditorType ( ) = default;

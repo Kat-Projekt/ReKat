@@ -76,7 +76,7 @@ public:
 		} catch
 			( const std::bad_variant_access& )
 		{
-			DEBUG ( DebugLevel::ERROR, "Type missmatch '", _value.Name ( ) );
+			DEBUG ( DebugLevel::ERROR, "Type missmatch '", _value.Name ( ), "' for '", _name, "'" );
 			throw;
 		}
 	}

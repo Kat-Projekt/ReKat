@@ -31,7 +31,7 @@ std::size_t Maestro::_Register
 	// is this the first insertion?
 	if ( _aliases.find ( stable_name ) == _aliases.end ( ) )
 	{
-		DEBUG ( DebugLevel::NOTICE, "First component of type: ", formatted_name );
+		DEBUG ( DebugLevel::TRACE, "First component of type: ", formatted_name );
 		_aliases [ formatted_name ] = formatted_name;
 		_aliases [ stable_name ] = formatted_name;
 		_aliases [ latest_name ] = formatted_name;
@@ -40,18 +40,24 @@ std::size_t Maestro::_Register
 	// new latest version?
 	if ( Is_Version_Major ( _factories [ _aliases [ latest_name ] ].metadata, comp.metadata ) )
 	{
-		DEBUG ( DebugLevel::NOTICE, "New latest version of: ", formatted_name );
+		DEBUG ( DebugLevel::TRACE, "New latest version of: ", formatted_name );
 		_aliases [ latest_name ] = formatted_name;
 	}
 
-	// new latest stable version?
+	// new latest stable version? or first stable version
 	if (
-		comp.metadata.stable
+		comp.metadata.stable // new component is stable
 		&&
-		Is_Version_Major ( _factories [ _aliases [ stable_name ] ].metadata, comp.metadata ) 
+		(
+			// new stable + higher version
+			Is_Version_Major ( _factories [ _aliases [ stable_name ] ].metadata, comp.metadata )
+			||
+			// old stable was not stable
+			!_factories [ _aliases [ stable_name ] ].metadata.stable
+		)
 	)
 	{
-		DEBUG ( DebugLevel::NOTICE, "New stable version of: ", formatted_name );
+		DEBUG ( DebugLevel::TRACE, "New stable version of: ", formatted_name );
 		_aliases [ stable_name ] = formatted_name;
 	}
 
@@ -149,7 +155,7 @@ Maestro::Construct (
 	uint64_t patch
 ) {
 	// for consistence in version numbering
-	auto _place_holder_meta = Reflection::Construct ( name.c_str ( ), "__", major, minor, patch );
+	auto _place_holder_meta = Reflection::Construct ( name.c_str ( ), "__", major, minor, patch, stable );
 	
 	// find version name
 	std::string true_name = name + "-";
@@ -160,35 +166,36 @@ Maestro::Construct (
 		{ true_name += "stable"; }
 		else
 		{ true_name += "latest"; }
-		DEBUG ( DebugLevel::NOTICE, "Pre get: ", true_name );
-		true_name = _aliases [ true_name ];
 	} else {
 		true_name += Reflection::Version_Number ( _place_holder_meta );
 	}
-
-	DEBUG ( DebugLevel::INFO, "Requested to build component: ", true_name );
-
-	auto factory = _factories.find ( true_name );
-	if ( factory == _factories.end ( ) )
+	
+	DEBUG ( DebugLevel::INFO, "Requesting: ", true_name );
+	auto name_iter = _aliases.find ( true_name );
+	if ( name_iter == _aliases.end ( ) )
 	{
 		DEBUG ( DebugLevel::ERROR, "This specific version cannot be found: ", true_name );
 		return uniqueBehaviour ( nullptr, nullptr );
 	}
+
+	true_name = name_iter->second;
+	// garanteed to exist
+	auto factory = _factories [ true_name ];
 	
-	DEBUG ( DebugLevel::NOTICE, "Constructing component: ", factory->second.metadata );
+	DEBUG ( DebugLevel::NOTICE, "Constructing component: ", factory.metadata );
 
 	Behaviour* new_component = nullptr;
 	try 
-	{ new_component = factory->second.constructor ( ); }
+	{ new_component = factory.constructor ( ); }
 	catch ( const std::exception& e )
 	{
 		DEBUG ( DebugLevel::WARN, "Error clarification: ", e.what ( ) );
-		DEBUG ( DebugLevel::ERROR, "Error during component ", factory->second.metadata, " construction" );
+		DEBUG ( DebugLevel::ERROR, "Error during component ", factory.metadata, " construction" );
 	}
 
 	return uniqueBehaviour (
 		new_component,
-		factory->second.deconstructor
+		factory.deconstructor
 	);
 }
 
@@ -199,4 +206,16 @@ Maestro::Get_Registered_Components ( )
 	for ( const auto & iter : _factories )
 	{ v.push_back ( iter.second.metadata ); }
 	return v;
+}
+
+const std::unordered_map < std::string, std::string > &
+Maestro::Get_Registered_Components_Aliases ( )
+{
+	// print as verbose for nicer things
+	DEBUG ( DebugLevel::VERBOSE, "Maestro aliasses" );
+	for ( const auto& iter : _aliases )
+	{
+		DEBUG ( DebugLevel::VERBOSE, "{ ", iter.first, ", ", iter.second, " }");
+	}
+	return _aliases;
 }

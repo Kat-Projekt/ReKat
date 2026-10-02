@@ -21,7 +21,16 @@ private:
 	 **********************************************************/
 	virtual Reflection::Value _Perform 
 	( const std::string&, const Reflection::Values& )
-	{ return Reflection::Value(); }
+	{ return Reflection::Value ( ); }
+	/***********************************************************
+	 * \brief [internal] helper function for reflection function
+	 *
+	 * Do not ovveride this function manually use the 
+	 * METHODS(...) macro
+	 **********************************************************/
+	virtual std::vector < std::string > _Reflected_Methods
+	( ) const
+	{ return {}; }
 	/***********************************************************
 	 * \brief [internal] helper function for reflection function
 	 *
@@ -39,7 +48,27 @@ private:
 	 **********************************************************/
 	virtual Reflection::Value _Query
 	( const std::string& ) const
-	{ return Reflection::Value(); }
+	{ return Reflection::Value ( ); }
+	/***********************************************************
+	 * \brief [internal] helper function for reflection function
+	 *
+	 * Do not ovveride this function manually use the 
+	 * PARAMETERS(...) macro
+	 **********************************************************/
+	virtual std::vector < std::string > _Reflected_Parameters
+	( ) const
+	{ return {}; }
+	/***********************************************************
+	 * \brief [internal] helper function for reflection function
+	 *
+	 * Do not ovveride this function manually use the 
+	 * METADATA(...) macro
+	 **********************************************************/
+	virtual Reflection::Metadata _Metadata
+	( ) const
+	{ return Reflection::Metadata ( ); }
+
+
 protected:
 	/***************************************
 	 * \brief Is this Behaviour performable?
@@ -240,6 +269,17 @@ public:
 	
 		return _Perform ( name, values );
 	}
+	/*********************************************
+	 * \brief Gets the reflected functions names
+	 *
+	 * Note that the parameter list is not exposed
+	 * Only the function name is provvided
+	 *
+	 * \return A vector containg the names
+	 ********************************************/
+	std::vector < std::string >
+	Reflected_Methods ( ) const
+	{ return _Reflected_Methods ( ); }
 	/*********************************************************
 	 * \brief Configures the Behaviour parameters
 	 *
@@ -314,7 +354,23 @@ public:
 	Reflection::Value Query
 	( const std::string& parameter ) const
 	{ return _Query ( parameter ); }
-
+	/********************************************
+	 * \brief Gets the reflected parameters names
+	 *
+	 * Does not differentiate between Parameters
+	 * and Properties.
+	 *
+	 * \return A vector containg the names
+	 *******************************************/
+	std::vector < std::string >
+	Reflected_Parameters ( ) const
+	{ return _Reflected_Parameters ( ); }
+	/*******************************************************
+	 * \brief This function return the metadata informations
+	 ******************************************************/
+	virtual Reflection::Metadata Metadata
+	( ) const
+	{ return _Metadata ( ); }
 };
 
 #endif

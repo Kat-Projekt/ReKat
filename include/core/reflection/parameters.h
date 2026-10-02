@@ -22,7 +22,7 @@ void _Configure ( const Reflection::Values& values ) override		\
 		}							\
 	}								\
 }									\
-Reflection::Value _Query ( const std::string& param ) const override		\
+Reflection::Value _Query ( const std::string& param ) const override	\
 {									\
 	auto p = parameters.find ( param );				\
 	if ( p == parameters.end ( ) )					\
@@ -34,14 +34,27 @@ Reflection::Value _Query ( const std::string& param ) const override		\
 		/* calls the getter for parameter*/			\
 		return p->second.second ( );				\
 	}								\
+}									\
+std::vector < std::string > _Reflected_Parameters ( ) const override	\
+{									\
+	std::vector < std::string > param_names;			\
+	param_names.reserve ( parameters.size ( ) );			\
+									\
+	for ( const auto& param : parameters )				\
+	{ param_names.push_back ( param.first ); }			\
+									\
+	return param_names;						\
 }
+
 
 		
 #define PARAMETER(name)						\
 { #name,							\
 {								\
 	[this]( const Reflection::Values& args ) {		\
-		this -> name = args(#name);			\
+		this -> name = static_cast 			\
+			< decltype ( name ) > ( args(#name) );	\
+		Modify ( );					\
 	},							\
 	[this]( ) -> Reflection::Value {			\
 		return Reflection::Value {} = this->name;	\
