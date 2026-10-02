@@ -29,38 +29,41 @@ include_directories( SYSTEM
 ## unicode text
 add_definitions(-DUNICODE -D_UNICODE)
 
-## compiler specific flags for debugging
-if(MSVC)
-	set( CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4 /std:c++17" )
-else()
-	set( REKAT_CXX_FLAGS
-		"${CMAKE_CXX_FLAGS}"
-		"-Weverything"
-		"-Werror"
-		"-Wno-c++98-compat"
-		"-Wno-c++98-compat-pedantic"
-		"-Wno-c++11-extensions"
-		"-Wno-c++20-extensions"
-		"-Wno-c++23-extensions"
-		"-Wno-documentation"
-		"-Wno-poison-system-directories"
-		"-Wno-weak-vtables"
-		"-Wno-padded"
-		"-Wno-zero-as-null-pointer-constant"
-		## for glad.c 
-		"$<$<COMPILE_LANGUAGE:CXX>:-std=c++17>"
-		"$<$<COMPILE_LANGUAGE:C>:-Wno-strict-prototypes>"
-		"-Wno-nonportable-include-path"
-	)
+## detect os
+if ( WIN32 )
+	set ( REKAT_OS "windows" )
+elseif ( APPLE )
+	set ( REKAT_OS "macos" )
+elseif ( UNIX )
+	set ( REKAT_OS "linux" )
+else ( )
+	message ( FATAL_ERROR "UNKNOWN OS" )
+endif ( )
 
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O2 -std=c++17")
+## detect compiler
+if ( CMAKE_CXX_COMPILER_ID MATCHES "Clang" )
+	set ( REKAT_COMPILER "clang" )
+elseif ( CMAKE_CXX_COMPILER_ID MATCHES "GNU")
+	set ( REKAT_COMPILER "gcc" )
+elseif ( CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+	set ( REKAT_COMPILER "visual_studio" )
+else ( )
+	message ( FATAL_ERROR "UNKNOWN COMPILER ${CMAKE_CXX_COMPILER_ID}" )
+endif ( )
 
-	if(NOT WIN32)
-		set(GLAD_LIBRARIES dl)
-	else()
-		set(WINSOCK_LIBRARIES Ws2_32.lib Mswsock.lib AdvApi32.lib)
-	endif()
-endif()
+set ( REKAT_COMPILER_FLAGS_LOCATION "${CMAKE_SOURCE_DIR}/cmake/compilers/${REKAT_OS}-${REKAT_COMPILER}.cmake" )
+message ( STATUS "os: ${REKAT_OS}, compiler: ${REKAT_COMPILER} -> ${REKAT_COMPILER_FLAGS_LOCATION}" )
+
+## import compiler flags
+include ( "${REKAT_COMPILER_FLAGS_LOCATION}" )
+
+## Extra windows libraries / glad
+if ( NOT WIN32 )
+	set ( GLAD_LIBRARIES dl )
+else ( )
+	set ( WINSOCK_LIBRARIES Ws2_32.lib Mswsock.lib AdvApi32.lib )
+endif ( )
+
 
 file(GLOB LIBS_SOURCES libraries/glad/src/glad.c )
 file(GLOB PROJECT_SOURCES source/*/*.cpp source/*.cpp )

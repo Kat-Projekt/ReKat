@@ -182,6 +182,7 @@ function ( KAT_project TARGET )
 endfunction ( )
 
 list ( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake" )
+list ( APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}/cmake/compilers" )
 ## this compiles RaKat shared library 
 include ( library )
 
