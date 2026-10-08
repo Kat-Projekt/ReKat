@@ -1,0 +1,35 @@
+#include <catch2/catch_test_macros.hpp>
+#include <catch2/matchers/catch_matchers_floating_point.hpp>
+#include <catch2/reporters/catch_reporter_event_listener.hpp>
+#include <catch2/reporters/catch_reporter_registrars.hpp>
+
+#include <thread>
+
+template < typename fun >
+void Call_Multiple ( fun function, int times )
+{
+	std::atomic < int  > started_threads = 0;
+	std::atomic < bool > call = false;
+
+	std::vector < std::thread > threads;
+	threads.reserve ( times );
+
+	for ( int i = 0; i < times; i ++ )
+	{
+		threads.emplace_back (
+			[&] ( ) {
+				started_threads += 1;
+				// wait for start flagg
+				while ( !call ) { std::this_thread::yield ( ); }
+				function ( );
+			}
+		);
+	}
+
+	while ( started_threads != times )
+	{ call = true; }
+
+	for ( auto & t : threads )
+	{ t.join ( ); }
+}
+
