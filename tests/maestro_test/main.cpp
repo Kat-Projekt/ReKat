@@ -168,6 +168,8 @@ SCENARIO ( "a TestReflection component can execute every function" )
 		Maestro m;
 		int r = m.Register ( "TestReflection.dylib" );
 		auto b = m.Construct ( "TestReflection" );
+		// start is neccesasrry before perform
+		b->_Start ( );
 
 		THEN ( "the component is loaded correctly" )
 		{
