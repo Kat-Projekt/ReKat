@@ -52,7 +52,7 @@ private:
 	EditorType _value;
 public:
 	Value ( )
-	: _name ( "" ), _value ( std::monostate { } ) { }
+	: _name ( "__non_setted__" ), _value ( std::monostate { } ) { }
 
 	Value
 	( const char* name )
@@ -76,7 +76,12 @@ public:
 		} catch
 			( const std::bad_variant_access& )
 		{
-			DEBUG ( DebugLevel::ERROR, "Type missmatch '", _value.Name ( ), "' for '", _name, "'" );
+			T test_value;
+			EditorType t ( test_value );
+			DEBUG ( DebugLevel::ERROR, 
+					"Type missmatch '", _value.Name ( ), 
+					"' for '", _name, "' when requested: '",
+					t.Name ( ), "'" );
 			throw;
 		}
 	}
