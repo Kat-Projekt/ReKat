@@ -5,6 +5,9 @@
 #include "reflection/reflection"
 #include "export.h"
 
+#include <atomic>
+#include <mutex>
+
 class Aktor;
 
 /**
@@ -68,24 +71,37 @@ private:
 	( ) const
 	{ return Reflection::Metadata ( ); }
 
-
-protected:
+private:
 	/***************************************
 	 * \brief Is this Behaviour performable?
 	 **************************************/
-	bool _active = true;
+	std::atomic < bool > _active = true;
 	/*****************************************
 	 * \brief Has this Behaviour been Started?
 	 ****************************************/
-	bool _started = false;
+	std::atomic < bool > _started = false;
 	/*******************************************************
 	 * \brief Used for signaling chashed status invalidation
 	 ******************************************************/
-	mutable bool _modified = true;
+	mutable std::atomic < bool > _modified = true;
+	/*************************************************
+	 * \brief Used as a gate for preventing concurrent
+	 * 	  modification of derived class properties
+	 ************************************************/
+	std::mutex executing;
+	/**********************************************
+	 * \brief Used for preventing mutable cash rush
+	 *********************************************/
+	mutable std::mutex quering;
+protected:
 	/**************************************
 	 * \brief Reference to the binded Aktor
+	 *
+	 * Since the component life is binded
+	 * to the aktor this pointer is const
 	 *************************************/
-	Aktor * obj = nullptr;
+	Aktor * akt = nullptr;
+
 public:
 	// default constructor 
 	Behaviour ( ) = default;
@@ -97,17 +113,17 @@ public:
 	Behaviour & operator = ( const Behaviour& ) = delete;
 
 	// publically callable update functions (Aktor->...) + _active / start gates
-	void _Start ( );
-	void _Early_Update ( );
-	void _Update ( );
-	void _Late_Update ( );
-	void _Fixed_Update ( );
+	void _Start ( ); 
+	void _Early_Update ( ) { _Internal_Caller ( &Behaviour::Start ); }
+	void _Update ( ) {_Internal_Caller ( &Behaviour::Update ); }
+	void _Late_Update ( ) {_Internal_Caller ( &Behaviour::Late_Update ); }
+	void _Fixed_Update ( ) {_Internal_Caller ( &Behaviour::Fixed_Update ); }
+
+	// internal router for update class functions
+	void _Internal_Caller ( void ( Behaviour::* function ) ( void ) );
 	
 	// Collision / Trigger routing + _start / _active gates
-	void _Collsion_Enter ( Aktor *, bool );
-	void _Collsion ( Aktor *, bool );
-	void _Collsion_Exit ( Aktor *, bool );
-
+	void _Collsion_Router ( Aktor *, int mode, bool );
 private:
 	/**************************************************
 	 * \brief Function used for settin up the behaviour
@@ -118,25 +134,56 @@ private:
 	virtual void Start ( ) { }
 	/*******************************************
 	 * \brief This is called first on each frame
+	 *
+	 * See Update for more infos
 	 ******************************************/
 	virtual void Early_Update ( ) { }
 	/**********************************************
 	 * \brief Called every frame after Early Update
 	 *
-	 * Note that this is per aktor, so
-	 * Aktor1        
-	 * ├─Early Update
-	 * ├─Update      
-	 * └─Late Update 
-	 * Aktor2        
-	 * ├─Early Update
-	 * ├─Update      
-	 * └─Late Update 
-	 * ...
+	 * Note that this is per Scene, so
+	 *
+	 * Scene                                        
+	 * │                                            
+	 * ├─ Early Update                              
+	 * │  ├─ Aktor1                                 
+	 * │  │  └─ Early Update                        
+	 * │  │     ├── Behaviour1.Early_Update ( )     
+	 * │  │     ├── Behaviour2.Early_Update ( )     
+	 * │  │     └── ...                             
+	 * │  ├─ Aktor2                                 
+	 * │  │  └─ Early Update                        
+	 * │  │     └── ...                             
+	 * │  └─ ...                                    
+	 * │                                            
+	 * ├─ Update                                    
+	 * │  ├─ Aktor1                                 
+	 * │  │  └─ Update                              
+	 * │  │     ├── Behaviour1.Update ( )     
+	 * │  │     ├── Behaviour2.Update ( )     
+	 * │  │     └── ...                             
+	 * │  ├─ Aktor2                                 
+	 * │  │  └─ Update                              
+	 * │  │     └── ...                             
+	 * │  └─ ...                                    
+	 * │                                            
+	 * └─ Late Update                              
+	 *    ├─ Aktor1                                 
+	 *    │  └─ Late Update                        
+	 *    │     ├── Behaviour1.Late_Update ( )     
+	 *    │     ├── Behaviour2.Late_Update ( )     
+	 *    │     └── ...                             
+	 *    ├─ Aktor2                                 
+	 *    │  └─ Late Update                        
+	 *    │     └── ...                             
+	 *    └─ ...     
+	 *
 	 *********************************************/
 	virtual void Update ( ) { }
 	/**********************************************
 	 * \brief This is called before the frame's end
+	 *
+	 * See Update for more infos
 	 *********************************************/
 	virtual void Late_Update ( ) { }
 	/*******************************************************
@@ -262,12 +309,20 @@ public:
 	template < typename ... Args >
 	Reflection::Value Perform ( const std::string& name, Args&...args )
 	{
-		/* create empty state */
-		Reflection::Values values;
-		/* folds parameters */
-		( values.operator, ( std::forward <Args> (args) ), ... );
-	
-		return _Perform ( name, values );
+		std::lock_guard < std::mutex > execution_lock ( executing );
+
+		if ( _active && _started )
+		{
+			/* create empty state */
+			Reflection::Values values;
+			/* folds parameters */
+			( values.operator, ( std::forward <Args> (args) ), ... );
+		
+			return _Perform ( name, values );
+
+		} else {
+			return Reflection::Value {};
+		}
 	}
 	/*********************************************
 	 * \brief Gets the reflected functions names
@@ -317,6 +372,9 @@ public:
 	template < typename ... Args > 
 	void Configure ( Args& ... params )
 	{
+		// same thread as the Update class functions
+		std::lock_guard < std::mutex > execution_lock ( executing );
+		
 		/* create empty state */
 		Reflection::Values values;
 		/* folds parameters */
@@ -353,7 +411,13 @@ public:
 	 **************************************************************/
 	Reflection::Value Query
 	( const std::string& parameter ) const
-	{ return _Query ( parameter ); }
+	{
+		// all querring appens on a separa thead than the Update class
+		// functions since it is constant
+		std::lock_guard < std::mutex > query_lock ( quering );
+		
+		return _Query ( parameter );
+	}
 	/********************************************
 	 * \brief Gets the reflected parameters names
 	 *
