@@ -1,19 +1,23 @@
 # This documents explains how memory is manages for the main classes of the Engine
 The engine cor exposes 5 class types:
+- **Orkestrator**: This class coordinates *Operas*
+- **Opera**: This class coordiantes *Maestro* and *Direktor*
 - **Aktor**: This are the caracters that interact in a *Scene* and they do *Behaviours*.
 - **Behaviour**: This are the actions that an *Aktor* does when in play.
 - **Scene**: This is a stage where *Aktors* *Behave* and live
-- **Direktor**: This static class coordinates *Scenes* and *Actors* that are not associated with a *Scene*
-- **Maestro**: This static class tells to *Aktos* what to do and asignes them *Behaviours*
+- **Direktor**: This class coordinates *Scenes* and *Actors* that are not associated with a *Scene*
+- **Maestro**: This class tells to *Aktos* what to do and asignes them *Behaviours*
 
 ## Relationships
-| Class       | Creator   | Owner  | Destroyer | Updated   | Called by  |
-| ----------- | --------- | ------ | --------- | --------- | ---------- |
-| [A]ktor     | D         | D      | D         | S         | S,A,B,User |
-| [B]ehaviour | M->A      | A      | A         | A         | User       |
-| [S]cene     | D         | D      | D         | D         | A,B,User   |
-| [D]irektor  | None      | None   | User      | User      | Global     |
-| [M]aestro   | None      | None   | User      | None      | A,User     |
+| Class         | Creator   | Owner  | Destroyer | Updated   | Called by  |
+| ------------- | --------- | ------ | --------- | --------- | ---------- |
+| [A]ktor       | D         | D      | D         | S         | S,A,B,User |
+| [B]ehaviour   | M->A      | A      | A         | A         | User       |
+| [S]cene       | D         | D      | D         | D         | O,B,User   |
+| [D]irektor    | O         | O      | O         | O         | B,User     |
+| [M]aestro     | O         | O      | O         | None      | A,User     |
+| [O]pera       | K         | K      | K         | K         | User       |
+| Or[K]estrator | None      | None   | None      | User      | User       |
 
 ## Legenda
 | KeyWord    | Meaning                                                                                                        |

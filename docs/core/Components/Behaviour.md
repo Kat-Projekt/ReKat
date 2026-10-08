@@ -140,3 +140,46 @@ This particular function will be called as follows:
 ```
 
 More information on reflection on the reflection.md document.
+
+## Thread safety
+
+What is supposed to appen:
+
+Every function that is not Configure, Query, Metadata related cannot be called if Active is not set
+
+Start is called only once.
+
+Update Class functions or Perform can be called only after Start is called
+
+Modifications can be adressed any time, if they are in a const function like Querry.
+
+
+
+Things that modifty the component:
+- Configure
+- Update
+- Perform
+- Set_Active
+
+class B
+{
+    mutex executing;
+    mutex cashing;
+
+    #define _INTERNAL_FLAG_STARTED  = 0x1
+    #define _INTERNAL_FLAG_ACTIVE   = 0x2
+    #define _INTERNAL_FLAG_MODIFIED = 0x4
+
+    atomic < uint_8 > _fags;
+
+    void _Start ( )
+    {
+        if ( _)
+
+        std::unique_lock<std::mutex> lock ( executing );
+
+        Start ( );
+
+        _started = true;
+    }
+}

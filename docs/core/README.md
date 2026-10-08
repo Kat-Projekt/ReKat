@@ -47,7 +47,6 @@ This is an overview of the classes. For the specifics of every class read the ap
        - If A2 is responsible for A3, A1 is also responsible for A3
 
 ## Example Hierarchy Graph
-riscrivi il grafico con Directror ( actors then scens and actors with *An)
 ```                                                         
 ┌────────────────────────────────────────────────────────────────┐
 │ Opera        ┌───┐           ┌───┐                             │
