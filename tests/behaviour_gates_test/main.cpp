@@ -191,6 +191,21 @@ SCENARIO ( "Call concurrency for a behaviour", "[behaviour][threads]"  )
 	
 		WHEN ( "Performing after start" )
 		{
+			
+			Call_Multiple ( [&] () { b.Prepare ( "function" ); }, times );
+			b._Start ( );
+			Call_Multiple ( [&] () { b.Prepare ( "function" ); }, times );
+			b.Set_Active ( false );
+			Call_Multiple ( [&] () { b.Prepare ( "function" ); }, times );
+
+			THEN ( "Collisions after start" )
+			{
+				REQUIRE ( b.reflected_function == times * 3 );
+			}
+		}
+
+		WHEN ( "Preparing is indipendent of start and active" )
+		{
 			b._Start ( );
 			
 			Call_Multiple ( [&] () { b.Perform ( "function" ); }, times );

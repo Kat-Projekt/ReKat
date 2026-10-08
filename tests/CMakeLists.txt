@@ -99,6 +99,7 @@ function(KAT_test TARGET)
 		${TARGET}
 		WORKING_DIRECTORY "$<TARGET_FILE_DIR:${TARGET}>"
 		EXTRA_ARGS "--colour-mode ansi"
+		ADD_TAGS_AS_LABELS
 	)
 endfunction ( )
 

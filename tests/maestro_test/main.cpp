@@ -1,31 +1,6 @@
-#include <catch2/catch_test_macros.hpp>
-#include <catch2/matchers/catch_matchers_floating_point.hpp>
-#include <catch2/reporters/catch_reporter_event_listener.hpp>
-#include <catch2/reporters/catch_reporter_registrars.hpp>
-#include <algorithm> // for reflection names
-#include <sstream>   // for metadata
-
-using namespace Catch::Matchers;
-
-#include <iostream>
+#include "../helper/test"
 
 #include <core/maestro.h>
-
-class SectionLogger : public Catch::EventListenerBase {
-public:
-	using Catch::EventListenerBase::EventListenerBase;
-
-	void sectionStarting( Catch::SectionInfo const& sectionInfo) override 
-	{
-		std::cout << "[";
-		ReKat::Debug::_print_colored ( sectionInfo.name.c_str ( ), FOREGROUND_GREEN );
-		std::cout << "]\n";
-		// std::cout << "-------------------------------------------------------------------------------\n";
-	}
-};
-
-CATCH_REGISTER_LISTENER(SectionLogger)
-
 
 SCENARIO ( "a maestro can register components", "[maestro]" )
 {
@@ -112,7 +87,7 @@ SCENARIO ( "a maestro can create a component", "[maestro]" )
 	}
 }
 
-SCENARIO ( "a TestReflection component can set and get every parameter" )
+SCENARIO ( "an imported TestReflection component can set and get every parameter", "[maestro][behaviour]" )
 {
 	GIVEN ( "a TestReflecion component created by a maestro" )
 	{
@@ -161,7 +136,7 @@ SCENARIO ( "a TestReflection component can set and get every parameter" )
 	}
 }
 
-SCENARIO ( "a TestReflection component can execute every function" )
+SCENARIO ( "an imported TestReflection component can execute every function", "[maestro][behaviour]"  )
 {
 	GIVEN ( "a TestReflecion component created by a maestro" )
 	{
@@ -217,7 +192,7 @@ SCENARIO ( "a TestReflection component can execute every function" )
 	}
 }
 
-SCENARIO ( "a TestReflection component can express reflection" )
+SCENARIO ( "an imported TestReflection component can express reflection", "[maestro][behaviour]"  )
 {
 	GIVEN ( "a TestReflecion component created by a maestro" )
 	{
