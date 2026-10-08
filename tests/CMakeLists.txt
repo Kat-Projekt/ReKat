@@ -97,8 +97,8 @@ function(KAT_test TARGET)
 	## Ctest discorver
 	catch_discover_tests (
 		${TARGET}
-		WORKING_DIRECTORY
-		"$<TARGET_FILE_DIR:${TARGET}>"
+		WORKING_DIRECTORY "$<TARGET_FILE_DIR:${TARGET}>"
+		EXTRA_ARGS "--colour-mode ansi"
 	)
 endfunction ( )
 
