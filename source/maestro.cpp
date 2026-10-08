@@ -15,6 +15,8 @@ std::size_t Maestro::_Register
 		  std::string ( comp.metadata.name )
 		+ std::string ( "-stable" );
 
+	std::unique_lock < std::shared_mutex > register_lock ( registration_mutex );
+
 	DEBUG ( DebugLevel::INFO, "Registering component: ", formatted_name );
 
 	// duplicate version number
@@ -170,6 +172,8 @@ Maestro::Construct (
 		true_name += Reflection::Version_Number ( _place_holder_meta );
 	}
 	
+	std::shared_lock < std::shared_mutex > register_lock ( registration_mutex );
+
 	DEBUG ( DebugLevel::INFO, "Requesting: ", true_name );
 	auto name_iter = _aliases.find ( true_name );
 	if ( name_iter == _aliases.end ( ) )
@@ -202,6 +206,8 @@ Maestro::Construct (
 std::vector < Reflection::Metadata >
 Maestro::Get_Registered_Components ( )
 {
+	std::shared_lock < std::shared_mutex > register_lock ( registration_mutex );
+
 	std::vector < Reflection::Metadata > v;
 	for ( const auto & iter : _factories )
 	{ v.push_back ( iter.second.metadata ); }
@@ -211,6 +217,7 @@ Maestro::Get_Registered_Components ( )
 const std::unordered_map < std::string, std::string > &
 Maestro::Get_Registered_Components_Aliases ( )
 {
+	std::shared_lock < std::shared_mutex > register_lock ( registration_mutex );
 	// print as verbose for nicer things
 	DEBUG ( DebugLevel::VERBOSE, "Maestro aliasses" );
 	for ( const auto& iter : _aliases )

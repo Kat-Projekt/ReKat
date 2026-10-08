@@ -10,6 +10,7 @@
 #include <unordered_map>
 #include <vector>
 #include <string>
+#include <shared_mutex>
 
 #include "behaviour.h"
 #include "reflection/reflection"
@@ -91,6 +92,9 @@ private:
 		std::string,
 		std::string
 	> _aliases;
+
+	// mutex for registration / Construction
+	std::shared_mutex registration_mutex;
 
 	/*******************************************
 	 * \brief [internal] Registers the component

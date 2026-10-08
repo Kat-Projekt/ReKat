@@ -324,6 +324,23 @@ public:
 			return Reflection::Value {};
 		}
 	}
+	/*******************************************************************
+	 * \brief Works like Perform but works without the component
+	 * 	needing to be started or active still garantes thread safety
+	 ******************************************************************/
+	template < typename ... Args >
+	Reflection::Value Prepare ( const std::string& name, Args&...args )
+	{
+		std::lock_guard < std::mutex > execution_lock ( executing );
+
+		/* create empty state */
+		Reflection::Values values;
+		/* folds parameters */
+		( values.operator, ( std::forward <Args> (args) ), ... );
+	
+		return _Perform ( name, values );
+	}
+
 	/*********************************************
 	 * \brief Gets the reflected functions names
 	 *
