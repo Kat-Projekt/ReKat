@@ -1,24 +1,23 @@
 #pragma once
+#ifndef DEBUGGER_IMPL
+#define DEBUGGER_IMPL
+
+#include "printer.h"
+#include <string>
+#include <stdio.h>
+#include <iostream>
+#include <sstream>
+#include <stdexcept>
 
 #if ( defined (LINUX) || defined (__linux__) || defined (__APPLE__) ) // unix includes
-	#include "printer.h"
-	#include <iostream>
-	#include <string>
 	#include <execinfo.h>
-	#include <stdio.h>
 	#include <stdlib.h>
-	#include <stdexcept>
 #elif ( defined (_WIN32) || defined (_WIN64) ) // windows includes
-	#include "printer.h"
-	#include <string>
 	#include <windows.h>
 	#include <dbghelp.h>
-	#include <stdio.h>
-	#include <stdexcept>
 
 	#pragma comment(lib, "Dbghelp.lib")
 #endif
-
 
 
 /***************************************************
@@ -69,228 +68,79 @@ enum class DebugLevel : int {
 
 namespace ReKat {
 namespace Debug {
+	/******************************************
+	 * @brief [internal] prints the stack trace
+	 *****************************************/
+	std::string _print_stack_backtrace ( void );
+	
+	/*****************************************
+	 * @brief [internal] internal color values
+	 ****************************************/
+	inline constexpr std::string_view _Red		= "\033[31m";
+	inline constexpr std::string_view _Green	= "\033[32m";
+	inline constexpr std::string_view _Yellow	= "\033[33m";
+	inline constexpr std::string_view _Blue		= "\033[34m";
+	inline constexpr std::string_view _Magenta	= "\033[35m";
+	inline constexpr std::string_view _Cyan		= "\033[36m";
+	inline constexpr std::string_view _Reset	= "\033[0m";
 
-#ifndef DEBUG_LEVEL
-/***************************
- * @brief The level of debug
- **************************/
-inline constexpr DebugLevel DefaultDebugLevel = DebugLevel::INFO;
-#else
-inline constexpr DebugLevel DefaultDebugLevel = DEBUG_LEVEL;
-#endif
+	/**************************************************
+	 * @brief [internal] formats a string to be colored
+	 *************************************************/
+	std::string _print_colored
+	( const char* string, std::string_view color );
 
-#ifndef DEBUG_SILENT_DEBUGGER
-/******************************
- * @brief If errors are printed
- *****************************/
-inline constexpr bool SilenceDebugger = false;
-#else
-inline constexpr bool SilenceDebugger =  DEBUG_SILENT_DEBUGGER;
-#endif
+	/************************************************
+	 * @brief [internal] gets the file name from path
+	 * 
+	 * @param file the file path
+	 * @return the name of the file with extension
+	 ***********************************************/
+	const char* _strip_root_path 
+	( const char* file );
 
-/******************************************
- * @brief [internal] prints the stack trace
- * 
- * To test the windows implementation
- *****************************************/
-inline void _print_stack_backtrace ( void );
-
-#if ( defined (LINUX) || defined (__linux__) || defined (__APPLE__) ) // unix implementation
-	#define FOREGROUND_RED 1
-	#define FOREGROUND_BLUE 2
-	#define FOREGROUND_GREEN 4
-	#define FOREGROUND_INTENSITY 0
-	#define BACKGROUND_RED 8
-	#define BACKGROUND_BLUE 16
-	#define BACKGROUND_GREEN 32
-	#define BACKGROUND_INTENSITY 0
-
-	inline void _print_colored (
-		const char* string,
-		int color
-	) {
-		// used for converting windows colors to linux ones
-		int foreground_color = ( color & 1 ) == 1 ? 31 : ( color & 2 ) == 2 ? 34 : ( color & 4 ) == 4 ? 32 : 0;
-		int background_color = ( color & 8 ) == 8 ? 41 : ( color & 16 ) == 16 ? 44 : ( color & 32 ) == 32 ? 42 : 0;
-
-		std::cout << "\033[1";
-		if ( foreground_color )
-		{
-			std::cout << ';';
-			std::cout << foreground_color;
-		}
-		if ( background_color )
-		{
-			std::cout << ';';
-			std::cout << background_color;
-		}
-		std::cout << "m";
-		std::cout << string;
-		std::cout << "\033[0m";
-	}
-
-	inline void _print_stack_backtrace
-	( void )
+	/***********************************************************
+	 * \brief [internal] for storing the information for a level
+	 **********************************************************/
+	struct LevelInfo
 	{
-		void* frames [32];
-		int count = backtrace ( frames, 32 );
-
-		char** symbols = backtrace_symbols ( frames, count );
-
-		for ( int i = 0; i < count; ++i )
-		{ std::cout << symbols [i] << '\n'; }
-
-		free ( symbols );
-	}
-#elif ( defined (_WIN32) || defined (_WIN64) ) // windows implementaion	
-	inline void _print_colored (
-		const char* string,
-		WORD color
-	) {
-		HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-		SetConsoleOutputCP(CP_UTF8);
-		SetConsoleTextAttribute(hConsole, color);
-		std::cout << string;
-		SetConsoleTextAttribute( hConsole, FOREGROUND_RED | FOREGROUND_BLUE | FOREGROUND_GREEN | FOREGROUND_INTENSITY );
-	}
-
-	inline void _print_stack_backtrace
-	( void )
-	{
-		void* stack[32];
-		USHORT frames = CaptureStackBackTrace(0, 32, stack, nullptr);
-
-		HANDLE process = GetCurrentProcess();
-
-		static bool initialized = false;
-		if (!initialized)
-		{
-			SymInitialize(process, nullptr, TRUE);
-			initialized = true;
-		}
-
-		SYMBOL_INFO* symbol = (SYMBOL_INFO*)calloc(sizeof(SYMBOL_INFO) + 256, 1);
-		symbol->MaxNameLen = 255;
-		symbol->SizeOfStruct = sizeof(SYMBOL_INFO);
-
-		for (USHORT i = 0; i < frames; ++i)
-		{
-			DWORD64 displacement = 0;
-			if (SymFromAddr(process, (DWORD64)stack[i], &displacement, symbol))
-			{
-				printf("#%u %s +0x%llx\n",
-					i,
-					symbol->Name,
-					(unsigned long long)displacement);
-			}
-			else
-			{
-				printf("#%u %p\n", i, stack[i]);
-			}
-		}
-
-		free(symbol);
-	}
-#endif
-
-/************************************************
- * @brief [internal] gets the file name from path
- * 
- * @param file the file path
- * @return the name of the file with extension
- ***********************************************/
-inline const char* _strip_root_path 
-( const char* file )
-{
-	if ( !file )
-	{ return nullptr; }
-
-	const char* filename = file;
-
-	while ( *file )
-	{
-		if ( *file == '/' || *file == '\\' )
-		{ filename = file + 1; }
-		file++;
-	}
-
-	return filename;
-}
-
-/***********************************************************
- * \brief [internal] for storing the information for a level
- **********************************************************/
-struct LevelInfo
-{
-	const char* name;
-	// because on windows it is WORD and unix int
-	decltype(FOREGROUND_RED) color;
-};
-
-
-/***********************************************
- * @brief [internal] processes the debug command
- **********************************************/
-template < typename ... Args >
-inline void _debug_printer (
-	DebugLevel level,
-	const char * file,
-	int line,
-	Args && ... args
-) {
-	if ( SilenceDebugger && level > DebugLevel::ERROR )
-	{ return; }
-	if ( level > DefaultDebugLevel )
-	{ return; }
-
-	static constexpr LevelInfo level_descriptor[] =
-	{
-		{ "FATAL",    FOREGROUND_RED | FOREGROUND_INTENSITY },
-		{ "ERROR",    FOREGROUND_RED | FOREGROUND_INTENSITY },
-		{ "WARN",     FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY },
-		{ "NOTICE",   FOREGROUND_GREEN | FOREGROUND_BLUE | FOREGROUND_INTENSITY },
-		{ "INFO",     FOREGROUND_GREEN | FOREGROUND_INTENSITY },
-		{ "TRACE",    FOREGROUND_INTENSITY },
-		{ "VERBOSE",  FOREGROUND_INTENSITY }
+		const char* name;
+		std::string_view color;
 	};
 
-	auto level_info = level_descriptor [ static_cast < int > ( level ) ];
+	/***********************************************
+	 * @brief [internal] processes the thread safety
+	 **********************************************/
+	void _debug_printer_out_wrapper
+	( const std::string & final_message );
 
-	if ( !SilenceDebugger ) {
-		std::cout << "[";
-		_print_colored ( level_info.name, level_info.color );
-		std::cout << "] " << _strip_root_path ( file ) << ":" << line << " -> ";
-		( std::cout << ... << std::forward < Args > ( args ) );
-		std::cout << '\n';
-	}
+	/***********************************************
+	 * @brief [internal] processes the debug printer
+	 **********************************************/
+	void _debug_printer_impl (
+		DebugLevel level,
+		const char * file,
+		int line,
+		const char * message
+	);
 
-	// in case of errors print the stack strace
-	if ( level == DebugLevel::FATAL )
-	{
-		if ( !SilenceDebugger )
-		{ _print_stack_backtrace ( ); }
-		throw std::runtime_error (
-			"FATAL ERROR on "
-			+ std::string ( _strip_root_path ( file ) ) +
-			":"
-			+ std::to_string ( line )
-		);
+	/***********************************************************
+	 * @brief [internal] processes the debug arguments expansion
+	 **********************************************************/
+	template < typename ... Args >
+	inline void _debug_printer (
+		DebugLevel level,
+		const char * file,
+		int line,
+		Args && ... args
+	) {
+		std::ostringstream stream;
+		( stream << ... << std::forward < Args > ( args ) );
+		_debug_printer_impl ( level, file, line, stream.str ( ).c_str ( ) );
 	}
-
-	if ( level == DebugLevel::ERROR )
-	{
-		if ( !SilenceDebugger )
-		{ _print_stack_backtrace ( ); }
-		throw std::runtime_error (
-			"ERROR on "
-			+ std::string ( _strip_root_path ( file ) ) +
-			":"
-			+ std::to_string ( line )
-		);
-	}
-}
 
 } }
+
 /**
  * @addtogroup Debug
  * @{
@@ -305,3 +155,5 @@ inline void _debug_printer (
 #define DEBUG(level, ...) ReKat::Debug::_debug_printer (level,__FILE__,__LINE__,__VA_ARGS__)
 #endif
 /** @} */
+
+#endif
