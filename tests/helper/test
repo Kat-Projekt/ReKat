@@ -41,18 +41,63 @@ void Call_Multiple ( fun function, int times )
 
 using namespace Catch::Matchers;
 
-class SectionLogger : public Catch::EventListenerBase {
+class Logger : public Catch::EventListenerBase {
 public:
 	using Catch::EventListenerBase::EventListenerBase;
 
-	void sectionStarting( Catch::SectionInfo const& sectionInfo) override 
+	std::string Encapsulate ( const std::string & string, const std::string_view color )
 	{
-		std::cout << "[";
-		ReKat::Debug::_print_colored ( sectionInfo.name.c_str ( ), FOREGROUND_GREEN );
-		std::cout << "]\n";
-		// std::cout << "-------------------------------------------------------------------------------\n";
+		std::string s = "[";
+		s += ReKat::Debug::_print_colored (
+			string.c_str ( ),
+			color );
+		s += "]";
+
+		return s;
+	}
+
+	std::string Convert ( Catch::ResultDisposition::Flags result )
+	{
+		switch ( result )
+		{
+			case Catch::ResultDisposition::Normal: return "Normal"; break;
+			case Catch::ResultDisposition::ContinueOnFailure: return "ContinueOnFailure"; break;
+			case Catch::ResultDisposition::FalseTest: return "FalseTest"; break;
+			case Catch::ResultDisposition::SuppressFail: return "SuppressFail"; break;
+			default: return "?";
+		}
+		
+	}
+
+	void sectionStarting ( const Catch::SectionInfo & sectionInfo ) override 
+	{
+		ReKat::Debug::_debug_printer_out_wrapper (
+			Encapsulate (
+				sectionInfo.name.c_str ( ),
+				ReKat::Debug::_Green ) +
+			"\n------------------------------------------------------------------------------\n"
+		);
+	}
+
+	void assertionStarting ( const Catch::AssertionInfo &Info ) override
+	{
+		ReKat::Debug::_debug_printer_out_wrapper (
+			Encapsulate ( Info.macroName.operator std::__1::string ( ), ReKat::Debug::_Cyan )
+			+ " " + Info.capturedExpression+ " -> " + Convert ( Info.resultDisposition ) + "\n"
+		);
+	}
+
+	void assertionEnded ( const Catch::AssertionStats &Info ) override
+	{
+		ReKat::Debug::_debug_printer_out_wrapper (
+			Encapsulate ( Info.assertionResult.getExpandedExpression ( ), ReKat::Debug::_Yellow )
+			+ " -> " + 
+			( Info.assertionResult.isOk ( ) ? 
+				Encapsulate ( "v", ReKat::Debug::_Green ) :
+				Encapsulate ( "x", ReKat::Debug::_Red )
+			) + "\n"
+		);
 	}
 };
 
-CATCH_REGISTER_LISTENER(SectionLogger)
-
+CATCH_REGISTER_LISTENER ( Logger )

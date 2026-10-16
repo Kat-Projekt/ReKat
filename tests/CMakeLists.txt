@@ -39,8 +39,8 @@ function(KAT_test TARGET)
 	message ( STATUS "Building test: '${TARGET}' from ${TARGET_PATH}" )
 	file(GLOB TARGET_SOURCE ${TARGET_PATH} )
 
-	add_executable( ${TARGET} ${TARGET_SOURCE} ${PROJECT_SOURCES}
-		${PROJECT_HEADERS} ${PROJECT_CONFIGS} ${LIBS_SOURCES} )
+	add_executable( ${TARGET} ${TARGET_SOURCE} 
+		${PROJECT_HEADERS} )
 
 	target_link_libraries ( ${TARGET} ReKat Catch2::Catch2WithMain )
 	
