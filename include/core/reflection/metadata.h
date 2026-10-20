@@ -4,6 +4,17 @@
 
 namespace Reflection
 {
+	enum class PreferedThread
+	{
+		General,
+		Graphik,
+		AI,
+		Reserved_1,
+		Reserved_2,
+		Reserved_3,
+		Reserved_4
+	};
+
 	typedef struct {
 		const char * name;
 		const char * description;
@@ -11,6 +22,7 @@ namespace Reflection
 		uint64_t minor;
 		uint64_t patch;
 		bool stable;
+		PreferedThread thread;
 	} Metadata;
 
 	bool Is_Version_Major ( const Metadata& lower, const Metadata& upper );
@@ -21,9 +33,10 @@ namespace Reflection
 
 	constexpr Metadata Construct ( const char * name, const char * desc,
 			      uint64_t major, uint64_t minor = 0,
-			      uint64_t patch = 0, bool stable = false )
+			      uint64_t patch = 0, bool stable = false,
+			      PreferedThread thread = PreferedThread::General )
 	{
-		return ( Reflection::Metadata {name,desc,major,minor,patch,stable} );
+		return ( Reflection::Metadata {name,desc,major,minor,patch,stable,thread} );
 	}
 }
 
