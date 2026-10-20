@@ -225,7 +225,12 @@ if ( REKAT_TEST )
 
 	# KAT_test ( catch2_test )
 	# KAT_test ( reflection_test )
-	KAT_test ( maestro_test ADD_COMPONENTS Empty_v1 Empty_v2 Empty_v3 Empty_Throw TestReflection )
-	KAT_test ( threading_maestro_test ADD_COMPONENTS Empty_v1 Empty_v2 Empty_v3 Empty_Throw TestReflection MaestroConcurrency )
-	KAT_test ( behaviour_gates_test )
+	KAT_test ( maestro
+		PATH core/components/maestro_test.cpp
+		ADD_COMPONENTS Empty_v1 Empty_v2 Empty_v3 Empty_Throw TestReflection )
+	KAT_test ( maestro_threads
+		PATH core/components/maestro_threads_test.cpp
+		ADD_COMPONENTS Empty_v1 Empty_v2 Empty_v3 Empty_Throw TestReflection MaestroConcurrency )
+	KAT_test ( behaviour
+		PATH core/components/behaviour_test.cpp )
 endif ( )

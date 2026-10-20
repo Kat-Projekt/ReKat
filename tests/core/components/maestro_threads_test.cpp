@@ -1,4 +1,4 @@
-#include "../helper/test"
+#include <test>
 
 #include <core/maestro.h>
 

@@ -27,7 +27,7 @@ function(KAT_test TARGET)
 
 	## Get Source path for test
 	if ( DEFINED KAT_PATH )
-		set ( TARGET_PATH "${KAT_PATH}/main.cpp" )
+		set ( TARGET_PATH "${CMAKE_CURRENT_SOURCE_DIR}/tests/${KAT_PATH}" )
 	else ( )
 		set ( TARGET_PATH "${CMAKE_CURRENT_SOURCE_DIR}/tests/${TARGET}/main.cpp" )
 	endif ( )
@@ -41,6 +41,8 @@ function(KAT_test TARGET)
 
 	add_executable( ${TARGET} ${TARGET_SOURCE} 
 		${PROJECT_HEADERS} )
+
+	target_include_directories ( ${TARGET} PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/tests/helper" )
 
 	target_link_libraries ( ${TARGET} ReKat Catch2::Catch2WithMain )
 	
