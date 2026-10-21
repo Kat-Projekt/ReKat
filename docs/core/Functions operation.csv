@@ -1,0 +1,16 @@
+﻿Namespace;Function;Descriptor;Value
+Maestro;Costruct;Description;Constructs a behaviour provvided it's version key
+;;Throws if;Behaviour is not Registered
+;;Throws if;Behaviour throws on construction
+;;Returns;a uniquePointer to the Behaviour
+;;;
+;Register;Descprition;Registeres a behaviour provvided a file path
+;;Throws if ;Loaded Dll has not the correct simbols
+;;Returns;0 if Behaviour is not loaded else 1
+;;;
+;Register Path;Description;Registers all behaviours in a directory recursviely
+;;Returns;Number of loaded Behaviours
+;;;
+;Get Metadata;Description;Gets the Metadata if specified Behaviour
+;;Throws if ;Requested Behaviour is not Registered
+;;Returns;Metadata of that component
