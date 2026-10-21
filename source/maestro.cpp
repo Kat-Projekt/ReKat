@@ -1,5 +1,7 @@
 #include <core/maestro.h>
 
+Maestro * Maestro::global_maestro = nullptr;
+
 std::size_t Maestro::_Register
 ( Maestro::componentLibraryFunctions comp )
 {
@@ -66,7 +68,7 @@ std::size_t Maestro::_Register
 	return 1;
 }
 
-std::size_t Maestro::Register_Directory
+std::size_t Maestro::Register_Directory_Impl
 ( const boost::dll::fs::path& path )
 {
 	if ( !boost::filesystem::is_directory ( path ) )
@@ -85,7 +87,7 @@ std::size_t Maestro::Register_Directory
 	return registered_components;
 }
 
-std::size_t Maestro::Register
+std::size_t Maestro::Register_Impl
 ( const boost::dll::fs::path& path )
 {
 	// Check if file is a library
@@ -149,7 +151,7 @@ std::size_t Maestro::Register
 }
 
 Maestro::uniqueBehaviour
-Maestro::Construct (
+Maestro::Construct_Impl (
 	const std::string& name,
 	bool stable,
 	uint64_t major,	
@@ -203,8 +205,44 @@ Maestro::Construct (
 	);
 }
 
+Reflection::Metadata
+Maestro::Get_Metadata_Impl (
+	const std::string& name,
+	bool stable,
+	uint64_t major,	
+	uint64_t minor,
+	uint64_t patch
+) {
+	auto _place_holder_meta = Reflection::Construct ( name.c_str ( ), "__", major, minor, patch, stable );
+	
+	// find version name
+	std::string true_name = name + "-";
+	
+	if ( major == 0 && minor == 0 && patch == 0 )
+	{
+		if ( stable )
+		{ true_name += "stable"; }
+		else
+		{ true_name += "latest"; }
+	} else {
+		true_name += Reflection::Version_Number ( _place_holder_meta );
+	}
+	
+
+	std::shared_lock < std::shared_mutex > register_lock ( registration_mutex );
+
+	DEBUG ( DebugLevel::INFO, "Requesting: ", true_name );
+	auto name_iter = _aliases.find ( true_name );
+	if ( name_iter == _aliases.end ( ) )
+	{
+		DEBUG ( DebugLevel::ERROR, "Cannot find selcted Behavoour Metadata" );
+	}
+
+	return _factories [ name_iter->second ].metadata;
+}
+
 std::vector < Reflection::Metadata >
-Maestro::Get_Registered_Components ( )
+Maestro::Get_Registered_Components_Impl ( )
 {
 	std::shared_lock < std::shared_mutex > register_lock ( registration_mutex );
 
@@ -215,7 +253,7 @@ Maestro::Get_Registered_Components ( )
 }
 
 const std::unordered_map < std::string, std::string > &
-Maestro::Get_Registered_Components_Aliases ( )
+Maestro::Get_Registered_Components_Aliases_Impl ( )
 {
 	std::shared_lock < std::shared_mutex > register_lock ( registration_mutex );
 	// print as verbose for nicer things

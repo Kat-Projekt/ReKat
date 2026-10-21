@@ -113,10 +113,12 @@ public:
 	Behaviour & operator = ( const Behaviour& ) = delete;
 
 	// publically callable update functions (Aktor->...) + _active / start gates
-	void _Start ( ); 
+	void _Start ( );
+	void _Frame_Start ( ) { _Internal_Caller ( &Behaviour::Frame_Start ); }
 	void _Early_Update ( ) { _Internal_Caller ( &Behaviour::Start ); }
 	void _Update ( ) {_Internal_Caller ( &Behaviour::Update ); }
 	void _Late_Update ( ) {_Internal_Caller ( &Behaviour::Late_Update ); }
+	void _Frame_End ( ) { _Internal_Caller ( &Behaviour::Frame_End ); }
 	void _Fixed_Update ( ) {_Internal_Caller ( &Behaviour::Fixed_Update ); }
 
 	// internal router for update class functions
@@ -132,11 +134,15 @@ private:
 	 * It is called exacly once per component
 	 *************************************************/
 	virtual void Start ( ) { }
-	/*******************************************
-	 * \brief This is called first on each frame
+	/******************************************
+	 * \brief Called at the begining of a frame
+	 *****************************************/
+	virtual void Frame_Start ( ) { }
+	/********************************************
+	 * \brief This is called first on frame stack
 	 *
 	 * See Update for more infos
-	 ******************************************/
+	 *******************************************/
 	virtual void Early_Update ( ) { }
 	/**********************************************
 	 * \brief Called every frame after Early Update
@@ -186,6 +192,10 @@ private:
 	 * See Update for more infos
 	 *********************************************/
 	virtual void Late_Update ( ) { }
+	/***********************************
+	 * \brief Last call before frame end
+	 **********************************/
+	virtual void Frame_End ( ) { }
 	/*******************************************************
 	 * \brief This is called when the Phisiks system updates
 	 *

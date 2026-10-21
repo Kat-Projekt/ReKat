@@ -12,6 +12,18 @@ bool Reflection::Is_Version_Major ( const Reflection::Metadata& lower, const Ref
 	{ return false; }
 }
 
+bool Reflection::Is_Metadata_Equal ( const Reflection::Metadata& first, const Reflection::Metadata& second )
+{
+	if ( first.major != second.major )
+	{ return false; }
+	else if ( first.minor != second.minor )
+	{ return false; }
+	else if ( first.patch != second.patch )
+	{ return false; }
+	else
+	{ return true; }
+}
+
 std::string Reflection::Version_Number ( const Reflection::Metadata& meta )
 {	
 	std::string r = ""; // version 

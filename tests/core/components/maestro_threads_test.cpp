@@ -7,6 +7,7 @@ SCENARIO ( "components can be loaded concurrently", "[maestro][threads]" )
 	GIVEN ( "an empty Maestro" )
 	{
 		Maestro m;
+		m.Set_Global ( );
 
 		WHEN ( "loading components" )
 		{
@@ -34,7 +35,7 @@ SCENARIO ( "components can be loaded concurrently", "[maestro][threads]" )
 						started_threads += 1;
 						// wait for start flagg
 						while ( !start ) { std::this_thread::yield ( ); }
-						int r = m.Register ( name );
+						int r = m.Register_Impl ( name );
 						registered_compo += r;
 					}
 				);
@@ -61,7 +62,8 @@ SCENARIO ( "a Maestro can allocate Behaviours on multiple threads", "[maestro][t
 	GIVEN ( "an Iniziazized Maestro" )
 	{
 		Maestro m;
-		auto r = m.Register_Directory ( "." );
+		m.Set_Global ( );
+		auto r = m.Register_Directory_Impl ( "." );
 		static const int times = 1000;
 
 		THEN ( "6 components registered" )

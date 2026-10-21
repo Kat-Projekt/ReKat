@@ -77,9 +77,10 @@ private:
 
 		std::shared_ptr < boost::dll::shared_library > lifeline;
 	} componentLibraryFunctions;
+public:
 	// unique Behviour pointer with custom deconstructor
 	typedef std::unique_ptr < Behaviour, std::function < void ( Behaviour * ) > > uniqueBehaviour;
-
+private:
 	// Factory container for containers
 	std::unordered_map
 	<
@@ -107,6 +108,13 @@ private:
 	 * \return 1 on registration, 0 on failed
 	 ******************************************/
 	[[nodiscard]] std::size_t _Register ( componentLibraryFunctions comp );
+
+	/***************************************************
+	 * \brief [internal] Used for namespace like calling
+	 *
+	 * Maestro::Function ( ... );
+	 **************************************************/
+	 static Maestro * global_maestro;
 public:
 	/*************************************************
 	 * \brief Registers every component in a directory
@@ -119,7 +127,7 @@ public:
 	 * \param path The path of the directory
 	 * \return The number of registered components
 	 ************************************************/
-	[[nodiscard]] std::size_t Register_Directory ( const boost::dll::fs::path& path );
+	[[nodiscard]] std::size_t Register_Directory_Impl ( const boost::dll::fs::path& path );
 	/*****************************************************
 	 * \brief Registers the component in the specied file
 	 * 
@@ -129,7 +137,7 @@ public:
 	 * \param path Where the component is located
 	 * \return 1 on registration, 0 on failed
 	 ****************************************************/
-	[[nodiscard]] std::size_t Register ( const boost::dll::fs::path& path );
+	[[nodiscard]] std::size_t Register_Impl ( const boost::dll::fs::path& path );
 
 
 	/****************************************************
@@ -147,14 +155,27 @@ public:
 	 * 	you need to use a specific one.
 	 * \return An owning pointer to the Behaviour
 	 ***************************************************/
-	[[nodiscard]] uniqueBehaviour Construct (
+	[[nodiscard]] uniqueBehaviour Construct_Impl (
 		const std::string& name,
 		bool stable = true,
 		uint64_t major = 0,	
 		uint64_t minor = 0,
 		uint64_t patch = 0
 	);
-
+	/*********************************************
+	 * \brief Used for getting the metadata of the 
+	 * 	specified component
+	 *
+	 * This is used for version handling on Aktor
+	 * and for autoupdate on Aktor,
+	 ********************************************/
+	[[nodiscard]] Reflection::Metadata Get_Metadata_Impl (
+		const std::string& name,
+		bool stable = true,
+		uint64_t major = 0,	
+		uint64_t minor = 0,
+		uint64_t patch = 0
+	);
 
 	/*******************************************************
 	 * \brief Gets the metadata of the registered components
@@ -165,14 +186,58 @@ public:
 	 * \return The metadata vector
 	 ******************************************************/
 	[[nodiscard]] std::vector < Reflection::Metadata >
-	Get_Registered_Components ( );
+	Get_Registered_Components_Impl ( );
 	/********************************
 	 * \brief Gets the aliasses table
 	 * 
 	 * \return The aliasses table ref
 	 *******************************/
 	[[nodiscard]] const std::unordered_map < std::string, std::string > &
-	Get_Registered_Components_Aliases ( );
+	Get_Registered_Components_Aliases_Impl ( );
+
+public:
+	/***************************************************************
+	 * \brief This is used for setting the current Maestro as global
+	 *
+	 * This is important for Orkestration and called autonomously by
+	 * the orkestrator.
+	 *
+	 * This exposes the target for generic Maestro::Functions for
+	 * Behaviour management
+	 **************************************************************/
+	void Set_Global ( )
+	{ global_maestro = this; }
+
+	[[nodiscard]] static std::size_t Register_Directory ( const boost::dll::fs::path& path )
+	{ return global_maestro->Register_Directory_Impl ( path ); }
+	
+	[[nodiscard]] static std::size_t Register ( const boost::dll::fs::path& path )
+	{ return global_maestro->Register_Impl ( path ); }
+	
+	[[nodiscard]] static uniqueBehaviour Construct (
+		const std::string& name,
+		bool stable = true,
+		uint64_t major = 0,	
+		uint64_t minor = 0,
+		uint64_t patch = 0
+	)
+	{ return global_maestro->Construct_Impl ( name, stable, major, minor, patch ); }
+	[[nodiscard]] static Reflection::Metadata Get_Metadata (
+		const std::string& name,
+		bool stable = true,
+		uint64_t major = 0,	
+		uint64_t minor = 0,
+		uint64_t patch = 0
+	)
+	{ return global_maestro->Get_Metadata_Impl ( name, stable, major, minor, patch ); }
+
+	[[nodiscard]] static std::vector < Reflection::Metadata >
+	Get_Registered_Components ( )
+	{ return global_maestro->Get_Registered_Components_Impl ( ); }
+	
+	[[nodiscard]] static const std::unordered_map < std::string, std::string > &
+	Get_Registered_Components_Aliases ( )
+	{ return global_maestro->Get_Registered_Components_Aliases_Impl ( ); }
 };
 
 #endif

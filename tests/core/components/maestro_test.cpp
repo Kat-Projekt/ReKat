@@ -7,6 +7,7 @@ SCENARIO ( "a maestro can register components", "[maestro]" )
 	GIVEN( "a maestro" )
 	{
 		Maestro m;
+		m.Set_Global ( );
 		int r = m.Register ( "Empty_v1.dylib" );
 
 		THEN ( "the maestro has 1 registered component" )
@@ -52,6 +53,7 @@ SCENARIO ( "a maestro can create a component", "[maestro]" )
 	GIVEN ( "a maestro and a component" )
 	{
 		Maestro m;
+		m.Set_Global ( );
 		int r = m.Register_Directory ( "." );
 
 		THEN ( "the maestro registered all components" )
@@ -92,6 +94,7 @@ SCENARIO ( "an imported TestReflection component can set and get every parameter
 	GIVEN ( "a TestReflecion component created by a maestro" )
 	{
 		Maestro m;
+		m.Set_Global ( );
 		int r = m.Register ( "TestReflection.dylib" );
 		auto b = m.Construct ( "TestReflection" );
 
@@ -141,6 +144,7 @@ SCENARIO ( "an imported TestReflection component can execute every function", "[
 	GIVEN ( "a TestReflecion component created by a maestro" )
 	{
 		Maestro m;
+		m.Set_Global ( );
 		int r = m.Register ( "TestReflection.dylib" );
 		auto b = m.Construct ( "TestReflection" );
 		// start is neccesasrry before perform
@@ -197,6 +201,7 @@ SCENARIO ( "an imported TestReflection component can express reflection", "[maes
 	GIVEN ( "a TestReflecion component created by a maestro" )
 	{
 		Maestro m;
+		m.Set_Global ( );
 		int r = m.Register ( "TestReflection.dylib" );
 		auto b = m.Construct ( "TestReflection" );
 

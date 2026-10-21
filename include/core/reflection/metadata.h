@@ -26,6 +26,7 @@ namespace Reflection
 	} Metadata;
 
 	bool Is_Version_Major ( const Metadata& lower, const Metadata& upper );
+	bool Is_Metadata_Equal ( const Metadata& first, const Metadata& second );
 
 	std::string Version_Number ( const Metadata& meta );
 
