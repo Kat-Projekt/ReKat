@@ -233,4 +233,7 @@ if ( REKAT_TEST )
 		ADD_COMPONENTS Empty_v1 Empty_v2 Empty_v3 Empty_Throw TestReflection MaestroConcurrency )
 	KAT_test ( behaviour
 		PATH core/components/behaviour_test.cpp )
+	KAT_test ( aktor-behaviour_integration
+		PATH core/integration/aktor_test.cpp
+		ADD_COMPONENTS Empty_v1 Empty_v2 Empty_v3 AddTest RemTest )
 endif ( )
