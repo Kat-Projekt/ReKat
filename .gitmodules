@@ -1,23 +1,23 @@
-[submodule "Code/Lib/glfw"]
+[submodule "libraries/glfw"]
 	path = libraries/glfw
 	url = https://github.com/glfw/glfw
-[submodule "Code/Lib/stb"]
+[submodule "libraries/stb"]
 	path = libraries/stb
 	url = https://github.com/nothings/stb
-[submodule "Code/Lib/freetype"]
+[submodule "libraries/freetype"]
 	path = libraries/freetype
 	url = https://github.com/freetype/freetype.git
-[submodule "Code/Lib/glm"]
+[submodule "libraries/glm"]
 	path = libraries/glm
 	url = https://github.com/g-truc/glm
-[submodule "Code/Lib/glad"]
+[submodule "libraries/glad"]
 	path = libraries/glad
 	url = https://github.com/Dav1dde/glad
 	branch = c
-[submodule "Code/Lib/openal-soft"]
+[submodule "libraries/openal-soft"]
 	path = libraries/openal-soft
 	url = https://github.com/kcat/openal-soft
-[submodule "Code/Lib/boost"]
+[submodule "libraries/boost"]
 	path = libraries/boost
 	url = https://github.com/boostorg/boost.git
 [submodule "tests/Catch2"]
